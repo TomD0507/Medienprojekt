@@ -1,21 +1,24 @@
-import { useState } from "react";
-import Message from "./Message";
-import ListGroup from "./components/ListGroup";
+import React, { useState } from "react";
+import Overlay from "./components/Overlay";
+
 function App() {
-  let items = ["item1", "item", "item 7", "hello"];
-  let [Header, updateFunction] = useState("Liste");
-  const handleSelectItem = (item: string) => {
-    console.log(item);
-    updateFunction(item.length == 0 ? "Liste" : "Selected: " + item);
-  };
+  const [isOpen, setOverlay] = useState(false);
+
+  const closeOverlay = () => setOverlay(false);
+
+
+
   return (
     <div>
-      <Message />
-      <ListGroup
-        items={items}
-        heading={Header}
-        onSelectItem={handleSelectItem}
-      />
+      {isOpen ? (
+        <Overlay
+          isOpen={isOpen}
+          onClose={closeOverlay}
+        >
+        </Overlay>
+      ) : null}
+
+      <button onClick={() => setOverlay(true)}>Open overlay</button>
     </div>
   );
 }
