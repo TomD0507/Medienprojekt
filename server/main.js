@@ -11,7 +11,25 @@ const connection = mysql.createConnection({
 const app = express()
 app.use(cors())
 
-//Checks if connected properly 
+// Demodaten
+const demo = {
+    user: [
+        {
+            "id": "007",
+            "name": "Omit"
+        }
+    ],
+    todos: [
+        {
+            "id": "001",
+            "userID": "007",
+            "title": "Medienprojekt aufsetzen",
+            "description": "Pls"
+        }
+    ]
+}
+
+// Checks if connected properly 
 connection.connect(function(err) {
     if (err) {
       console.error('error connecting: ' + err.stack);
