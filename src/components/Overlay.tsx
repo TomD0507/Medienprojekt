@@ -17,7 +17,9 @@ function Overlay({ isOpen, onClose }:OverlayProps) {
         <button className="overlay-close" onClick={onClose}>
           ×
         </button>
-        <AddTask></AddTask>
+        <AddTask
+          user={"isOpen"}
+          onClose={onClose}></AddTask>
       </div>
     </div>
   );

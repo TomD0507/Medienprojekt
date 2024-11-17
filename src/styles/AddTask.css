@@ -1,0 +1,11 @@
+.addTask {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    border:1px solid;
+    width: 50px; /* Direct setzen,damit ein kreis entsteht egal welcher inhalt. schaut aber bei zu großem inhalt drüber hinaus */
+    height: 50px; /*  */
+    border-radius:50%; /* round border*/
+    font-size: 24px;
+    cursor: pointer;
+  }
