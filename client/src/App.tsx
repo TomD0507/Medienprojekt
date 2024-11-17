@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import Overlay from "./components/Overlay";
 
 function App() {
@@ -6,7 +6,22 @@ function App() {
 
   const closeOverlay = () => setOverlay(false);
 
-
+  useEffect( () => {
+    fetch('http://localhost:5000/api', {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      console.log('Hello World!', data)
+    })
+    .catch( error => {
+      console.error(error)
+    })
+  }, [])
 
   return (
     <div>

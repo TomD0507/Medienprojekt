@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //ein Task element
 type Priority = "low" | "medium" | "high";//prioritätet
 type Subtask = {
@@ -24,3 +25,5 @@ function Task(props: TaskProps){
     }
     return <h1>still to do</h1>
 }
+
+export default Task
