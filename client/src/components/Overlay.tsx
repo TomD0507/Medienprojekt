@@ -5,9 +5,10 @@ import AddTask from "./AddTask";
 interface OverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  children?: React.ReactNode;
 }
 
-function Overlay({ isOpen, onClose }:OverlayProps) {
+function Overlay({ isOpen, onClose, children }: OverlayProps) {
   if (!isOpen) return null; // Nur wenn geöffnet rendern
 
   return (
@@ -17,12 +18,11 @@ function Overlay({ isOpen, onClose }:OverlayProps) {
         <button className="overlay-close" onClick={onClose}>
           ×
         </button>
-        <AddTask
-          user={"isOpen"}
-          onClose={onClose}></AddTask>
+
+        {children}
       </div>
     </div>
   );
-};
+}
 
 export default Overlay;
