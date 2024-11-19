@@ -53,43 +53,70 @@ function Task(props: TaskProps) {
     : "Still to do";
 
   return (
-    <div className="task-element side-by-side">
-      <div className="item">
-        <button className="checkbox" onClick={toggleTaskDone}>
-          {taskDone ? <span>&#x2713;</span> : " "}
-        </button>
-      </div>
-      <div className={taskDone ? "item done-task" : "item normal-task"}>
-        <h2>{props.title}</h2>
-        <p>{props.description}</p>
-        <h3>Subtasks</h3>
-        <ul>
-          {subtasks.map((subtask, index) => (
-            <li
-              key={subtask.name}
-              //onClick={() => toggleSubtask(index)}
-              className={"subtaskbox side-by-side"}
-            >
-              <button className="checkbox" onClick={() => toggleSubtask(index)}>
-                {subtask.done ? <span>&#x2713;</span> : ""}
-              </button>
-              <div className={subtask.done ? "done-task" : "normal-task"}>
-                {subtask.name}
-              </div>
-            </li>
-          ))}
-        </ul>
+    <>
+      <div className="task-element">
+        <div
+          className={taskDone ? "grayout" : "no_grayout"}
+          onClick={toggleTaskDone}
+        ></div>
         <div className="side-by-side">
-          <p>Deadline: {props.deadline.toDateString()}</p>
-          <p>Status: {taskStatus}</p>
+          <div className="item">
+            <button className="checkbox over_grayout" onClick={toggleTaskDone}>
+              {taskDone ? <span>&#x2713;</span> : " "}
+            </button>
+          </div>
+          <div className="item">
+            <div className={taskDone ? "item done-task" : "item normal-task"}>
+              <h2>{props.title}</h2>
+              <p>{props.description}</p>
+              <h3>Subtasks</h3>
+            </div>
+            <ul>
+              {subtasks.map((subtask, index) => (
+                <li
+                  key={subtask.name}
+                  //onClick={() => toggleSubtask(index)}
+                  className={"subtaskbox side-by-side"}
+                >
+                  <button
+                    className="checkbox"
+                    onClick={() => toggleSubtask(index)}
+                  >
+                    {subtask.done ? <span>&#x2713;</span> : " "}
+                  </button>
+                  <div className={subtask.done ? "done-task" : "normal-task"}>
+                    {subtask.name}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="side-by-side">
+              <p>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  className="bi bi-calendar"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                </svg>
+                {props.deadline.toDateString()}
+              </p>
+              <p>Status: {taskStatus}</p>
+            </div>
+          </div>
+          <div className="item"></div>
+          <div className="item"></div>
+          <div className="item">
+            <span className="priority-display">
+              {getPrioritySymbol(props.priority)}
+            </span>
+          </div>
         </div>
       </div>
-      <div className="item">
-        <span className="priority-display">
-          {getPrioritySymbol(props.priority)}
-        </span>
-      </div>
-    </div>
+    </>
   );
 }
 export default Task;
