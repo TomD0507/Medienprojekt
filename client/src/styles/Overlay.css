@@ -8,6 +8,7 @@
     background: rgba(0, 0, 0, 0.5); /* schwarz, 0,5 alpha */
     display: flex;
     justify-content: center;
+    z-index: 1001; /* über dem rest*/
     align-items: center;
   }
   
@@ -35,13 +36,21 @@
   /* Close button */
   .overlay-close {
     position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     top: 10px;
     right: 10px;
     border:1px solid;
-    width: 50px; /* Direct setzen,damit ein kreis entsteht egal welcher inhalt. schaut aber bei zu großem inhalt drüber hinaus */
-    height: 50px; /*  */
+    width: 2em;
+    height: 2em;
     border-radius:50%; /* round border*/
-    font-size: 24px;
     cursor: pointer;
+    font-size: 1.5em; /*circle size*/
+  }
+  .overlay-close span {
+    font-size: 4em; /* Symbolgröße */
+    line-height: 10; /* Verhindert unnötigen vertikalen Platz */
+    display: inline-block; /* Wichtig für transform */
   }
   

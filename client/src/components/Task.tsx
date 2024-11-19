@@ -3,11 +3,27 @@
 
 import React, { useState } from "react";
 import "../styles/Task.css";
-type Priority = "low" | "medium" | "high"; //prioritätet
+type Priority = "none" | "low" | "medium" | "high"; //prioritäten
+const getPrioritySymbol = (priority: Priority) => {
+  switch (priority) {
+    case "none":
+      return "⏺️"; // Kein Symbol
+    case "low":
+      return "🟢"; // Grünes Symbol für niedrige Priorität
+    case "medium":
+      return "🟠"; // Oranges Symbol für mittlere Priorität
+    case "high":
+      return "🔴"; // Rotes Symbol für hohe Priorität
+    default:
+      return ""; // Falls der Wert unerwartet ist
+  }
+};
+
 type Subtask = {
   name: string;
   done: boolean;
 };
+
 //argumente, die ein taskelement haben kann
 interface TaskProps {
   id: string;
@@ -29,6 +45,7 @@ function Task(props: TaskProps) {
     );
     setSubtasks(updatedSubtasks);
   };
+
   const taskStatus = taskDone
     ? "Done"
     : props.deadline <= new Date()
@@ -36,27 +53,42 @@ function Task(props: TaskProps) {
     : "Still to do";
 
   return (
-    <div className="task-element">
-      <button className="checkbox" onClick={toggleTaskDone}>
-        {taskDone ? "Mark as Not Done" : "Mark as Done"}
-      </button>
-      <h2>{props.title}</h2>
-      <p>{props.description}</p>
-      <p>Priority: {props.priority}</p>
-      <p>Deadline: {props.deadline.toDateString()}</p>
-      <p>Status: {taskStatus}</p>
-      <h3>Subtasks</h3>
-      <ul>
-        {subtasks.map((subtask, index) => (
-          <li
-            key={subtask.name}
-            onClick={() => toggleSubtask(index)}
-            className={subtask.done ? "done-task" : "normal-task"}
-          >
-            {subtask.name} - {subtask.done ? "Done" : "Not Done"}
-          </li>
-        ))}
-      </ul>
+    <div className="task-element side-by-side">
+      <div className="item">
+        <button className="checkbox" onClick={toggleTaskDone}>
+          {taskDone ? <span>&#x2713;</span> : " "}
+        </button>
+      </div>
+      <div className={taskDone ? "item done-task" : "item normal-task"}>
+        <h2>{props.title}</h2>
+        <p>{props.description}</p>
+        <h3>Subtasks</h3>
+        <ul>
+          {subtasks.map((subtask, index) => (
+            <li
+              key={subtask.name}
+              //onClick={() => toggleSubtask(index)}
+              className={"subtaskbox side-by-side"}
+            >
+              <button className="checkbox" onClick={() => toggleSubtask(index)}>
+                {subtask.done ? <span>&#x2713;</span> : ""}
+              </button>
+              <div className={subtask.done ? "done-task" : "normal-task"}>
+                {subtask.name}
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="side-by-side">
+          <p>Deadline: {props.deadline.toDateString()}</p>
+          <p>Status: {taskStatus}</p>
+        </div>
+      </div>
+      <div className="item">
+        <span className="priority-display">
+          {getPrioritySymbol(props.priority)}
+        </span>
+      </div>
     </div>
   );
 }

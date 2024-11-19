@@ -1,6 +1,5 @@
 // import React from "react";
 import "../styles/Overlay.css";
-import AddTask from "./AddTask";
 //
 interface OverlayProps {
   isOpen: boolean;
@@ -16,7 +15,7 @@ function Overlay({ isOpen, onClose, children }: OverlayProps) {
       <div className="overlay-backdrop" onClick={onClose}></div>
       <div className="overlay-content">
         <button className="overlay-close" onClick={onClose}>
-          ×
+          <span>&times;</span>
         </button>
 
         {children}

@@ -36,10 +36,18 @@ function App() {
       ) : null}
 
       <Task
-        id={""}
-        title={""}
-        description={""}
-        subtasks={[]}
+        id={"ID"}
+        title={"Test-ToDo"}
+        description={"Test Description"}
+        subtasks={[
+          { name: "Write documentation", done: false },
+          { name: "Fix bugs", done: true },
+          { name: "Prepare presentation", done: false },
+          {
+            name: "extreme long desc to test wheter it can handle or not, like i mean wheter it goes to next lines and where its buttton goes and stuff",
+            done: false,
+          },
+        ]}
         deadline={new Date()}
         priority={"low"}
         done={false}
