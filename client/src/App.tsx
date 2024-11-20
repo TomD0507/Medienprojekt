@@ -8,13 +8,13 @@ import { CollList } from "./components/CollList";
 
 function App() {
   const [isOpen, setOverlay] = useState(false);
+  const closeOverlay = () => setOverlay(false);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
-
-  const closeOverlay = () => setOverlay(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -26,7 +26,7 @@ function App() {
         setIsMenuOpen(false);
       }
 
-      if ( 
+      if (
         searchBarRef.current &&
         !searchBarRef.current.contains(event.target as Node) &&
         isSearchOpen
@@ -60,7 +60,6 @@ function App() {
 
   return (
     <div className="app">
-      
       {/* Header */}
       <Header
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
@@ -69,18 +68,22 @@ function App() {
 
       {/* Home Screen */}
       <main>
-        <header>
-          Aufgaben
-        </header>
-        <CollList title = "Offene ToDos">
-          {isOpen ? (
+        <header>Aufgaben</header>
+        <CollList title="Offene ToDos">
+          {/*{isOpen ? (
             <Overlay
               isOpen={isOpen}
               onClose={closeOverlay}
-              children={<AddTask user={"isOpen"} onClose={closeOverlay}></AddTask>}
+              children={
+                <AddTask user={"isOpen"} onClose={closeOverlay}></AddTask>
+              }
             ></Overlay>
-          ) : null}
-
+          ) : null}*/}
+          <AddTask
+            user={"isOpen"}
+            onClose={closeOverlay}
+            isOpen={isOpen}
+          ></AddTask>
           <Task
             id={"ID"}
             title={"Test-ToDo"}
@@ -101,19 +104,21 @@ function App() {
           <button onClick={() => setOverlay(true)}>Open overlay</button>
         </CollList>
         <CollList title="Erledigte Aufgaben">
-          <p>
-            Leer
-          </p>
+          <p>Leer</p>
         </CollList>
       </main>
 
       {/* Menu */}
-      {isMenuOpen && <div ref={menuRef} className="menu-overlay">Menü</div>}
+      {isMenuOpen && (
+        <div ref={menuRef} className="menu-overlay">
+          Menü
+        </div>
+      )}
 
       {/* Searchbar */}
       {isSearchOpen && (
         <div ref={searchBarRef} className="search-bar">
-          <input type="text" placeholder = "Nach Keywords suchen.." />
+          <input type="text" placeholder="Nach Keywords suchen.." />
         </div>
       )}
     </div>
