@@ -1,19 +1,27 @@
-.addTask {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    bottom: -10px;
-    right: -10px;
-    border:1px solid;
-    width: 2em;
-    height: 2em;
-    border-radius:50%; /* round border*/
-    font-size: 24px;
-    cursor: pointer;
-  }
-  .addTask span {
-    font-size: 2em; /* Symbolgröße */
-    display: inline-block; /* Wichtig für transform */
-    transform: scaleX(1.5); /* Horizontal strecken um 50% */
-  }
+.add-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em; /* Adds spacing between form sections */
+}
+
+/* Title and Description Container */
+.add-task-form label {
+  display: flex;
+  flex-direction: column; /* Stack fields vertically */
+  gap: 0em; /* Optional: spacing between Title and Description */
+}
+/* Item-Container  wenn kompletter bereich eingenommen werden soll*/
+.add_item {
+  display: flex;
+  width: 100%;
+  padding: 1em;
+}
+textarea {
+  width: 100%;
+}
+input {
+  flex-grow: 1;
+}
+select {
+  flex-grow: 1;
+}

@@ -14,13 +14,33 @@
   flex-wrap: nowrap; /* Elemente nicht umbrechen bei kleiner Breite */
 }
 /* Item-Container  wenn kompletter bereich eingenommen werden soll*/
-.item {
+.itemmiddle {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   padding: 10px;
   border-radius: 5px;
 }
+.item {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  padding-top: 10em;
+}
+.itemleft {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  padding-top: 10%;
+}
+.itemright {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  padding-top: 10%;
+}
 .subitem {
-  padding: 10px;
+  padding: 10em;
   border-radius: 5px;
 }
 /* Checkbox-Design */
@@ -60,11 +80,16 @@ ul {
   margin: 0;
   font-size: 0.8em;
 }
-
 li {
-  padding: 0.5em 1em;
-  margin-bottom: 5px;
-  border-radius: 5px;
+  padding: 0em 1em 1em 2em;
+}
+.descriptionbox {
+  /*top right bot left*/
+  padding: 0em 1em 0em 1em;
+}
+.subtaskbox {
+  align-self: center;
+  font-size: 1em;
 }
 .subtaskbox button {
   align-self: center;

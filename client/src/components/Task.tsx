@@ -60,15 +60,15 @@ function Task(props: TaskProps) {
           onClick={toggleTaskDone}
         ></div>
         <div className="side-by-side">
-          <div className="item">
+          <div className="itemleft">
             <button className="checkbox over_grayout" onClick={toggleTaskDone}>
               {taskDone ? <span>&#x2713;</span> : " "}
             </button>
           </div>
-          <div className="item">
+          <div className="itemmiddle">
             <div className={taskDone ? "item done-task" : "item normal-task"}>
               <h2>{props.title}</h2>
-              <p>{props.description}</p>
+              <p className="descriptionbox">{props.description}</p>
               <h3>Subtasks</h3>
             </div>
             <ul>
@@ -107,9 +107,7 @@ function Task(props: TaskProps) {
               <p>Status: {taskStatus}</p>
             </div>
           </div>
-          <div className="item"></div>
-          <div className="item"></div>
-          <div className="item">
+          <div className="itemright">
             <span className="priority-display">
               {getPrioritySymbol(props.priority)}
             </span>
