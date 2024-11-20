@@ -22,12 +22,181 @@ a:hover {
   color: #535bf2;
 }
 
+header {
+  text-align: center;
+  font-size: large;
+  padding-bottom: 10px;
+}
+
+main {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 20px;
+}
+
 body {
   margin: 0;
+  padding: 0;
+  background-color: #98bad5;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+}
+
+.app {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background-color: #304674;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.menu-button,
+.search-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.menu-button:hover,
+.search-button:hover {
+  opacity: 0.8;
+}
+
+/* Menü-Overlay */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
+
+/* Erledigte und offene ToDos*/
+.collapsible-list {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.collapsible-header {
+  width: 100%;
+  padding: 10px;
+  background-color: #98bad5;
+  color: white;
+  text-align: left;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.collapsible-header:hover {
+  background-color: #c6d3e3;
+}
+
+.collapsible-content {
+  padding: 10px;
+  background: #f4f4f4;
+  font-size: 14px;
+  transition: max-height 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* Suchleiste */
+.search-bar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  z-index: 10;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Smartphone Size */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .menu-button,
+  .search-button {
+    font-size: 20px;
+  }
+
+  main {
+    padding: 10px;
+  }
+}
+
+/* Desktop Size */
+@media (min-width: 1024px) {
+  .app {
+    padding: 40px;
+  }
+
+  .header {
+    padding: 20px 30px;
+    max-width: 800px;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  main {
+    max-width: 800px; 
+  }
 }
 
 h1 {
@@ -36,13 +205,14 @@ h1 {
 }
 
 button {
+  width: 100%;
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #304674;
   cursor: pointer;
   transition: border-color 0.25s;
 }
