@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import AddTask from "./components/AddTask";
-import Task, { Priority, TaskProps } from "./components/Task";
+import { Priority, TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import { CollList } from "./components/CollList";
@@ -38,18 +38,21 @@ const initialTasks = [
 
 function App() {
   //TODO: replace with proper task save and handling)
+  //todo: save user id for backendcalls
   const [tasks, setTasks] = useState(initialTasks);
 
   const handleUpdateTask = (updatedTask: TaskProps) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
+    //backendcall: update(user,updatedTask)
   };
   const handleSaveTask = (newTask: TaskProps) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
+    //backendcall: insert(user,newTask)
   };
-  const [id, updateID] = useState(tasks.length + 1);
+  const [id, updateID] = useState(tasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
 
   const [isOpen, setOverlay] = useState(false);

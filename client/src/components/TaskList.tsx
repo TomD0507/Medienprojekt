@@ -1,7 +1,5 @@
-import React from "react";
 import Task, { TaskProps } from "./Task"; // Import der Task-Komponente
 
-type Priority = "none" | "low" | "medium" | "high";
 // Definiere die Struktur eines Tasks
 
 // TaskList-Komponente

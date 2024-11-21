@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 //ein Task element
 
-import React, { useState } from "react";
+import { useState } from "react";
 import "../styles/Task.css";
 import EditTask from "./EditTask"; //prioritäten
 const getPrioritySymbol = (priority: Priority) => {
@@ -156,7 +156,6 @@ function Task({ props, onUpdateTask }: TaskElProps) {
             <div className={props.done ? "item done-task" : "item normal-task"}>
               <h2>{props.title}</h2>
               <p className="descriptionbox">{props.description}</p>
-              <h3>Subtasks</h3>
             </div>
             <ul>
               {props.subtasks.map((subtask, index) => (

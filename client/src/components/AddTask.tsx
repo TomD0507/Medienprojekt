@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Overlay from "./Overlay";
-import { TaskProps, Priority, Subtask } from "./Task";
+import { TaskProps, Priority } from "./Task";
 
 interface AddTaskProps {
   id: number;
@@ -16,7 +16,6 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
   const [subtasks, setSubtasks] = useState([""]);
   const [priority, setPriority] = useState<Priority>("none");
   const [deadlineDate, setDeadlineDate] = useState("");
-  const [deadlineTime, setDeadlineTime] = useState("");
   const [reminder, setReminder] = useState("Nie");
   const [repeat, setRepeat] = useState("Nie");
 
@@ -54,7 +53,6 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
     setSubtasks([""]);
     setPriority("none");
     setDeadlineDate("");
-    setDeadlineTime("");
     setReminder("Nie");
     setRepeat("Nie");
     onClose(); // Close the form
