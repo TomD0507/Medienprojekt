@@ -38,12 +38,19 @@ function EditTask({
     initialSubtasks.map((subtask) => subtask.name)
   );
   const [priority, setPriority] = useState<Priority>(initialPriority);
-  const [deadlineDate, setDeadlineDate] = useState(
-    initialDeadline.split(" ")[0]
-  );
-  const [deadlineTime, setDeadlineTime] = useState(
-    initialDeadline.split(" ")[1] || "00:00"
-  );
+  const [deadlineDate, setDeadlineDate] = useState(() => {
+    if (initialDeadline && initialDeadline.split(" ").length === 2) {
+      return initialDeadline.split(" ")[0]; // Date part
+    }
+    return ""; // Fallback if invalid or empty
+  });
+
+  const [deadlineTime, setDeadlineTime] = useState(() => {
+    if (initialDeadline && initialDeadline.split(" ").length === 2) {
+      return initialDeadline.split(" ")[1]; // Time part
+    }
+    return ""; // Fallback if invalid or empty
+  });
   const [reminder, setReminder] = useState(initialReminder);
   const [repeat, setRepeat] = useState(initialRepeat);
 
