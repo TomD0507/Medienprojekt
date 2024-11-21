@@ -10,7 +10,7 @@ interface TaskListProps {
 
 function TaskList({ tasks, onUpdateTask }: TaskListProps) {
   return (
-    <div className="task-list">
+    <div>
       {tasks.map((task) => (
         <Task
           key={task.id} // Uniqe Key für jedes Task-Element

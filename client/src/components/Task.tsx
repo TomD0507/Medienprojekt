@@ -39,6 +39,7 @@ export interface TaskProps {
   done: boolean;
   reminder: string;
   repeat: string;
+  deleted: boolean;
 }
 interface TaskElProps {
   props: TaskProps;
@@ -113,6 +114,7 @@ function Task({ props, onUpdateTask }: TaskElProps) {
       done: props.done,
       reminder: props.reminder,
       repeat: props.repeat,
+      deleted: props.deleted,
     });
   };
   const toggleTaskdone = () => {
@@ -126,9 +128,24 @@ function Task({ props, onUpdateTask }: TaskElProps) {
       done: !props.done,
       reminder: props.reminder,
       repeat: props.repeat,
+      deleted: props.deleted,
     });
   };
-
+  const handleDeleteTask = () => {
+    onUpdateTask({
+      id: props.id,
+      title: props.title,
+      description: props.description,
+      subtasks: props.subtasks,
+      priority: props.priority,
+      deadline: props.deadline,
+      done: props.done,
+      reminder: props.reminder,
+      repeat: props.repeat,
+      deleted: true,
+    });
+    setIsEditing(false); // Close the dialog
+  };
   const handleEditSave = (updatedTask: TaskProps) => {
     onUpdateTask(updatedTask);
     setIsEditing(false); // Close the dialog
@@ -214,6 +231,8 @@ function Task({ props, onUpdateTask }: TaskElProps) {
           repeat={props.repeat}
           done={props.done}
           onSave={handleEditSave}
+          deleted={props.deleted}
+          onDelete={handleDeleteTask}
           onClose={() => setIsEditing(false)}
           isOpen={isEditing}
         />

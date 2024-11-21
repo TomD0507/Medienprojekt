@@ -19,6 +19,7 @@ const initialTasks = [
     done: false,
     reminder: "Nie",
     repeat: "Nie",
+    deleted: false,
   },
   {
     id: 2,
@@ -33,6 +34,7 @@ const initialTasks = [
     done: false,
     reminder: "Täglich",
     repeat: "Nie",
+    deleted: false,
   },
 ];
 
@@ -125,8 +127,11 @@ function App() {
             onSave={handleSaveTask}
           ></AddTask>
 
-          <TaskList tasks={tasks} onUpdateTask={handleUpdateTask} />
-          <button onClick={() => setOverlay(true)}>Open overlay</button>
+          <TaskList
+            tasks={tasks.filter((task) => !task.deleted)}
+            onUpdateTask={handleUpdateTask}
+          />
+          <button onClick={() => setOverlay(true)}>Aufgabe hinzufügen</button>
         </CollList>
         <CollList title="Erledigte Aufgaben">
           <p>Leer</p>

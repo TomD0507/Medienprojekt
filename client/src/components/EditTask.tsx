@@ -13,7 +13,9 @@ interface EditTaskProps {
   done: boolean;
   reminder: string;
   repeat: string;
+  deleted: boolean;
   onClose: () => void;
+  onDelete: () => void;
   onSave: (updatedTask: TaskProps) => void;
   isOpen: boolean;
 }
@@ -28,7 +30,9 @@ function EditTask({
   done,
   reminder: initialReminder,
   repeat: initialRepeat,
+  deleted,
   onClose,
+  onDelete,
   onSave,
   isOpen,
 }: EditTaskProps) {
@@ -82,6 +86,7 @@ function EditTask({
       done,
       reminder,
       repeat,
+      deleted,
     });
 
     onClose();
@@ -204,8 +209,8 @@ function EditTask({
           </label>
           <div style={{ display: "flex", gap: "10px" }}>
             <button type="submit">Speichern</button>
-            <button type="button" onClick={onClose}>
-              Abbrechen
+            <button type="button" className="deleteButton" onClick={onDelete}>
+              Löschen
             </button>
           </div>
         </form>

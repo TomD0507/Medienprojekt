@@ -2,10 +2,9 @@
 .task-element {
   position: relative;
   background: #fff; /* Weißer Hintergrund */
-  margin: auto;
+  margin: 0em 0em 1em 0em;
   border-radius: 1em;
   padding: 1%;
-  max-width: 90%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 .side-by-side {
