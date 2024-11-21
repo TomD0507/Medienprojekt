@@ -27,36 +27,63 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
     setSubtasks(newSubtasks);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+  
     if (!title.trim()) {
       alert("Bitte einen Titel hinzufügen.");
       return;
     }
+  
     const newTask = {
-      id: id,
+      id: id, // Ensure you're passing the correct ID here
       title,
       description,
       subtasks: subtasks
         .filter((task) => task.trim() !== "")
         .map((task) => ({ name: task.trim(), done: false })),
       priority,
-      deadline: new Date(`${deadlineDate}`),
+      deadline: new Date(deadlineDate),
       reminder,
       repeat,
       done: false,
     };
-    onSave(newTask); // save funktion
-    //form leer machen
-    setTitle("");
-    setDescription("");
-    setSubtasks([""]);
-    setPriority("none");
-    setDeadlineDate("");
-    setReminder("Nie");
-    setRepeat("Nie");
-    onClose(); // Close the form
+  
+    try {
+      console.log("Submitting task:", newTask);
+  
+      // Make API request to save the task
+      const response = await fetch("http://localhost:5000/api/todos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTask),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to save task: ${response.statusText}`);
+      }
+  
+      const savedTask = await response.json();
+      console.log("Task saved successfully:", savedTask);
+      
+      // Optionally update local state with the new task if needed
+      onSave(savedTask);
+      setTitle("");
+      setDescription("");
+      setSubtasks([""]);
+      setPriority("none");
+      setDeadlineDate("");
+      setReminder("Nie");
+      setRepeat("Nie");
+      onClose(); // Close the form
+    } catch (error) {
+      console.error("Error saving task:", error);
+      alert("An error occurred while saving the task. Please try again.");
+    }
   };
+  
 
   return (
     <Overlay
