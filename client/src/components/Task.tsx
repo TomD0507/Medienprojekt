@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import "../styles/Task.css";
-type Priority = "none" | "low" | "medium" | "high"; //prioritäten
+import EditTask from "./EditTask"; //prioritäten
 const getPrioritySymbol = (priority: Priority) => {
   switch (priority) {
     case "none":
@@ -19,6 +19,7 @@ const getPrioritySymbol = (priority: Priority) => {
   }
 };
 
+type Priority = "none" | "low" | "medium" | "high";
 type Subtask = {
   name: string;
   done: boolean;
@@ -33,20 +34,53 @@ interface TaskProps {
   deadline: Date;
   priority: Priority;
   done: boolean;
-  //reminder: keine ahnung wie ich den darstelle/welcher type
+  reminder: string;
+  repeat: string;
 }
-function Task(props: TaskProps) {
-  const [taskDone, setTaskDone] = useState(props.done);
-  const toggleTaskDone = () => setTaskDone(!taskDone);
-  const [subtasks, setSubtasks] = useState(props.subtasks);
+interface TaskElProps {
+  props: TaskProps;
+  onUpdateTask: (updatedTask: TaskProps) => void;
+}
+function Task({ props, onUpdateTask }: TaskElProps) {
+  const [isEditing, setIsEditing] = useState(false);
   const toggleSubtask = (index: number) => {
-    const updatedSubtasks = subtasks.map((subtask, i) =>
+    const updatedSubtasks = props.subtasks.map((subtask, i) =>
       i === index ? { ...subtask, done: !subtask.done } : subtask
     );
     setSubtasks(updatedSubtasks);
   };
+  const setSubtasks = (updatedSubtasks: Subtask[]) => {
+    onUpdateTask({
+      id: props.id,
+      title: props.title,
+      description: props.description,
+      subtasks: updatedSubtasks,
+      priority: props.priority,
+      deadline: props.deadline,
+      done: props.done,
+      reminder: props.reminder,
+      repeat: props.repeat,
+    });
+  };
+  const toggleTaskdone = () => {
+    onUpdateTask({
+      id: props.id,
+      title: props.title,
+      description: props.description,
+      subtasks: props.subtasks,
+      priority: props.priority,
+      deadline: props.deadline,
+      done: !props.done,
+      reminder: props.reminder,
+      repeat: props.repeat,
+    });
+  };
 
-  const taskStatus = taskDone
+  const handleEditSave = (updatedTask: TaskProps) => {
+    onUpdateTask(updatedTask);
+    setIsEditing(false); // Close the dialog
+  };
+  const taskStatus = props.done
     ? "Done"
     : props.deadline <= new Date()
     ? "Overtime"
@@ -56,23 +90,23 @@ function Task(props: TaskProps) {
     <>
       <div className="task-element">
         <div
-          className={taskDone ? "grayout" : "no_grayout"}
-          onClick={toggleTaskDone}
+          className={props.done ? "grayout" : "no_grayout"}
+          onClick={() => setIsEditing(true)}
         ></div>
         <div className="side-by-side">
           <div className="itemleft">
-            <button className="checkbox over_grayout" onClick={toggleTaskDone}>
-              {taskDone ? <span>&#x2713;</span> : " "}
+            <button className="checkbox over_grayout" onClick={toggleTaskdone}>
+              {props.done ? <span>&#x2713;</span> : " "}
             </button>
           </div>
           <div className="itemmiddle">
-            <div className={taskDone ? "item done-task" : "item normal-task"}>
+            <div className={props.done ? "item done-task" : "item normal-task"}>
               <h2>{props.title}</h2>
               <p className="descriptionbox">{props.description}</p>
               <h3>Subtasks</h3>
             </div>
             <ul>
-              {subtasks.map((subtask, index) => (
+              {props.subtasks.map((subtask, index) => (
                 <li
                   key={subtask.name}
                   //onClick={() => toggleSubtask(index)}
@@ -114,6 +148,24 @@ function Task(props: TaskProps) {
           </div>
         </div>
       </div>
+      {isEditing && (
+        <EditTask
+          id={props.id}
+          title={props.title}
+          description={props.description}
+          subtasks={props.subtasks}
+          priority={props.priority}
+          deadline={`${
+            props.deadline.toISOString().split("T")[0]
+          } ${props.deadline.toISOString().split("T")[1].slice(0, 5)}`}
+          reminder={props.reminder}
+          repeat={props.repeat}
+          done={props.done}
+          onSave={handleEditSave}
+          onClose={() => setIsEditing(false)}
+          isOpen={isEditing}
+        />
+      )}
     </>
   );
 }

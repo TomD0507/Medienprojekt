@@ -5,8 +5,63 @@ import Task from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import { CollList } from "./components/CollList";
+import TaskList from "./components/TaskList";
+const initialTasks = [
+  {
+    id: "1",
+    title: "Task 1",
+    description: "Description for Task 1",
+    subtasks: [
+      { name: "Subtask 1.1", done: false },
+      { name: "Subtask 1.2", done: true },
+    ],
+    deadline: new Date(2024, 11, 25),
+    priority: "Hoch" as Priority,
+    done: false,
+    reminder: "Nie",
+    repeat: "Nie",
+  },
+  {
+    id: "2",
+    title: "Task 2",
+    description: "Description for Task 2",
+    subtasks: [
+      { name: "Subtask 2.1", done: false },
+      { name: "Subtask 2.2", done: false },
+    ],
+    deadline: new Date(2024, 11, 30),
+    priority: "Keine" as Priority,
+    done: false,
+    reminder: "Täglich",
+    repeat: "Nie",
+  },
+];
 
+type Priority = "none" | "low" | "medium" | "high";
+type Subtask = {
+  name: string;
+  done: boolean;
+};
+interface TaskProps {
+  id: string;
+  title: string;
+  description: string;
+  subtasks: Subtask[];
+  deadline: Date;
+  priority: Priority;
+  done: boolean;
+  reminder: string;
+  repeat: string;
+}
 function App() {
+  const [tasks, setTasks] = useState(initialTasks);
+
+  const handleUpdateTask = (updatedTask: TaskProps) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+  };
+
   const [isOpen, setOverlay] = useState(false);
   const closeOverlay = () => setOverlay(false);
 
@@ -70,37 +125,13 @@ function App() {
       <main>
         <header>Aufgaben</header>
         <CollList title="Offene ToDos">
-          {/*{isOpen ? (
-            <Overlay
-              isOpen={isOpen}
-              onClose={closeOverlay}
-              children={
-                <AddTask user={"isOpen"} onClose={closeOverlay}></AddTask>
-              }
-            ></Overlay>
-          ) : null}*/}
           <AddTask
             user={"isOpen"}
             onClose={closeOverlay}
             isOpen={isOpen}
           ></AddTask>
-          <Task
-            id={"ID"}
-            title={"Test-ToDo"}
-            description={"Test Description"}
-            subtasks={[
-              { name: "Write documentation", done: false },
-              { name: "Fix bugs", done: true },
-              { name: "Prepare presentation", done: false },
-              {
-                name: "extreme long desc to test wheter it can handle or not, like i mean wheter it goes to next lines and where its buttton goes and stuff",
-                done: false,
-              },
-            ]}
-            deadline={new Date()}
-            priority={"low"}
-            done={false}
-          ></Task>
+
+          <TaskList tasks={tasks} onUpdateTask={handleUpdateTask} />
           <button onClick={() => setOverlay(true)}>Open overlay</button>
         </CollList>
         <CollList title="Erledigte Aufgaben">

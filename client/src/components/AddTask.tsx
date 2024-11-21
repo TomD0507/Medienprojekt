@@ -5,6 +5,7 @@ import Overlay from "./Overlay";
 
 //menu zum hinzufügen von Tasks
 
+type Priority = "none" | "low" | "medium" | "high";
 interface AddTaskProps {
   user: string;
   onClose: () => void;
@@ -15,7 +16,8 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [subtasks, setSubtasks] = useState([""]);
-  const [priority, setPriority] = useState("Keine");
+  const [priority, setPriority] = useState<Priority>("none");
+
   const [deadlineDate, setDeadlineDate] = useState("");
   const [deadlineTime, setDeadlineTime] = useState("");
   const [reminder, setReminder] = useState("Nie");
@@ -118,12 +120,12 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
             <div className="add_item">
               <select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value)}
+                onChange={(e) => setPriority(e.target.value as Priority)}
               >
-                <option value="Keine">Keine</option>
-                <option value="Niedrig">Niedrig</option>
-                <option value="Mittel">Mittel</option>
-                <option value="Hoch">Hoch</option>
+                <option value="none">Keine</option>
+                <option value="low">Niedrig</option>
+                <option value="medium">Mittel</option>
+                <option value="high">Hoch</option>
               </select>
             </div>
           </label>
