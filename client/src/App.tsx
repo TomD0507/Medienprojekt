@@ -47,12 +47,12 @@ function App() {
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
-    //backendcall: update(user,updatedTask)
+    //backendcall: update(user,updatedTask) maybe zeit eintrag in datenbank für erstellen und löschen
   };
   const handleSaveTask = (newTask: TaskProps) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
-    //backendcall: insert(user,newTask)
+    //backendcall: insert(user,newTask)maybe zeit eintrag in datenbank für erstellen und löschen
   };
   const [id, updateID] = useState(tasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
