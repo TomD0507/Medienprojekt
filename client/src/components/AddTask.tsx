@@ -42,12 +42,21 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
         .filter((task) => task.trim() !== "")
         .map((task) => ({ name: task.trim(), done: false })),
       priority,
-      deadline: new Date(`${deadlineDate} ${deadlineTime}`),
+      deadline: new Date(`${deadlineDate}`),
       reminder,
       repeat,
       done: false,
     };
-    onSave(newTask); // Save the task using the onSave prop
+    onSave(newTask); // save funktion
+    //form leer machen
+    setTitle("");
+    setDescription("");
+    setSubtasks([""]);
+    setPriority("none");
+    setDeadlineDate("");
+    setDeadlineTime("");
+    setReminder("Nie");
+    setRepeat("Nie");
     onClose(); // Close the form
   };
 
@@ -133,14 +142,9 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
             Deadline:
             <div className="add_item">
               <input
-                type="date"
+                type="datetime-local"
                 value={deadlineDate}
                 onChange={(e) => setDeadlineDate(e.target.value)}
-              />
-              <input
-                type="time"
-                value={deadlineTime}
-                onChange={(e) => setDeadlineTime(e.target.value)}
               />
             </div>
           </label>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/AddTask.css"; // Wiederverwendung des AddTask-Stils
 import Overlay from "./Overlay";
-import { Priority, TaskProps } from "./Task";
+import { isValidDate, Priority, TaskProps } from "./Task";
 
 interface EditTaskProps {
   id: number;
@@ -9,7 +9,7 @@ interface EditTaskProps {
   description: string;
   subtasks: { name: string; done: boolean }[];
   priority: Priority;
-  deadline: string; // Kombiniert Datum und Uhrzeit im Format "YYYY-MM-DD HH:mm"
+  deadline: Date;
   done: boolean;
   reminder: string;
   repeat: string;
@@ -39,18 +39,19 @@ function EditTask({
   );
   const [priority, setPriority] = useState<Priority>(initialPriority);
   const [deadlineDate, setDeadlineDate] = useState(() => {
-    if (initialDeadline && initialDeadline.split(" ").length === 2) {
-      return initialDeadline.split(" ")[0]; // Date part
+    if (isValidDate(initialDeadline)) {
+      const year = initialDeadline.getFullYear();
+      const month = (initialDeadline.getMonth() + 1)
+        .toString()
+        .padStart(2, "0"); // Ensure 2 digits
+      const day = initialDeadline.getDate().toString().padStart(2, "0");
+      const hours = initialDeadline.getHours().toString().padStart(2, "0");
+      const minutes = initialDeadline.getMinutes().toString().padStart(2, "0");
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
     return ""; // Fallback if invalid or empty
   });
 
-  const [deadlineTime, setDeadlineTime] = useState(() => {
-    if (initialDeadline && initialDeadline.split(" ").length === 2) {
-      return initialDeadline.split(" ")[1]; // Time part
-    }
-    return ""; // Fallback if invalid or empty
-  });
   const [reminder, setReminder] = useState(initialReminder);
   const [repeat, setRepeat] = useState(initialRepeat);
 
@@ -68,7 +69,7 @@ function EditTask({
       return;
     }
 
-    const deadline = new Date(`${deadlineDate}T${deadlineTime}`);
+    const deadline = new Date(`${deadlineDate}`);
     onSave({
       id,
       title,
@@ -167,14 +168,9 @@ function EditTask({
             Deadline:
             <div className="add_item">
               <input
-                type="date"
+                type="datetime-local"
                 value={deadlineDate}
                 onChange={(e) => setDeadlineDate(e.target.value)}
-              />
-              <input
-                type="time"
-                value={deadlineTime}
-                onChange={(e) => setDeadlineTime(e.target.value)}
               />
             </div>
           </label>

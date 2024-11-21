@@ -18,7 +18,10 @@ const getPrioritySymbol = (priority: Priority) => {
       return ""; // Falls der Wert unerwartet ist
   }
 };
-
+export function isValidDate(date: Date) {
+  // Check if the input is a valid Date object
+  return date instanceof Date && !isNaN(date.getTime());
+}
 export type Priority = "none" | "low" | "medium" | "high";
 export type Subtask = {
   name: string;
@@ -49,10 +52,7 @@ function Task({ props, onUpdateTask }: TaskElProps) {
     );
     setSubtasks(updatedSubtasks);
   };
-  function isValidDate(date: Date) {
-    // Check if the input is a valid Date object
-    return date instanceof Date && !isNaN(date.getTime());
-  }
+
   function formatDate(date: Date) {
     if (!isValidDate(date)) {
       return "Ungültiges Datum"; // "Invalid date" in German
@@ -210,20 +210,7 @@ function Task({ props, onUpdateTask }: TaskElProps) {
           description={props.description}
           subtasks={props.subtasks}
           priority={props.priority}
-          deadline={`${props.deadline.getFullYear()}-${(
-            props.deadline.getMonth() + 1
-          )
-            .toString()
-            .padStart(2, "0")}-${props.deadline
-            .getDate()
-            .toString()
-            .padStart(2, "0")} ${props.deadline
-            .getHours()
-            .toString()
-            .padStart(2, "0")}:${props.deadline
-            .getMinutes()
-            .toString()
-            .padStart(2, "0")}`}
+          deadline={props.deadline}
           reminder={props.reminder}
           repeat={props.repeat}
           done={props.done}
