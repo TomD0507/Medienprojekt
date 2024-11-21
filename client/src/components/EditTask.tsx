@@ -1,25 +1,10 @@
 import React, { useState } from "react";
 import "../styles/AddTask.css"; // Wiederverwendung des AddTask-Stils
 import Overlay from "./Overlay";
+import { Priority, TaskProps } from "./Task";
 
-type Priority = "none" | "low" | "medium" | "high";
-interface TaskProps {
-  id: string;
-  title: string;
-  description: string;
-  subtasks: Subtask[];
-  deadline: Date;
-  priority: Priority;
-  done: boolean;
-  reminder: string;
-  repeat: string;
-}
-type Subtask = {
-  name: string;
-  done: boolean;
-};
 interface EditTaskProps {
-  id: string;
+  id: number;
   title: string;
   description: string;
   subtasks: { name: string; done: boolean }[];

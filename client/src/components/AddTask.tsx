@@ -1,23 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
-import "../styles/AddTask.css";
+import { useState } from "react";
 import Overlay from "./Overlay";
+import { TaskProps, Priority, Subtask } from "./Task";
 
-//menu zum hinzufügen von Tasks
-
-type Priority = "none" | "low" | "medium" | "high";
 interface AddTaskProps {
-  user: string;
+  id: number;
   onClose: () => void;
   isOpen: boolean;
-} // user identification fürs erstellen vom task? oder backcall zum erstelln von taks nach schließen?
-function AddTask({ onClose, isOpen }: AddTaskProps) {
+  onSave: (task: TaskProps) => void; // Add onSave prop
+}
+
+const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
   // State declarations
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [subtasks, setSubtasks] = useState([""]);
   const [priority, setPriority] = useState<Priority>("none");
-
   const [deadlineDate, setDeadlineDate] = useState("");
   const [deadlineTime, setDeadlineTime] = useState("");
   const [reminder, setReminder] = useState("Nie");
@@ -37,16 +34,20 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
       alert("Bitte einen Titel hinzufügen.");
       return;
     }
-    const formData = {
+    const newTask = {
+      id: id,
       title,
       description,
-      subtasks: subtasks.filter((task) => task.trim() !== ""),
+      subtasks: subtasks
+        .filter((task) => task.trim() !== "")
+        .map((task) => ({ name: task.trim(), done: false })),
       priority,
-      deadline: `${deadlineDate} ${deadlineTime}`,
+      deadline: new Date(`${deadlineDate} ${deadlineTime}`),
       reminder,
       repeat,
+      done: false,
     };
-    console.log("Form Data:", formData);
+    onSave(newTask); // Save the task using the onSave prop
     onClose(); // Close the form
   };
 
@@ -57,6 +58,7 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
       children={
         <form onSubmit={handleSubmit} className="add-task-form">
           <h3>Aufgabe erstellen</h3>
+          {/* Add Task Form Fields */}
           <label>
             Titel:
             <div className="add_item">
@@ -85,15 +87,13 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
                 <input
                   type="text"
                   value={subtask}
-                  onChange={(e) => {
-                    updateSubtask(index, e.target.value);
-                  }}
+                  onChange={(e) => updateSubtask(index, e.target.value)}
                   placeholder={`Unteraufgabe ${index + 1}`}
                 />
-                {subtasks.length > 1 && ( // Ensure there's more than one subtask to show delete button
+                {subtasks.length > 1 && (
                   <button
                     onClick={(e) => {
-                      e.preventDefault(); // Prevent form submission
+                      e.preventDefault();
                       setSubtasks(subtasks.filter((_, i) => i !== index));
                     }}
                     style={{
@@ -109,7 +109,7 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
                 )}
               </div>
             ))}
-            {subtasks.length < 4 && ( //max 4 subtasks
+            {subtasks.length < 4 && (
               <button type="button" onClick={addSubtask}>
                 + Unteraufgabe hinzufügen
               </button>
@@ -148,7 +148,7 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
             Erinnerung hinzufügen:
             <div className="add_item">
               <select
-                value={repeat}
+                value={reminder}
                 onChange={(e) => setReminder(e.target.value)}
               >
                 <option value="Nie">Nie</option>
@@ -182,18 +182,6 @@ function AddTask({ onClose, isOpen }: AddTaskProps) {
       }
     ></Overlay>
   );
-}
+};
 
 export default AddTask;
-/*
-
-  return (
-    <>
-      <h2>Overlay Content</h2>
-      <p>custom overlay</p>
-      <button className="addTask" onClick={onClose}>
-        <span>&#x2713;</span>
-      </button>
-    </>
-  );
-}*/

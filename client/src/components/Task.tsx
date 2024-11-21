@@ -7,7 +7,7 @@ import EditTask from "./EditTask"; //prioritäten
 const getPrioritySymbol = (priority: Priority) => {
   switch (priority) {
     case "none":
-      return "⏺️"; // Kein Symbol
+      return " "; // Kein Symbol
     case "low":
       return "🟢"; // Grünes Symbol für niedrige Priorität
     case "medium":
@@ -19,15 +19,15 @@ const getPrioritySymbol = (priority: Priority) => {
   }
 };
 
-type Priority = "none" | "low" | "medium" | "high";
-type Subtask = {
+export type Priority = "none" | "low" | "medium" | "high";
+export type Subtask = {
   name: string;
   done: boolean;
 };
 
 //argumente, die ein taskelement haben kann
-interface TaskProps {
-  id: string;
+export interface TaskProps {
+  id: number;
   title: string;
   description: string;
   subtasks: Subtask[];
@@ -49,6 +49,59 @@ function Task({ props, onUpdateTask }: TaskElProps) {
     );
     setSubtasks(updatedSubtasks);
   };
+  function isValidDate(date: Date) {
+    // Check if the input is a valid Date object
+    return date instanceof Date && !isNaN(date.getTime());
+  }
+  function formatDate(date: Date) {
+    if (!isValidDate(date)) {
+      return "Ungültiges Datum"; // "Invalid date" in German
+    }
+
+    const now = new Date();
+    const timeDifference = now.getTime() - date.getTime(); // Difference in milliseconds
+
+    // Check if the date is today
+    const isToday = date.toDateString() === now.toDateString();
+    const isYesterday =
+      timeDifference >= 24 * 60 * 60 * 1000 &&
+      timeDifference < 2 * 24 * 60 * 60 * 1000;
+
+    // If it's today, show the time (e.g., "12:30")
+    if (isToday) {
+      return `Heute um ${date.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    }
+
+    // If it's yesterday, show "Yesterday"
+    if (isYesterday) {
+      return `Gestern um ${date.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    }
+
+    // If it's within the last 7 days, show relative date (e.g., "20. Nov.")
+    if (timeDifference < 7 * 24 * 60 * 60 * 1000) {
+      return date.toLocaleDateString("de-DE", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+    }
+
+    // For older dates, show a more detailed format (e.g., "20. November 2024, 12:30")
+    return date.toLocaleString("de-DE", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
   const setSubtasks = (updatedSubtasks: Subtask[]) => {
     onUpdateTask({
       id: props.id,
@@ -124,22 +177,24 @@ function Task({ props, onUpdateTask }: TaskElProps) {
                 </li>
               ))}
             </ul>
-            <div className="side-by-side">
-              <p>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  className="bi bi-calendar"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
-                </svg>
-                {props.deadline.toDateString()}
-              </p>
-              <p>Status: {taskStatus}</p>
-            </div>
+            {isValidDate(props.deadline) && (
+              <div className="side-by-side">
+                <p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="bi bi-calendar"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                  </svg>
+                  {formatDate(props.deadline)}
+                </p>
+                <p>Status: {taskStatus}</p>
+              </div>
+            )}
           </div>
           <div className="itemright">
             <span className="priority-display">
@@ -155,9 +210,20 @@ function Task({ props, onUpdateTask }: TaskElProps) {
           description={props.description}
           subtasks={props.subtasks}
           priority={props.priority}
-          deadline={`${
-            props.deadline.toISOString().split("T")[0]
-          } ${props.deadline.toISOString().split("T")[1].slice(0, 5)}`}
+          deadline={`${props.deadline.getFullYear()}-${(
+            props.deadline.getMonth() + 1
+          )
+            .toString()
+            .padStart(2, "0")}-${props.deadline
+            .getDate()
+            .toString()
+            .padStart(2, "0")} ${props.deadline
+            .getHours()
+            .toString()
+            .padStart(2, "0")}:${props.deadline
+            .getMinutes()
+            .toString()
+            .padStart(2, "0")}`}
           reminder={props.reminder}
           repeat={props.repeat}
           done={props.done}
@@ -170,31 +236,3 @@ function Task({ props, onUpdateTask }: TaskElProps) {
   );
 }
 export default Task;
-/*
-const TaskList = ({ subtasks }) => {
-  const [taskState, setTaskState] = useState(subtasks);
-
-  const toggleTask = (index) => {
-    const updatedTasks = taskState.map((task, i) =>
-      i === index ? { ...task, done: !task.done } : task
-    );
-    setTaskState(updatedTasks);
-  };
-
-  return (
-    <ul>
-      {taskState.map((item, index) => (
-        <li
-          key={item.name}
-          onClick={() => toggleTask(index)}
-          className={item.done ? "done-task" : "normal-task"}
-        >
-          {item.name} - {item.done ? "Done" : "Not Done"}
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-export default TaskList;
-*/

@@ -1,19 +1,8 @@
 import React from "react";
-import Task from "./Task"; // Import der Task-Komponente
+import Task, { TaskProps } from "./Task"; // Import der Task-Komponente
 
 type Priority = "none" | "low" | "medium" | "high";
 // Definiere die Struktur eines Tasks
-type TaskProps = {
-  id: string;
-  title: string;
-  description: string;
-  subtasks: { name: string; done: boolean }[];
-  deadline: Date;
-  priority: Priority;
-  done: boolean;
-  reminder: string;
-  repeat: string;
-};
 
 // TaskList-Komponente
 interface TaskListProps {

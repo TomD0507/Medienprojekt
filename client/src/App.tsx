@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import Overlay from "./components/Overlay";
 import AddTask from "./components/AddTask";
-import Task from "./components/Task";
+import Task, { Priority, TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 const initialTasks = [
   {
-    id: "1",
+    id: 1,
     title: "Task 1",
     description: "Description for Task 1",
     subtasks: [
@@ -22,7 +21,7 @@ const initialTasks = [
     repeat: "Nie",
   },
   {
-    id: "2",
+    id: 2,
     title: "Task 2",
     description: "Description for Task 2",
     subtasks: [
@@ -37,23 +36,8 @@ const initialTasks = [
   },
 ];
 
-type Priority = "none" | "low" | "medium" | "high";
-type Subtask = {
-  name: string;
-  done: boolean;
-};
-interface TaskProps {
-  id: string;
-  title: string;
-  description: string;
-  subtasks: Subtask[];
-  deadline: Date;
-  priority: Priority;
-  done: boolean;
-  reminder: string;
-  repeat: string;
-}
 function App() {
+  //TODO: replace with proper task save and handling)
   const [tasks, setTasks] = useState(initialTasks);
 
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -61,6 +45,12 @@ function App() {
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
   };
+  const handleSaveTask = (newTask: TaskProps) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    incrementID();
+  };
+  const [id, updateID] = useState(tasks.length + 1);
+  const incrementID = () => updateID((prevID) => (prevID += 1));
 
   const [isOpen, setOverlay] = useState(false);
   const closeOverlay = () => setOverlay(false);
@@ -126,9 +116,10 @@ function App() {
         <header>Aufgaben</header>
         <CollList title="Offene ToDos">
           <AddTask
-            user={"isOpen"}
+            id={id}
             onClose={closeOverlay}
             isOpen={isOpen}
+            onSave={handleSaveTask}
           ></AddTask>
 
           <TaskList tasks={tasks} onUpdateTask={handleUpdateTask} />
