@@ -16,6 +16,44 @@
   width: 100%;
   padding: 1em;
 }
+.taskMenuButton {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1.3em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #304674;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.taskMenuAbortButton {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1.3em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #595959;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.deleteSubTaskButton {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+.deleteSubTaskButton:hover {
+  opacity: 0.8;
+}
+.taskMenuButton:hover {
+  opacity: 0.8;
+}
 textarea {
   width: 100%;
 }
@@ -25,6 +63,6 @@ input {
 select {
   flex-grow: 1;
 }
-.deleteButton{
- background-color: red;
+.deleteButton {
+  background-color: red;
 }

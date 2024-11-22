@@ -29,45 +29,59 @@
   top: 10%;
   right: 10%;
   padding: 20px;
-  max-height: 80%;
+  height: 80%;
   width: 80%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   overflow: auto; /* Ermöglicht Scrollen */
 }
 
 /* Close button */
 .overlay-close {
-  position: fixed;
+  content: "";
   display: flex;
   justify-content: center;
-  align-items: center;
-  top: 10%;
-  right: 10%;
-  border: 10px solid;
-  width: 2em;
-  height: 2em;
-  border-radius: 50%; /* round border*/
+  align-items: center; /* Ensures centering */
+  position: absolute; /* Position relative to .overlay-content */
+  width: 5em; /* Size of the button */
+  height: 5em; /* Match height to width for a perfect circle */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for depth */
+  border-radius: 50%; /* Circular container */
   cursor: pointer;
-  font-size: 1.5em; /*circle size*/
+  background-color: #304674; /* Button color */
+  top: 10px; /* Position the close button within the container */
+  right: 10px; /* Position the close button within the container */
 }
-.overlay-close span {
-  font-size: 4em; /* Symbolgröße */
-  line-height: 0; /* Verhindert unnötigen vertikalen Platz */
+
+.overlay-close:hover {
+  opacity: 0.8;
+}
+.x::before,
+.x::after {
+  content: ""; /* Empty content */
+  position: absolute; /* Positioned relative to the button */
+  width: 0.8em;
+  height: 4em;
+  border-radius: 8px;
+  background-color: white;
+  top: 50%; /* Center it vertically */
+  left: 50%; /* Center it horizontally */
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(45deg); /* First diagonal */
+}
+.x::after {
+  transform: translate(-50%, -50%) rotate(-45deg); /* Opposite diagonal */
 }
 
 /*scrollbar design*/
 /* Scrollbar-Styling für Webkit-Browser (Chrome, Edge, Safari) */
-.overlay-content {
-  overflow: auto; /* Ermöglicht Scrollen */
-}
 
 .overlay-content::-webkit-scrollbar {
-  width: 8px; /* Breite der Scroll-Leiste */
+  width: 16px; /* Breite der Scroll-Leiste */
 }
 
 .overlay-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.5); /* Dunkler Daumen */
-  border-radius: 4px; /* Runde Ecken */
+  background: rgba(0, 0, 0, 0.1); /* Dunkler Daumen */
+  border-radius: 8px; /* Runde Ecken */
 }
 
 .overlay-content::-webkit-scrollbar-thumb:hover {
@@ -76,11 +90,5 @@
 
 .overlay-content::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1); /* Leicht grauer Hintergrund */
-  border-radius: 4px; /* Runde Ecken */
-}
-
-/* Für Firefox (über CSS-Variablen) */
-.overlay-content {
-  scrollbar-color: rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1); /* Daumen | Hintergrund */
-  scrollbar-width: thin; /* Dünnere Leiste */
+  border-radius: 8px; /* Runde Ecken */
 }
