@@ -47,6 +47,7 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
       reminder,
       repeat,
       done: false,
+      deleted: false,
     };
   
     try {
@@ -126,16 +127,10 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
                 />
                 {subtasks.length > 1 && (
                   <button
+                    className="deleteSubTaskButton"
                     onClick={(e) => {
                       e.preventDefault();
                       setSubtasks(subtasks.filter((_, i) => i !== index));
-                    }}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "red",
-                      cursor: "pointer",
-                      fontWeight: "bold",
                     }}
                   >
                     ✖
@@ -144,7 +139,11 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
               </div>
             ))}
             {subtasks.length < 4 && (
-              <button type="button" onClick={addSubtask}>
+              <button
+                className="taskMenuButton"
+                type="button"
+                onClick={addSubtask}
+              >
                 + Unteraufgabe hinzufügen
               </button>
             )}
@@ -202,9 +201,15 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
             </div>
           </label>
           <div style={{ display: "flex", gap: "10px" }}>
-            <button type="submit">Aufgabe erstellen</button>
-            <button type="button" onClick={onClose}>
+            <button
+              className="taskMenuAbortButton"
+              type="button"
+              onClick={onClose}
+            >
               Abbrechen
+            </button>
+            <button className="taskMenuButton" type="submit">
+              Aufgabe erstellen
             </button>
           </div>
         </form>

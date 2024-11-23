@@ -15,7 +15,7 @@ function Overlay({ isOpen, onClose, children }: OverlayProps) {
       <div className="overlay-backdrop" onClick={onClose}></div>
       <div className="overlay-content">
         <button className="overlay-close" onClick={onClose}>
-          <span>&times;</span>
+          <span className="x"></span>
         </button>
 
         {children}

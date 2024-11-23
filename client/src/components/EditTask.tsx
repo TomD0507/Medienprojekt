@@ -132,16 +132,10 @@ function EditTask({
                 />
                 {subtasks.length > 1 && (
                   <button
+                    className="deleteSubTaskButton"
                     onClick={(e) => {
                       e.preventDefault();
                       setSubtasks(subtasks.filter((_, i) => i !== index));
-                    }}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "red",
-                      cursor: "pointer",
-                      fontWeight: "bold",
                     }}
                   >
                     ✖
@@ -150,7 +144,11 @@ function EditTask({
               </div>
             ))}
             {subtasks.length < 4 && (
-              <button type="button" onClick={addSubtask}>
+              <button
+                className="taskMenuButton"
+                type="button"
+                onClick={addSubtask}
+              >
                 + Unteraufgabe hinzufügen
               </button>
             )}
@@ -208,9 +206,15 @@ function EditTask({
             </div>
           </label>
           <div style={{ display: "flex", gap: "10px" }}>
-            <button type="submit">Speichern</button>
-            <button type="button" className="deleteButton" onClick={onDelete}>
+            <button
+              className="taskMenuButton deleteButton"
+              type="button"
+              onClick={onDelete}
+            >
               Löschen
+            </button>
+            <button className="taskMenuButton" type="submit">
+              Speichern
             </button>
           </div>
         </form>

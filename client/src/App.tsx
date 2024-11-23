@@ -131,11 +131,13 @@ function App() {
             tasks={tasks.filter((task) => !task.deleted)}
             onUpdateTask={handleUpdateTask}
           />
-          <button onClick={() => setOverlay(true)}>Aufgabe hinzufügen</button>
         </CollList>
         <CollList title="Erledigte Aufgaben">
           <p>Leer</p>
         </CollList>
+        <button className="menu-button" onClick={() => setOverlay(true)}>
+          Aufgabe hinzufügen
+        </button>
       </main>
 
       {/* Menu */}
