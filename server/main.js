@@ -2,13 +2,6 @@ const mysql = require('mysql2')
 const express = require('express')
 const cors = require('cors')
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'medienprojekt',
-    port: "3307"
-})
-
 const corsOptions = {
     origin: 'http://localhost:5173', // Replace with your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
