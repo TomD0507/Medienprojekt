@@ -5,6 +5,8 @@ import { Header } from "./components/Header";
 import "./index.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
+import axios from 'axios';
+
 const initialTasks = [
   {
     id: 1,
@@ -53,6 +55,9 @@ function App() {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     //backendcall: insert(user,newTask)maybe zeit eintrag in datenbank für erstellen und löschen
+    const jsonString = JSON.stringify(tasks);
+    console.log(jsonString);
+    axios.post("http://localhost:5000/new-task", {jsonString})
   };
   const [id, updateID] = useState(tasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));

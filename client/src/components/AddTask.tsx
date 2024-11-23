@@ -47,6 +47,7 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
       done: false,
       deleted: false,
     };
+    console.log(newTask.description);
     onSave(newTask); // save funktion
     //form leer machen
     setTitle("");
