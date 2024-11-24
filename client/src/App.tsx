@@ -54,10 +54,16 @@ function App() {
   const handleSaveTask = (newTask: TaskProps) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
-    //backendcall: insert(user,newTask)maybe zeit eintrag in datenbank für erstellen und löschen
-    const jsonString = JSON.stringify(tasks);
-    console.log(jsonString);
-    axios.post("http://localhost:5000/new-task", {jsonString})
+    // backendcall: insert(user,newTask)maybe zeit eintrag in datenbank für erstellen und löschen
+    console.log(newTask);
+    axios.post("http://localhost:5000/new-task", {newTask})
+      .then(r => {
+        console.log(r)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+
   };
   const [id, updateID] = useState(tasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
