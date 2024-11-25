@@ -44,6 +44,9 @@ function App() {
   //TODO: replace with proper task save and handling)
   //todo: save user id for backendcalls
   const [tasks, setTasks] = useState(initialTasks);
+  // This is for the backendcall
+  const [todos, setTodos] = useState(null);
+  const [subtasks, setSubtasks] = useState(null);
 
   const handleUpdateTask = (updatedTask: TaskProps) => {
     setTasks((prevTasks) =>
@@ -51,11 +54,12 @@ function App() {
     );
     //backendcall: update(user,updatedTask) maybe zeit eintrag in datenbank für erstellen und löschen
   };
+
+  // Backendcall to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
     setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     // backendcall: insert(user,newTask)maybe zeit eintrag in datenbank für erstellen und löschen
-    console.log(newTask);
     axios.post("http://localhost:5000/new-task", {newTask})
       .then(r => {
         console.log(r)
@@ -63,8 +67,24 @@ function App() {
       .catch(err => {
         console.log(err)
       })
-
   };
+
+  // Backend call after initialization for getting all the todos
+  useEffect(() => {
+    axios.get('http://localhost:5000/read-tasks')
+    .then(res => {
+      setTodos(res.data);
+    })
+  }, [])
+
+  // Backend call after initialization for getting all the subtasks
+  useEffect(() => {
+    axios.get('http://localhost:5000/read-subtasks')
+    .then(res => {
+      setSubtasks(res.data);
+    })
+  }, [])
+
   const [id, updateID] = useState(tasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
 
@@ -140,6 +160,7 @@ function App() {
 
           <TaskList
             tasks={tasks.filter((task) => !task.deleted)}
+            subtasks={subtasks}
             onUpdateTask={handleUpdateTask}
           />
         </CollList>

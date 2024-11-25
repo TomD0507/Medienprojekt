@@ -46,8 +46,21 @@ function initTodoDB() {
     })
 
     // SQL query to create a dummy table for testing purposes
-    const sql_createTaskTable = 
-        'CREATE TABLE IF NOT EXISTS todos_init (userId int NOT NULL DEFAULT 1, todoId int NOT NULL primary key AUTO_INCREMENT, title VARCHAR(255) NOT NULL, description MEDIUMTEXT, deadline DATETIME, priority ENUM("none", "low", "medium", "high") NOT NULL, isDone BOOL DEFAULT 0, todoReminder varchar(255) DEFAULT "Nie", todoRepeat varchar(255) DEFAULT "Nie", todoDeleted BOOL DEFAULT 0)';
+    const sql_createTaskTable = `
+    CREATE TABLE IF NOT EXISTS todos_init (
+        userId INT NOT NULL DEFAULT 1,
+        todoId INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) NOT NULL,
+        description MEDIUMTEXT,
+        deadline DATETIME,
+        priority ENUM('none', 'low', 'medium', 'high') NOT NULL DEFAULT 'none',
+        isDone BOOL DEFAULT 0,
+        todoReminder ENUM('Nie', 'Täglich', 'Wöchentlich', 'Monatlich') DEFAULT 'Nie',
+        todoRepeat ENUM('Nie', 'Täglich', 'Wöchentlich', 'Monatlich') DEFAULT 'Nie',
+        todoDeleted BOOL DEFAULT 0
+    )
+    `;
+
     connection.query(sql_createTaskTable, (err, result) => {
         if (err) throw err;
         console.log('Table successfully created');
@@ -55,7 +68,7 @@ function initTodoDB() {
     
     // SQL query to create a dummy table for testing purposes
     const sql_createSubtaskTable = 
-        'CREATE TABLE IF NOT EXISTS subtasks_init (mainTaskId int NOT NULL, title VARCHAR(255) NOT NULL, isDone BOOL DEFAULT 0)';
+        'CREATE TABLE IF NOT EXISTS subtasks_init (mainTaskId int NOT NULL, name VARCHAR(255) NOT NULL, isDone BOOL DEFAULT 0)';
     connection.query(sql_createSubtaskTable, (err, result) => {
         if (err) throw err;
         console.log('Subtask Table successfully created');
@@ -74,10 +87,15 @@ function initTodoDB() {
 
     // SQL query to insert a value into a field
     const sql_insertValue = "INSERT INTO todos_init (userId, title, description, deadline) VALUES ?";
+    const sql_insertSubtask ="INSERT INTO subtasks_init (mainTaskId, name) VALUES (1, 'Das ist ein subtask')";
     const value = [[1, 'TestTodo', 'Das ist ein TestTodo', '2008-11-11 13:23:44']];
     connection.query(sql_insertValue, [value], (err, result) => {
         if (err) throw err;
         console.log('Value succesfully inserted');
+    })
+    connection.query(sql_insertSubtask, (err, result) => {
+        if (err) throw err;
+        console.log('Subtask succesfully inserted');
     })
 
     // // Reads all the values from a table
@@ -132,16 +150,13 @@ app.get("/api", (req, res) => {
           res.json(result);
         });
     });
-    // res.json({"users": ["userOne", "userTwo", "userThree"]})
 })
 
 
 function extractTodo(task) {
     let date;
-    console.log(task.deadline);
     if (task.deadline != null) {
         date = format(task.deadline, 'yyyy-MM-dd HH:mm:ss');
-        console.log(date);
     } else {
         date = task.date
     };
@@ -151,12 +166,10 @@ function extractTodo(task) {
 
 function extractSubtasks(mainTaskId, task) {
     const subtasks = task.subtasks;
-    console.log(subtasks);
     let subtasksArray = [];
     for (let subtask of subtasks) {
         subtasksArray.push([mainTaskId, subtask.name]);
     };
-    console.log(subtasksArray);
     return subtasksArray
 }
 // Creates a new entry for new task
@@ -171,15 +184,48 @@ app.post("/new-task", (req, res) => {
         }
         else {
             console.log('New Todo with id:', result.insertId, 'saved.');
+            // This is for adding the subtasks with its respective maintaskId to another table
             const subtasks = extractSubtasks(result.insertId, req.body.newTask);
             if (subtasks) {
-                const sql_subtask = 'INSERT INTO subtasks_init (mainTaskId, title) VALUES ?';
+                const sql_subtask = 'INSERT INTO subtasks_init (mainTaskId, name) VALUES ?';
                 connection.query(sql_subtask, [subtasks], function (err, result) {
                     if(err) throw err;
                     console.log("Subtasks successfully inserted.");
                 })
             } else {
                 console.log("No subtasks were added.");
+            }
+        }
+    })
+})
+
+// Gets all the todos in the database
+app.get('/read-tasks', (req, res) => {
+    const sql = 'SELECT * FROM todos_init';
+    connection.query(sql, function(err, result) {
+        if (err) {
+            console.log('Failed to read tasks from Database');
+        }
+        else {
+            console.log('Read tasks from database successfully');
+            res.send(result);
+        }
+    })
+})
+
+// Gets all the subtasks in the database
+app.get('/read-subtasks', (req, res) => {
+    const sql = 'SELECT * FROM subtasks_init';
+    connection.query(sql, function(err, result) {
+        if (err) {
+            console.log('Failed to read subtasks from Database');
+        }
+        else {
+            if (!result) {
+                console.log('No subtasks found!')
+            } else {
+                console.log('Read subtasks from database successfully');
+                res.send(result);
             }
         }
     })
