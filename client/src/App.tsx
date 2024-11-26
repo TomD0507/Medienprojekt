@@ -163,7 +163,7 @@ const getTasksFromArray = (
       subtasks: getSubtasksFromArray(subtaskArray, task.todoId),
       description: task.description,
       title: task.title,
-      deadline: task.deadline,
+      deadline: task.deadline ? new Date(task.deadline) : new Date(""),
       priority: task.priority as Priority,
       done: task.isDone,
       reminder: task.todoReminder,

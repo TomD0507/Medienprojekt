@@ -21,16 +21,17 @@ const connection = mysql.createConnection({
 
 function initTodoDB() {
   // SQL query to create the database only if it does not exist
-  const sql_createDb = "CREATE DATABASE IF NOT EXISTS medienprojektdb";
+  /*const sql_createDb = "CREATE DATABASE IF NOT EXISTS medienprojektdb";
   connection.query(sql_createDb, (err, result) => {
     if (err) {
       console.error("Error creating database:", err.message);
       return;
     }
     console.log("Database created or already exists");
-  });
+  });*/
 
   // SQL query to drop previous init table
+  /*
   const sql_dropTaskTable = "DROP TABLE IF EXISTS todos_init";
   connection.query(sql_dropTaskTable, (err, result) => {
     if (err) throw err;
@@ -43,7 +44,7 @@ function initTodoDB() {
     if (err) throw err;
     console.log("Previous subtasks table deleted.");
   });
-
+  */
   // SQL query to create a dummy table for testing purposes
   const sql_createTaskTable = `
     CREATE TABLE IF NOT EXISTS todos_init (
@@ -93,6 +94,7 @@ function initTodoDB() {
   });
 
   // SQL query to insert a value into a field
+  /*
   const sql_insertValue =
     "INSERT INTO todos_init (userId, todoId, title, description, deadline, dateCreated) VALUES ?";
   const sql_insertSubtask =
@@ -108,6 +110,7 @@ function initTodoDB() {
     if (err) throw err;
     console.log("Subtask succesfully inserted");
   });
+  */
 
   // // Reads all the values from a table
   // connection.connect(function(err) {
@@ -150,7 +153,7 @@ connection.connect(function (err) {
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
-
+/*
 app.get("/api", (req, res) => {
   // Reads all the values from a table
   connection.connect(function (err) {
@@ -164,7 +167,7 @@ app.get("/api", (req, res) => {
     );
   });
 });
-
+*/
 
 // Function to create a NEW Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
@@ -287,6 +290,12 @@ app.post("/update-task", (req, res) => {
         console.log("Task with id:", task[8], "successfully updated.");
       }
     });
+    //when there are no subtask we need to delete the previous ones
+    const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
+    connection.query(sql_delete, [task[7], task[8]], function(err, result) {
+      if (err) throw err;
+      else console.log("Updating subtasks...");
+    });
   } else {
     const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
     connection.query(sql_delete, [task[7], task[8]], function(err, result) {
@@ -318,6 +327,7 @@ app.get("/read-tasks", (req, res) => {
   connection.query(sql, [userId], function (err, result) {
     if (err) {
       console.log("Failed to read tasks from Database");
+      console.log(err);
     } else {
       console.log("Read tasks from database successfully");
       res.send(result);
@@ -342,24 +352,6 @@ app.get("/read-subtasks", (req, res) => {
   });
 });
 
-app.listen(5000, () => {
-  console.log("Server started on port 5000");
+app.listen(5000, '0.0.0.0', () => {
+  console.log('Backend läuft auf Port 5000');
 });
-
-// Demodaten
-const demo = {
-  user: [
-    {
-      id: "007",
-      name: "Omit",
-    },
-  ],
-  todos: [
-    {
-      id: "001",
-      userID: "007",
-      title: "Medienprojekt aufsetzen",
-      description: "Pls",
-    },
-  ],
-};
