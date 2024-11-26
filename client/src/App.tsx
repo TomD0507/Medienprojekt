@@ -202,7 +202,7 @@ function App() {
     initialTasks.filter((task) => !task.deleted && task.done)
   );
   // This is for the backendcall
-  const [todos, setTodos] = useState<TaskProps[]>([]);
+  //const [todos, setTodos] = useState<TaskProps[]>([]);
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -256,31 +256,46 @@ function App() {
   // Initialization call to the backend
   useEffect(() => {
     const fetchData = async () => {
-      // This is how you get the tasks for a specific userId from the db
-      const [tasksResponse, subtasksResponse] = await Promise.all([
-        axios.get(`${API_URL}/read-tasks`, {
-          params: { id: userId },
-        }),
-        axios.get(`${API_URL}/read-subtasks`, {
-          params: { id: userId },
-        }),
-      ]);
-      const tasksArray: TaskInput[] = tasksResponse.data;
-      const subtasksArray: SubtaskInput[] = subtasksResponse.data;
+      try {
+        const [tasksResponse, subtasksResponse] = await Promise.all([
+          axios.get(`${API_URL}/read-tasks`, { params: { id: userId } }),
+          axios.get(`${API_URL}/read-subtasks`, { params: { id: userId } }),
+        ]);
 
-      const initalizedTasks = getTasksFromArray(tasksArray, subtasksArray);
-      setTodos(initalizedTasks);
-      let maxId = 1;
-      for (const task of initalizedTasks) {
-        if (task.id > maxId) maxId = task.id;
+        const tasksArray: TaskInput[] = tasksResponse.data;
+        const subtasksArray: SubtaskInput[] = subtasksResponse.data;
+
+        const initalizedTasks = getTasksFromArray(tasksArray, subtasksArray);
+        let maxId = 0;
+        for (const task of initalizedTasks) {
+          if (task.id > maxId) maxId = task.id;
+        }
+        updateID(maxId + 1);
+
+        const [doneTasks, openTasks] = initalizedTasks.reduce<
+          [TaskProps[], TaskProps[]]
+        >(
+          ([done, open], task) => {
+            if (!task.deleted) {
+              task.done ? done.push(task) : open.push(task);
+            }
+            return [done, open];
+          },
+          [[], []]
+        );
+
+        setDoneTasks(doneTasks);
+        setOpenTasks(openTasks);
+
+        console.log("Open Tasks:", openTasks);
+        console.log("Done Tasks:", doneTasks);
+      } catch (error) {
+        console.error("Error fetching tasks or subtasks:", error);
       }
-      updateID(maxId);
-
-      setDoneTasks(todos.filter((task) => !task.deleted && task.done));
-      setOpenTasks(todos.filter((task) => !task.deleted && !task.done));
     };
+
     fetchData();
-  }, []);
+  }, [userId]);
 
   const [id, updateID] = useState(initialTasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
@@ -320,23 +335,6 @@ function App() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuOpen, isSearchOpen]);
-
-  useEffect(() => {
-    fetch(`${API_URL}/api`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then(() => {
-        console.log("Hello World!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   // filter außerhalb von searchquery
   const [filter, setFilter] = useState("all");
@@ -399,8 +397,6 @@ function App() {
     }
     return false;
   }
-
-  console.log(todos);
   return (
     <div className="app">
       {/* Header */}
