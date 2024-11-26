@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import AddTask from "./components/AddTask";
-import { Priority, TaskProps } from "./components/Task";
+import { Priority, TaskProps, Subtask } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import { CollList } from "./components/CollList";
@@ -85,6 +85,63 @@ const initialTasks = [
   },
 ];
 
+// Const for UserID, TODO: Update to var and updated when logged in
+const userId = 1;
+
+// Helper interfaces for database-arrays
+interface TaskInput {
+  todoId: number;
+  description: string;
+  title: string;
+  deadline: Date;
+  priority: 'none' | 'low' | 'medium' | 'high';
+  isDone: boolean;
+  todoReminder: 'Nie' | 'Täglich' | 'Wöchentlich' | 'Monatlich';
+  todoRepeat: 'Nie' | 'Täglich' | 'Wöchentlich' | 'Monatlich';
+  todoDeleted: boolean;
+}
+
+interface SubtaskInput {
+  mainTaskId: number;
+  name: string;
+  isDone: boolean;
+}
+
+// Helper functions for getting TasksProps[] from the backend-call
+const getTasksFromArray = (taskArray: TaskInput[], subtaskArray: SubtaskInput[]): TaskProps[] => {
+  const allTasks: TaskProps[] = [];
+  for (const task of taskArray) {
+    const loadedTask: TaskProps = {
+      id: task.todoId,
+      subtasks: getSubtasksFromArray(subtaskArray, task.todoId),
+      description: task.description,
+      title: task.title,
+      deadline: task.deadline,
+      priority: task.priority as Priority,
+      done: task.isDone,
+      reminder: task.todoReminder,
+      repeat: task.todoRepeat,
+      deleted: task.todoDeleted,
+    }
+    allTasks.push(loadedTask);
+  }
+  return allTasks;
+}
+
+const getSubtasksFromArray = (subtaskArray: SubtaskInput[], mainTaskId: number) => {
+  const allSubtasks: Subtask[] = [];
+  for (const subtask of subtaskArray) {
+    if (subtask.mainTaskId == mainTaskId) {
+      const loadedSubtask: Subtask = {
+        name: subtask.name,
+        done: subtask.isDone
+      }
+      allSubtasks.push(loadedSubtask)
+    }
+  }
+  return allSubtasks
+}
+
 function App() {
   //TODO: replace with proper task save and handling)
   //todo: save user id for backendcalls
@@ -95,9 +152,11 @@ function App() {
     initialTasks.filter((task) => !task.deleted && task.done)
   );
   // This is for the backendcall
-  const [todos, setTodos] = useState(null);
   const [subtasks, setSubtasks] = useState(null);
+  const [todos, setTodos] = useState<TaskProps[]>([]);
 
+
+  // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
     setOpenTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
@@ -106,15 +165,24 @@ function App() {
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
     //backendcall: update(user,updatedTask) maybe zeit eintrag in datenbank für erstellen und löschen
+    axios
+      .post('http://localhost:5000/update-task', { updatedTask, userId })
+      .then((r) => {
+        console.log(r);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   };
 
-  // Backendcall to save a task after creating it
+  // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
+    // Subtasks sind unique hinsichtlich ihrer "name" Property, also mehrer Subtasks dürfen nicht denselben Namen
+    // haben. Bitte noch eine Warnungsmeldung einbauen TODO() 
     setOpenTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
-    // backendcall: insert(user,newTask)maybe zeit eintrag in datenbank für erstellen und löschen
     axios
-      .post("http://localhost:5000/new-task", { newTask })
+      .post("http://localhost:5000/new-task", { newTask, userId })
       .then((r) => {
         console.log(r);
       })
@@ -122,25 +190,42 @@ function App() {
         console.log(err);
       });
   };
-  /*
+
+  // Function: Backend-Call
+  const handleDeleteTask = (deletedTask: TaskProps) => {
+    // Hier könnten der frontend-Code stehen TODO()
+    axios
+      .post("http://localhost:5000/delete-task", { deletedTask, userId })
+      .then((r) => {
+        console.log(r);
+      })
+      .catch((err) => {
+        console.log(err);
+      }); 
+  };
+
+  // Initialization call to the backend
   useEffect(()=> {
-    do allbackendcalls;
-    set all field;
-  }
-done=truen;)*/
-  // Backend call after initialization for getting all the todos
-  useEffect(() => {
-    axios.get("http://localhost:5000/read-tasks").then((res) => {
-      setTodos(res.data);
-    });
+    const fetchData = async () => {
+      // This is how you get the tasks for a specific userId from the db
+      const [tasksResponse, subtasksResponse] = await Promise.all([
+        axios.get("http://localhost:5000/read-tasks", { params: { id: userId } }),
+        axios.get("http://localhost:5000/read-subtasks", { params: { id: userId } }),
+      ]);
+      const tasksArray: TaskInput[] = tasksResponse.data;
+      const subtasksArray: SubtaskInput[] = subtasksResponse.data;
+      
+      const initalizedTasks = getTasksFromArray(tasksArray, subtasksArray);
+      setTodos(initalizedTasks);
+      let maxId = 1;
+      for (const task of initalizedTasks) {
+        if (task.id > maxId) maxId = task.id
+      }
+      updateID(maxId);
+    }
+    fetchData();
   }, []);
 
-  // Backend call after initialization for getting all the subtasks
-  useEffect(() => {
-    axios.get("http://localhost:5000/read-subtasks").then((res) => {
-      setSubtasks(res.data);
-    });
-  }, []);
 
   const [id, updateID] = useState(initialTasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
@@ -155,6 +240,8 @@ done=truen;)*/
   const menuRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
 
+
+  // This is a hook to close components when you click outside of them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -189,13 +276,14 @@ done=truen;)*/
       .then((response) => {
         return response.json();
       })
-      .then((data) => {
-        console.log("Hello World!", data);
+      .then(() => {
+        console.log("Hello World!");
       })
       .catch((error) => {
         console.error(error);
       });
   }, []);
+
   // filter außerhalb von searchquery
   const [filter, setFilter] = useState("all");
 
@@ -253,8 +341,9 @@ done=truen;)*/
       return task.done === true;
     }
     return false;
-  }
+  };
 
+  console.log(todos);
   return (
     <div className="app">
       {/* Header */}
