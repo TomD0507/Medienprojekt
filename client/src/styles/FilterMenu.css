@@ -1,0 +1,29 @@
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px; /* Add spacing between buttons */
+  }
+  
+  .filter-options button {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Add spacing between icon and text */
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #304674;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-options button:hover {
+    opacity: 0.8;
+  }
+  
+  .filter-options button i {
+    font-size: 16px; /* Adjust icon size */
+    color: #555; /* Icon color */
+  }
+  

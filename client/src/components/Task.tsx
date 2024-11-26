@@ -150,12 +150,13 @@ function Task({ props, onUpdateTask }: TaskElProps) {
     onUpdateTask(updatedTask);
     setIsEditing(false); // Close the dialog
   };
+  /*
   const taskStatus = props.done
     ? "Done"
     : props.deadline <= new Date()
     ? "Overtime"
     : "Still to do";
-
+*/
   return (
     <>
       <div className="task-element">
@@ -208,7 +209,7 @@ function Task({ props, onUpdateTask }: TaskElProps) {
                   </svg>
                   {formatDate(props.deadline)}
                 </p>
-                <p>Status: {taskStatus}</p>
+                {/*<p>Status: {taskStatus}</p>*/}
               </div>
             )}
           </div>

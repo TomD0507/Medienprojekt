@@ -1,12 +1,25 @@
 import { useEffect, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBook,
+  faCalendarDay,
+  faCalendarWeek,
+  faExclamation,
+  faCheckCircle,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
+
 import AddTask from "./components/AddTask";
 import { Priority, TaskProps, Subtask } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
+import "./styles/FilterMenu.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import axios from "axios";
 
+const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
+//http://localhost:5000 wenn local( auf computer)
 const initialTasks = [
   {
     id: 1,
@@ -17,7 +30,7 @@ const initialTasks = [
       { name: "Subtask 1.2", done: true },
     ],
     deadline: new Date(2024, 11, 25),
-    priority: "Hoch" as Priority,
+    priority: "high" as Priority,
     done: false,
     reminder: "Nie",
     repeat: "Nie",
@@ -32,7 +45,7 @@ const initialTasks = [
       { name: "Subtask 2.2", done: false },
     ],
     deadline: new Date(2024, 11, 30),
-    priority: "Keine" as Priority,
+    priority: "none" as Priority,
     done: false,
     reminder: "Täglich",
     repeat: "Nie",
@@ -47,7 +60,7 @@ const initialTasks = [
       { name: "Subtask 1.2", done: true },
     ],
     deadline: new Date(2024, 11, 25),
-    priority: "Hoch" as Priority,
+    priority: "high" as Priority,
     done: true,
     reminder: "Nie",
     repeat: "Nie",
@@ -62,7 +75,7 @@ const initialTasks = [
       { name: "Subtask 1.2", done: true },
     ],
     deadline: new Date(2024, 10, 25),
-    priority: "Hoch" as Priority,
+    priority: "high" as Priority,
     done: false,
     reminder: "Nie",
     repeat: "Nie",
@@ -77,7 +90,38 @@ const initialTasks = [
       { name: "Subtask 2.2", done: false },
     ],
     deadline: new Date(2024, 10, 30),
-    priority: "Keine" as Priority,
+    priority: "none" as Priority,
+    done: false,
+    reminder: "Täglich",
+    repeat: "Nie",
+    deleted: false,
+  },
+  {
+    id: 6,
+    title: "Task 6",
+    description: "Description for Task 2",
+    subtasks: [
+      { name: "Subtask 2.1", done: false },
+      { name: "Subtask 2.2", done: false },
+    ],
+    deadline: new Date(2024, 11, 1),
+    priority: "medium" as Priority,
+    done: false,
+    reminder: "Täglich",
+    repeat: "Nie",
+    deleted: false,
+  },
+
+  {
+    id: 7,
+    title: "Task 7",
+    description: "Description for Task 2",
+    subtasks: [
+      { name: "Subtask 2.1", done: false },
+      { name: "Subtask 2.2", done: false },
+    ],
+    deadline: new Date(2024, 11, 2),
+    priority: "medium" as Priority,
     done: false,
     reminder: "Täglich",
     repeat: "Nie",
@@ -94,10 +138,10 @@ interface TaskInput {
   description: string;
   title: string;
   deadline: Date;
-  priority: 'none' | 'low' | 'medium' | 'high';
+  priority: "none" | "low" | "medium" | "high";
   isDone: boolean;
-  todoReminder: 'Nie' | 'Täglich' | 'Wöchentlich' | 'Monatlich';
-  todoRepeat: 'Nie' | 'Täglich' | 'Wöchentlich' | 'Monatlich';
+  todoReminder: "Nie" | "Täglich" | "Wöchentlich" | "Monatlich";
+  todoRepeat: "Nie" | "Täglich" | "Wöchentlich" | "Monatlich";
   todoDeleted: boolean;
 }
 
@@ -108,7 +152,10 @@ interface SubtaskInput {
 }
 
 // Helper functions for getting TasksProps[] from the backend-call
-const getTasksFromArray = (taskArray: TaskInput[], subtaskArray: SubtaskInput[]): TaskProps[] => {
+const getTasksFromArray = (
+  taskArray: TaskInput[],
+  subtaskArray: SubtaskInput[]
+): TaskProps[] => {
   const allTasks: TaskProps[] = [];
   for (const task of taskArray) {
     const loadedTask: TaskProps = {
@@ -122,25 +169,28 @@ const getTasksFromArray = (taskArray: TaskInput[], subtaskArray: SubtaskInput[])
       reminder: task.todoReminder,
       repeat: task.todoRepeat,
       deleted: task.todoDeleted,
-    }
+    };
     allTasks.push(loadedTask);
   }
   return allTasks;
-}
+};
 
-const getSubtasksFromArray = (subtaskArray: SubtaskInput[], mainTaskId: number) => {
+const getSubtasksFromArray = (
+  subtaskArray: SubtaskInput[],
+  mainTaskId: number
+) => {
   const allSubtasks: Subtask[] = [];
   for (const subtask of subtaskArray) {
     if (subtask.mainTaskId == mainTaskId) {
       const loadedSubtask: Subtask = {
         name: subtask.name,
-        done: subtask.isDone
-      }
-      allSubtasks.push(loadedSubtask)
+        done: subtask.isDone,
+      };
+      allSubtasks.push(loadedSubtask);
     }
   }
-  return allSubtasks
-}
+  return allSubtasks;
+};
 
 function App() {
   //TODO: replace with proper task save and handling)
@@ -152,9 +202,7 @@ function App() {
     initialTasks.filter((task) => !task.deleted && task.done)
   );
   // This is for the backendcall
-  const [subtasks, setSubtasks] = useState(null);
   const [todos, setTodos] = useState<TaskProps[]>([]);
-
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -166,23 +214,23 @@ function App() {
     );
     //backendcall: update(user,updatedTask) maybe zeit eintrag in datenbank für erstellen und löschen
     axios
-      .post('http://localhost:5000/update-task', { updatedTask, userId })
+      .post(`${API_URL}/update-task`, { updatedTask, userId })
       .then((r) => {
         console.log(r);
       })
       .catch((err) => {
         console.log(err);
-      })
+      });
   };
 
   // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
     // Subtasks sind unique hinsichtlich ihrer "name" Property, also mehrer Subtasks dürfen nicht denselben Namen
-    // haben. Bitte noch eine Warnungsmeldung einbauen TODO() 
+    // haben. Bitte noch eine Warnungsmeldung einbauen TODO()
     setOpenTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     axios
-      .post("http://localhost:5000/new-task", { newTask, userId })
+      .post(`${API_URL}/new-task`, { newTask, userId })
       .then((r) => {
         console.log(r);
       })
@@ -192,40 +240,47 @@ function App() {
   };
 
   // Function: Backend-Call
+  /*
   const handleDeleteTask = (deletedTask: TaskProps) => {
     // Hier könnten der frontend-Code stehen TODO()
     axios
-      .post("http://localhost:5000/delete-task", { deletedTask, userId })
+      .post(`${API_URL}/delete-task`, { deletedTask, userId })
       .then((r) => {
         console.log(r);
       })
       .catch((err) => {
         console.log(err);
-      }); 
+      });
   };
-
+*/
   // Initialization call to the backend
-  useEffect(()=> {
+  useEffect(() => {
     const fetchData = async () => {
       // This is how you get the tasks for a specific userId from the db
       const [tasksResponse, subtasksResponse] = await Promise.all([
-        axios.get("http://localhost:5000/read-tasks", { params: { id: userId } }),
-        axios.get("http://localhost:5000/read-subtasks", { params: { id: userId } }),
+        axios.get(`${API_URL}/read-tasks`, {
+          params: { id: userId },
+        }),
+        axios.get(`${API_URL}/read-subtasks`, {
+          params: { id: userId },
+        }),
       ]);
       const tasksArray: TaskInput[] = tasksResponse.data;
       const subtasksArray: SubtaskInput[] = subtasksResponse.data;
-      
+
       const initalizedTasks = getTasksFromArray(tasksArray, subtasksArray);
       setTodos(initalizedTasks);
       let maxId = 1;
       for (const task of initalizedTasks) {
-        if (task.id > maxId) maxId = task.id
+        if (task.id > maxId) maxId = task.id;
       }
       updateID(maxId);
-    }
+
+      setDoneTasks(todos.filter((task) => !task.deleted && task.done));
+      setOpenTasks(todos.filter((task) => !task.deleted && !task.done));
+    };
     fetchData();
   }, []);
-
 
   const [id, updateID] = useState(initialTasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
@@ -239,7 +294,6 @@ function App() {
 
   const menuRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
-
 
   // This is a hook to close components when you click outside of them
   useEffect(() => {
@@ -268,7 +322,7 @@ function App() {
   }, [isMenuOpen, isSearchOpen]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api", {
+    fetch(`${API_URL}/api`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -280,7 +334,7 @@ function App() {
         console.log("Hello World!");
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
   }, []);
 
@@ -311,7 +365,9 @@ function App() {
     }
     if (filter === "week") {
       // "This Week" filter
-      const startOfWeek = new Date(today.getDate() - today.getDay() + 1);
+
+      const startOfWeek = new Date();
+      startOfWeek.setDate(today.getDate() - today.getDay() + 1);
       startOfWeek.setHours(0, 0, 0, 0);
 
       const endOfWeek = new Date(startOfWeek);
@@ -324,7 +380,8 @@ function App() {
 
     if (filter === "nextWeek") {
       // "Next Week" filter
-      const startOfNextWeek = new Date(today.getDate() - today.getDay() + 8);
+      const startOfNextWeek = new Date();
+      startOfNextWeek.setDate(today.getDate() - today.getDay() + 8);
       startOfNextWeek.setHours(0, 0, 0, 0);
 
       const endOfNextWeek = new Date(startOfNextWeek);
@@ -341,7 +398,7 @@ function App() {
       return task.done === true;
     }
     return false;
-  };
+  }
 
   console.log(todos);
   return (
@@ -371,7 +428,6 @@ function App() {
                     )) // Optionally search in description
               )
               .filter(filterByPredicates)}
-            subtasks={subtasks}
             onUpdateTask={handleUpdateTask}
           />
         </CollList>
@@ -390,7 +446,6 @@ function App() {
                     )) // Optionally search in description
               )
               .filter(filterByPredicates)}
-            subtasks={subtasks}
             onUpdateTask={handleUpdateTask}
           />
         </CollList>
@@ -411,25 +466,25 @@ function App() {
         <div ref={menuRef} className="menu-overlay">
           <div className="filter-options">
             <button onClick={() => setFilter("all")}>
-              <i className="icon-book"></i> Alle
+              <FontAwesomeIcon icon={faBook} /> Alle
             </button>
             <button onClick={() => setFilter("today")}>
-              <i className="icon-calendar-today"></i> Heute
+              <FontAwesomeIcon icon={faCalendarDay} /> Heute
             </button>
             <button onClick={() => setFilter("tomorrow")}>
-              <i className="icon-calendar-today"></i> Morgen
+              <FontAwesomeIcon icon={faCalendarDay} /> Morgen
             </button>
             <button onClick={() => setFilter("week")}>
-              <i className="icon-calendar-week"></i> Diese Woche
+              <FontAwesomeIcon icon={faCalendarWeek} /> Diese Woche
             </button>
             <button onClick={() => setFilter("nextWeek")}>
-              <i className="icon-calendar-week"></i> Nächste Woche
+              <FontAwesomeIcon icon={faCalendarWeek} /> Nächste Woche
             </button>
             <button onClick={() => setFilter("important")}>
-              <i className="icon-exclamation"></i> Wichtig
+              <FontAwesomeIcon icon={faExclamation} /> Wichtig
             </button>
             <button onClick={() => setFilter("done")}>
-              <i className="icon-check"></i> Erledigt
+              <FontAwesomeIcon icon={faCheckCircle} /> Erledigt
             </button>
             <button
               onClick={() => {
@@ -437,7 +492,7 @@ function App() {
                 setSearchQuery("");
               }}
             >
-              <i className="icon-book"></i> Filter entfernen
+              <FontAwesomeIcon icon={faFilter} /> Filter entfernen
             </button>
           </div>
         </div>

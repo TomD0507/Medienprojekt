@@ -1,12 +1,10 @@
 import Task, { TaskProps } from "./Task"; // Import der Task-Komponente
-import { Subtask } from "./Task";
 
 // Definiere die Struktur eines Tasks
 
 // TaskList-Komponente
 interface TaskListProps {
   tasks: TaskProps[];
-  subtasks: Subtask[] | null;
   onUpdateTask: (updatedTask: TaskProps) => void;
 }
 
