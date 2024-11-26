@@ -270,14 +270,18 @@ function App() {
 
       const initalizedTasks = getTasksFromArray(tasksArray, subtasksArray);
       setTodos(initalizedTasks);
-      let maxId = 1;
+      let maxId = 0;
       for (const task of initalizedTasks) {
         if (task.id > maxId) maxId = task.id;
       }
-      updateID(maxId);
+      updateID(maxId + 1);
 
+      console.log(todos);
       setDoneTasks(todos.filter((task) => !task.deleted && task.done));
       setOpenTasks(todos.filter((task) => !task.deleted && !task.done));
+
+      console.log(openTasks);
+      console.log(doneTasks);
     };
     fetchData();
   }, []);
@@ -320,23 +324,6 @@ function App() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuOpen, isSearchOpen]);
-
-  useEffect(() => {
-    fetch(`${API_URL}/api`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then(() => {
-        console.log("Hello World!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
 
   // filter außerhalb von searchquery
   const [filter, setFilter] = useState("all");
@@ -399,8 +386,6 @@ function App() {
     }
     return false;
   }
-
-  console.log(todos);
   return (
     <div className="app">
       {/* Header */}
