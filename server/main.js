@@ -54,7 +54,7 @@ function initTodoDB() {
         description MEDIUMTEXT,
         deadline DATETIME,
         priority ENUM('none', 'low', 'medium', 'high') NOT NULL DEFAULT 'none',
-        isDone BOOL DEFAULT 0,
+        isDone BOOL DEFAULT false,
         todoReminder ENUM('Nie', 'Täglich', 'Wöchentlich', 'Monatlich') DEFAULT 'Nie',
         todoRepeat ENUM('Nie', 'Täglich', 'Wöchentlich', 'Monatlich') DEFAULT 'Nie',
         todoDeleted BOOL DEFAULT 0,
@@ -75,8 +75,8 @@ function initTodoDB() {
       userId INT NOT NULL DEFAULT 1,
       mainTaskId int NOT NULL,
       name VARCHAR(255) NOT NULL,
-      isDone BOOL DEFAULT 0,
-      PRIMARY KEY (name)
+      isDone BOOL DEFAULT false,
+      PRIMARY KEY (userId, mainTaskId, name)
     )
     `;
   connection.query(sql_createSubtaskTable, (err, result) => {
@@ -85,13 +85,13 @@ function initTodoDB() {
   });
 
   // Delets all the values from a table
-  connection.connect(function (err) {
-    if (err) throw err;
-    connection.query("DELETE FROM todos_init", function (err, result, fields) {
-      if (err) throw err;
-      console.log("Entries successfully deleted.");
-    });
-  });
+  // connection.connect(function (err) {
+  //   if (err) throw err;
+  //   connection.query("DELETE FROM todos_init", function (err, result, fields) {
+  //     if (err) throw err;
+  //     console.log("Entries successfully deleted.");
+  //   });
+  // });
 
   // SQL query to insert a value into a field
   /*
@@ -238,7 +238,7 @@ app.post("/new-task", (req, res) => {
 });
 
 
-// Function to create a NEW Todoarray from a request body for SQL INSERT
+// Function to UPDATE an ALREADY EXISTING Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
 function extractTodo(reqBody) {
   let date;
@@ -246,6 +246,11 @@ function extractTodo(reqBody) {
     date = format(reqBody.updatedTask.deadline, "yyyy-MM-dd HH:mm:ss");
   } else {
     date = null;
+  }
+
+  let dateDeleted = null;
+  if(reqBody.updatedTask.deleted) {
+    dateDeleted = format(Date.now(), "yyyy-MM-dd HH:mm:ss");
   }
   const value = [
       reqBody.updatedTask.title,
@@ -255,6 +260,8 @@ function extractTodo(reqBody) {
       reqBody.updatedTask.done,
       reqBody.updatedTask.reminder,
       reqBody.updatedTask.repeat,
+      reqBody.updatedTask.deleted,
+      dateDeleted,
       reqBody.userId,
       reqBody.updatedTask.id
   ];
@@ -278,30 +285,30 @@ app.post("/update-task", (req, res) => {
   res.sendStatus(200);
   const subtasks = extractSubtasks(req.body);
   const task = extractTodo(req.body);
-  if (subtasks.length == 0) {
-    const sql =
-      "UPDATE todos_init SET title = ?, description = ?, deadline = ?, priority = ?, isDone = ?, todoReminder = ?, todoRepeat = ? WHERE userId = ? AND todoId = ?";
-    connection.query(sql, task, function(err, result) {
-      if (err) {
-        throw err;
-        console.log("Failed to update task.");
-      } else {
-        // task[8] is the maintaskID
-        console.log("Task with id:", task[8], "successfully updated.");
-      }
-    });
-    //when there are no subtask we need to delete the previous ones
-    const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
-    connection.query(sql_delete, [task[7], task[8]], function(err, result) {
-      if (err) throw err;
-      else console.log("Updating subtasks...");
-    });
-  } else {
-    const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
-    connection.query(sql_delete, [task[7], task[8]], function(err, result) {
-      if (err) throw err;
-      else console.log("Updating subtasks...");
-    })
+  console.log(task);
+  
+  // Deleting all the subtasks (they either get added back, extended or deleted after all), task[9] is userId and task[10] is taskId
+  const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
+  connection.query(sql_delete, [task[9], task[10]], function(err, result) {
+    if (err) throw err;
+    else console.log("Updating subtasks...");
+  });
+
+  // Updating the main task nevertheless
+  const sql =
+    "UPDATE todos_init SET title = ?, description = ?, deadline = ?, priority = ?, isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND todoId = ?";
+  connection.query(sql, task, function(err, result) {
+    if (err) {
+      throw err;
+      console.log("Failed to update task.");
+    } else {
+      // task[8] is the maintaskID
+      console.log("Task with id:", task[10], "successfully updated.");
+    }
+  });
+
+  // Updating the subtasks
+  if (subtasks.length != 0) {
     const sql_newSubtasks = "INSERT INTO subtasks_init (userId, mainTaskId, name, isDone) VALUES ?";
     connection.query(sql_newSubtasks, [subtasks], function(err, result) {
       if (err) throw err;
@@ -314,7 +321,7 @@ app.post("/update-task", (req, res) => {
 // Deletes an existing todo
 app.post("/delete-task", (req, res) => {
   const sql = "UPDATE todos_init SET todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND mainTaskId = ?";
-  connection.query(sql, [true, Date.dateNow(), req.body.userId, req.body.deletedTask.id], function(err, result) {
+  connection.query(sql, [true, Date.now(), req.body.userId, req.body.deletedTask.id], function(err, result) {
     if (err) throw err;
     else console.log("Task with id:", req.body.deletedTask.id, "was successfuly deleted!");
   })

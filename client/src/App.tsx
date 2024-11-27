@@ -19,7 +19,7 @@ import TaskList from "./components/TaskList";
 import axios from "axios";
 
 const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
-//http://localhost:5000 wenn local( auf computer)
+// const API_URL = "http://localhost:5000"; // wenn local( auf computer)
 const initialTasks = [
   {
     id: 1,
