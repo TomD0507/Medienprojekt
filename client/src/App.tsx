@@ -194,6 +194,26 @@ type AppProps = {
   userID: number;
 };
 
+
+// Function which returns true if a username with a password exists
+const checkLogin = async (
+  name: string,
+  pw: string
+): Promise<boolean> => {
+  try {
+    const res = await axios.get(`${API_URL}/login-user`, { params: { name: name, pw: pw } })
+    return res.data.userExists;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+//Example use
+// (async () => {
+//   const isLoggedIn = await checkLogin('testUser', 'winterMP');
+//   console.log(isLoggedIn); //isLoggedIn=true
+// })();
+
 function App({ userID }: AppProps) {
   //TODO: replace with proper task save and handling)
   //todo: save user id for backendcalls
@@ -227,8 +247,6 @@ function App({ userID }: AppProps) {
 
   // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
-    // Subtasks sind unique hinsichtlich ihrer "name" Property, also mehrer Subtasks dürfen nicht denselben Namen
-    // haben. Bitte noch eine Warnungsmeldung einbauen TODO()
     setOpenTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     axios
