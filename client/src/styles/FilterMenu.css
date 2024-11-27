@@ -8,14 +8,17 @@
   .filter-options button {
     display: flex;
     align-items: center;
-    gap: 8px; /* Add spacing between icon and text */
-    padding: 8px 12px;
+    gap: 5%; /* Add spacing between icon and text */
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #304674;
     cursor: pointer;
     transition: all 0.3s ease;
+    justify-content: flex-start; /* Ensure items start from the same position */
+    
+    padding: 8px 20%;
+    padding-left: auto; /* Offsets the content to the right */
   }
   
   .filter-options button:hover {

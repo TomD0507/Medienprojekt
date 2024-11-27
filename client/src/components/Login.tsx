@@ -11,7 +11,7 @@ type LoginProps = {
 function Login({ formData, onInputChange, onSubmit, status }: LoginProps) {
   return (
     <div className="container">
-      <div className="header">
+      <div className="login_header">
         <div className="text">Login</div>
         <div className="underline"></div>
       </div>

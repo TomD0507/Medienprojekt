@@ -10,44 +10,40 @@
 .side-by-side {
   /* Erlaubt elemente nebeneinander darzustellen*/
   display: flex; /* Aktiviert Flexbox */
+  
   flex-wrap: nowrap; /* Elemente nicht umbrechen bei kleiner Breite */
+  width: 90%;
 }
 /* Item-Container  wenn kompletter bereich eingenommen werden soll*/
 .itemmiddle {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 10px;
+  padding-top: 2.2%;
   border-radius: 5px;
 }
 .item {
   display: flex;
   flex-direction: column;
   flex-grow: 0;
-  padding-top: 10em;
+  padding-top: 2%;
 }
 .itemleft {
   display: flex;
   flex-direction: column;
   flex-grow: 0;
-  padding-top: 10%;
+  padding-top: 2%;
 }
 .itemright {
   display: flex;
   flex-direction: column;
   flex-grow: 0;
-  padding-top: 10%;
-}
-.subitem {
-  padding: 10em;
-  border-radius: 5px;
+  padding-top: 2%;
 }
 /* Checkbox-Design */
 .checkbox {
   position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
   width: 2em;
   height: 2em;
   min-width: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
