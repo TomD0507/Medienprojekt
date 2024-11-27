@@ -11,7 +11,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchToggle,
 }) => {
   return (
-    <header className="header">
+    <header className="app_header">
       <button className="menu-button" onClick={onMenuToggle}>
         ☰
       </button>

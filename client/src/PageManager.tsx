@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Login from "./components/Login";
-import "./index.css";
 import App from "./App";
 
 function PageManager() {
@@ -41,14 +40,12 @@ function PageManager() {
   };
 
   return userID === null ? (
-    <div>
-      <Login
-        formData={formData}
-        onInputChange={handleInputChange}
-        onSubmit={handleSubmit}
-        status={status}
-      />
-    </div>
+    <Login
+      formData={formData}
+      onInputChange={handleInputChange}
+      onSubmit={handleSubmit}
+      status={status}
+    />
   ) : (
     <App userID={userID} />
   );
