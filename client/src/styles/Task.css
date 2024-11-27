@@ -57,6 +57,8 @@
   color: #727272; /* Textfarbe */
   transition: transform 0.2s ease; /* Klickanimation */
   z-index: 2;
+  justify-content: center;
+  align-items: center;
 }
 .checkbox span {
   font-size: 2em; /* Symbolgröße */

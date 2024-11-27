@@ -8,7 +8,6 @@
   background: rgba(0, 0, 0, 0.5); /* schwarz, 0,5 alpha */
   display: flex;
   z-index: 1001; /* über dem rest*/
-  align-items: center;
 }
 
 /* hintergrund clickbar
@@ -34,42 +33,47 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   overflow: auto; /* Ermöglicht Scrollen */
 }
-
 /* Close button */
 .overlay-close {
-  content: "";
   display: flex;
   justify-content: center;
-  align-items: center; /* Ensures centering */
-  position: absolute; /* Position relative to .overlay-content */
-  width: 5em; /* Size of the button */
-  height: 5em; /* Match height to width for a perfect circle */
+  align-items: center; /* Center the X inside the circle */
+  position: fixed; /* Positioned relative to .overlay-content */
+  width: 10vw; /* Scales with viewport width */
+  height: 10vw; /* Match height to width for a perfect circle */
+  max-width: 5em; /* Optional: limit size for smaller screens */
+  max-height: 5em;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for depth */
-  border-radius: 50%; /* Circular container */
+  border-radius: 50%; /* Makes the button circular */
   cursor: pointer;
   background-color: #304674; /* Button color */
-  top: 10px; /* Position the close button within the container */
-  right: 10px; /* Position the close button within the container */
+  top: 11%; /* Position the close button within the overlay */
+  right: 15%; /* Adjust as needed */
+  transition: opacity 0.3s, transform 0.3s; /* Smooth hover effects */
 }
 
 .overlay-close:hover {
-  opacity: 0.8;
+  opacity: 0.8; /* Subtle fade effect */
+  transform: scale(1.1); /* Slight enlargement on hover */
 }
+
+/* Diagonal lines for the X */
 .x::before,
 .x::after {
-  content: ""; /* Empty content */
-  position: absolute; /* Positioned relative to the button */
-  width: 0.8em;
-  height: 4em;
-  border-radius: 8px;
-  background-color: white;
+  content: ""; /* Creates the lines */
+  position: absolute; /* Positioned relative to the button container */
+  width: 0.2em; /* Thickness of the lines */
+  height: 60%; /* Length relative to the button */
+  border-radius: 4px; /* Slight rounding for better aesthetics */
+  background-color: white; /* Line color */
   top: 50%; /* Center it vertically */
   left: 50%; /* Center it horizontally */
   transform-origin: center;
   transform: translate(-50%, -50%) rotate(45deg); /* First diagonal */
 }
+
 .x::after {
-  transform: translate(-50%, -50%) rotate(-45deg); /* Opposite diagonal */
+  transform: translate(-50%, -50%) rotate(-45deg); /* Second diagonal */
 }
 
 /*scrollbar design*/

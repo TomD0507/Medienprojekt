@@ -21,7 +21,6 @@ header {
 }
 /*darin ist der aufgaben container*/
 main {
-  width: 100%;
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -32,19 +31,14 @@ main {
 
 body {
   background-color: #98bad5;
-  position: absolute; /* Centers items horizontally */
-  overflow: auto; /* Ermöglicht Scrollen */
+  margin: 0; /* Remove default margin */
   min-width: 100vw;
-  min-height: 100vh;
+  min-height: 100vh;/* Center vertically */
 }
 
-.pp {
-  margin: 10px;
-  display: flex;
-  flex-direction: column;
+.app {
   align-items: center;
-  min-height: 100vh;
-  padding: 20px;
+  padding: 1vh;
   box-sizing: border-box;
 }
 
@@ -155,38 +149,7 @@ body {
   border-radius: 5px;
 }
 
-/* Smartphone Size */
-@media (max-width: 768px) {
-  .header {
-    padding: 10px;
-  }
 
-  .header-title {
-    font-size: 16px;
-  }
-
-  .menu-button,
-  .search-button {
-    font-size: 20px;
-  }
-
-  main {
-    padding: 10px;
-  }
-}
-
-/* Desktop Size */
-@media (min-width: 1024px) {
-  .app {
-    padding: 40px;
-  }
-
-  .header-title {
-    font-size: 20px;
-  }
-
-  
-}
 
 h1 {
   font-size: 3.2em;
