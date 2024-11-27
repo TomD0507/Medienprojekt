@@ -130,7 +130,6 @@ const initialTasks = [
 ];
 
 // Const for UserID, TODO: Update to var and updated when logged in
-const userId = 1;
 
 // Helper interfaces for database-arrays
 interface TaskInput {
@@ -191,8 +190,11 @@ const getSubtasksFromArray = (
   }
   return allSubtasks;
 };
+type AppProps = {
+  userID: number;
+};
 
-function App() {
+function App({ userID }: AppProps) {
   //TODO: replace with proper task save and handling)
   //todo: save user id for backendcalls
   const [openTasks, setOpenTasks] = useState(
@@ -214,7 +216,7 @@ function App() {
     );
     //backendcall: update(user,updatedTask) maybe zeit eintrag in datenbank für erstellen und löschen
     axios
-      .post(`${API_URL}/update-task`, { updatedTask, userId })
+      .post(`${API_URL}/update-task`, { updatedTask, userID })
       .then((r) => {
         console.log(r);
       })
@@ -230,7 +232,7 @@ function App() {
     setOpenTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     axios
-      .post(`${API_URL}/new-task`, { newTask, userId })
+      .post(`${API_URL}/new-task`, { newTask, userID })
       .then((r) => {
         console.log(r);
       })
@@ -244,7 +246,7 @@ function App() {
   const handleDeleteTask = (deletedTask: TaskProps) => {
     // Hier könnten der frontend-Code stehen TODO()
     axios
-      .post(`${API_URL}/delete-task`, { deletedTask, userId })
+      .post(`${API_URL}/delete-task`, { deletedTask, userID })
       .then((r) => {
         console.log(r);
       })
@@ -258,8 +260,8 @@ function App() {
     const fetchData = async () => {
       try {
         const [tasksResponse, subtasksResponse] = await Promise.all([
-          axios.get(`${API_URL}/read-tasks`, { params: { id: userId } }),
-          axios.get(`${API_URL}/read-subtasks`, { params: { id: userId } }),
+          axios.get(`${API_URL}/read-tasks`, { params: { id: userID } }),
+          axios.get(`${API_URL}/read-subtasks`, { params: { id: userID } }),
         ]);
 
         const tasksArray: TaskInput[] = tasksResponse.data;
@@ -295,7 +297,7 @@ function App() {
     };
 
     fetchData();
-  }, [userId]);
+  }, [userID]);
 
   const [id, updateID] = useState(initialTasks.length + 1); //TODO: proper way to get taskID(backend counts?)
   const incrementID = () => updateID((prevID) => (prevID += 1));
