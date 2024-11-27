@@ -63,7 +63,6 @@ function initTodoDB() {
         PRIMARY KEY (userId, todoId)
     )
     `;
-
   connection.query(sql_createTaskTable, (err, result) => {
     if (err) throw err;
     console.log("Table successfully created");
@@ -72,16 +71,34 @@ function initTodoDB() {
   // SQL query to create a dummy table for testing purposes
   const sql_createSubtaskTable = `
     CREATE TABLE IF NOT EXISTS subtasks_init (
+      id INT NOT NULL AUTO_INCREMENT,
       userId INT NOT NULL DEFAULT 1,
       mainTaskId int NOT NULL,
       name VARCHAR(255) NOT NULL,
       isDone BOOL DEFAULT false,
-      PRIMARY KEY (userId, mainTaskId, name)
+      PRIMARY KEY (id)
     )
     `;
   connection.query(sql_createSubtaskTable, (err, result) => {
     if (err) throw err;
     console.log("Subtask Table successfully created");
+  });
+
+
+  // SQL query to create a dummy table for testing purposes
+  const sql_createUserTable = `
+    CREATE TABLE IF NOT EXISTS users_init (
+      id INT NOT NULL AUTO_INCREMENT,
+      name VARCHAR(255) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      tasksCreated int NOT NULL DEFAULT 0,
+      tasksDone int NOT NULL DEFAULT 0,
+      PRIMARY KEY (id)
+    )
+    `;
+  connection.query(sql_createUserTable, (err, result) => {
+    if (err) throw err;
+    console.log("User Table successfully created");
   });
 
   // Delets all the values from a table
@@ -181,7 +198,7 @@ function createTodo(reqBody) {
   }
   const value = [
     [
-      reqBody.userId,
+      reqBody.userID,
       reqBody.newTask.id,
       reqBody.newTask.title,
       reqBody.newTask.description,
@@ -201,8 +218,7 @@ function extractNewSubtasks(reqBody) {
   const subtasks = reqBody.newTask.subtasks;
   let subtasksArray = [];
   for (let subtask of subtasks) {
-    console.log(subtask.name);
-    subtasksArray.push([reqBody.userId, reqBody.newTask.id, subtask.name]);
+    subtasksArray.push([reqBody.userID, reqBody.newTask.id, subtask.name]);
   }
   return subtasksArray;
 }
@@ -213,6 +229,7 @@ app.post("/new-task", (req, res) => {
   const sql =
     "INSERT INTO todos_init (userId, todoId, title, description, deadline, priority, todoReminder, todoRepeat, dateCreated) VALUES ?";
   const value = createTodo(req.body);
+  console.log(value);
   connection.query(sql, [value], (err, result) => {
     if (err) {
       console.log("Failed to store new task.");
@@ -262,7 +279,7 @@ function extractTodo(reqBody) {
       reqBody.updatedTask.repeat,
       reqBody.updatedTask.deleted,
       dateDeleted,
-      reqBody.userId,
+      reqBody.userID,
       reqBody.updatedTask.id
   ];
   return value;
@@ -274,7 +291,7 @@ function extractSubtasks(reqBody) {
   const subtasks = reqBody.updatedTask.subtasks;
   let subtasksArray = [];
   for (let subtask of subtasks) {
-    subtasksArray.push([reqBody.userId, reqBody.updatedTask.id, subtask.name, subtask.done]);
+    subtasksArray.push([reqBody.userID, reqBody.updatedTask.id, subtask.name, subtask.done]);
   }
   return subtasksArray;
 }
@@ -321,7 +338,7 @@ app.post("/update-task", (req, res) => {
 // Deletes an existing todo
 app.post("/delete-task", (req, res) => {
   const sql = "UPDATE todos_init SET todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND mainTaskId = ?";
-  connection.query(sql, [true, Date.now(), req.body.userId, req.body.deletedTask.id], function(err, result) {
+  connection.query(sql, [true, Date.now(), req.body.userID, req.body.deletedTask.id], function(err, result) {
     if (err) throw err;
     else console.log("Task with id:", req.body.deletedTask.id, "was successfuly deleted!");
   })
