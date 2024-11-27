@@ -101,6 +101,22 @@ function initTodoDB() {
     console.log("User Table successfully created");
   });
 
+  // SQL query to inititalize 5 dummy users and one developer user called "testUser"
+  // const sql_insertValue =
+  //   "INSERT INTO users_init (name, password) VALUES ?";
+  // const value = [
+  //   ["user1", "8g96c%MDjRrC:3Sw"],
+  //   ["user2", "<kn5%Vn!CwX-5?X$"],
+  //   ["user3", "Q>z<68aNqYZ3qta5"],
+  //   ["user4", "@#9C4-F4Ejq<.Ufe"],
+  //   ["user5", "R}jayT>2NMd7Sc)x"],
+  //   ["testUser", "winterMP"]
+  // ];
+  // connection.query(sql_insertValue, [value], (err, result) => {
+  //   if (err) throw err;
+  //   console.log("Users succesfully created.");
+  // });
+
   // Delets all the values from a table
   // connection.connect(function (err) {
   //   if (err) throw err;
@@ -229,7 +245,6 @@ app.post("/new-task", (req, res) => {
   const sql =
     "INSERT INTO todos_init (userId, todoId, title, description, deadline, priority, todoReminder, todoRepeat, dateCreated) VALUES ?";
   const value = createTodo(req.body);
-  console.log(value);
   connection.query(sql, [value], (err, result) => {
     if (err) {
       console.log("Failed to store new task.");
@@ -302,7 +317,6 @@ app.post("/update-task", (req, res) => {
   res.sendStatus(200);
   const subtasks = extractSubtasks(req.body);
   const task = extractTodo(req.body);
-  console.log(task);
   
   // Deleting all the subtasks (they either get added back, extended or deleted after all), task[9] is userId and task[10] is taskId
   const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
@@ -372,6 +386,20 @@ app.get("/read-subtasks", (req, res) => {
         console.log("Read subtasks from database successfully");
         res.send(result);
       }
+    }
+  });
+});
+
+// Checks if the username and password exist
+app.get("/login-user", (req, res) => {
+  console.log(req.query);
+  const sql = "SELECT EXISTS (SELECT 1 FROM users_init WHERE name = ? AND password = ?) AS user_exists";
+  connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
+    if (err) {
+      console.log("Login call attempt failed!");
+    } else {
+      const userExists = result[0].user_exists === 1;
+      res.json({ userExists });
     }
   });
 });
