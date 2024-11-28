@@ -390,19 +390,41 @@ app.get("/read-subtasks", (req, res) => {
   });
 });
 
-// Checks if the username and password exist
+// Checks if the username and password exist and returns id + name if it does
 app.get("/login-user", (req, res) => {
-  console.log(req.query);
-  const sql = "SELECT EXISTS (SELECT 1 FROM users_init WHERE name = ? AND password = ?) AS user_exists";
+  const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
     if (err) {
       console.log("Login call attempt failed!");
     } else {
-      const userExists = result[0].user_exists === 1;
-      res.json({ userExists });
+      res.json({ id: result[0].id, name: result[0].name });
     }
   });
 });
+
+// Checks if the username and password exist and returns id + name if it does
+app.get("/exists-user", (req, res) => {
+  const sql = "SELECT EXISTS (SELECT 1 FROM users_init WHERE name = ?) AS user_exists";
+  connection.query(sql, [req.query.name], function (err, result) {
+    if (err) {
+      console.log("Checking if user exists-call attempt failed!");
+    } else {
+      const userExists = result[0].user_exists === 1;
+      res.json({ userExists: userExists });
+    }
+  });
+});
+
+// Registers a new user
+app.post("/register-user", (req, res) => {
+  const sql =
+    "INSERT INTO users_init (name, password) VALUES (?, ?)";
+  console.log(req.body);
+  connection.query(sql, [req.body.name, req.body.pw], (err, result) => {
+    if (err) throw err;
+    console.log("User succesfully registered.");
+  });
+})
 
 app.listen(5000, '0.0.0.0', () => {
   console.log('Backend läuft auf Port 5000');

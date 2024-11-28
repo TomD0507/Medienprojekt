@@ -9,8 +9,11 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { checkLogin, usernameExists, registerUser } from "./helpers/loginHelper";
+import { getTasksFromArray, TaskInput, SubtaskInput } from "./helpers/taskHelper";
+
 import AddTask from "./components/AddTask";
-import { Priority, TaskProps, Subtask } from "./components/Task";
+import { Priority, TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import "./styles/FilterMenu.css";
@@ -18,8 +21,8 @@ import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import axios from "axios";
 
-const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
-// const API_URL = "http://localhost:5000"; // wenn local( auf computer)
+export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
+// export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
 const initialTasks = [
   {
     id: 1,
@@ -131,88 +134,9 @@ const initialTasks = [
 
 // Const for UserID, TODO: Update to var and updated when logged in
 
-// Helper interfaces for database-arrays
-interface TaskInput {
-  todoId: number;
-  description: string;
-  title: string;
-  deadline: Date;
-  priority: "none" | "low" | "medium" | "high";
-  isDone: boolean;
-  todoReminder: "Nie" | "Täglich" | "Wöchentlich" | "Monatlich";
-  todoRepeat: "Nie" | "Täglich" | "Wöchentlich" | "Monatlich";
-  todoDeleted: boolean;
-}
-
-interface SubtaskInput {
-  mainTaskId: number;
-  name: string;
-  isDone: boolean;
-}
-
-// Helper functions for getting TasksProps[] from the backend-call
-const getTasksFromArray = (
-  taskArray: TaskInput[],
-  subtaskArray: SubtaskInput[]
-): TaskProps[] => {
-  const allTasks: TaskProps[] = [];
-  for (const task of taskArray) {
-    const loadedTask: TaskProps = {
-      id: task.todoId,
-      subtasks: getSubtasksFromArray(subtaskArray, task.todoId),
-      description: task.description,
-      title: task.title,
-      deadline: task.deadline ? new Date(task.deadline) : new Date(""),
-      priority: task.priority as Priority,
-      done: task.isDone,
-      reminder: task.todoReminder,
-      repeat: task.todoRepeat,
-      deleted: task.todoDeleted,
-    };
-    allTasks.push(loadedTask);
-  }
-  return allTasks;
-};
-
-const getSubtasksFromArray = (
-  subtaskArray: SubtaskInput[],
-  mainTaskId: number
-) => {
-  const allSubtasks: Subtask[] = [];
-  for (const subtask of subtaskArray) {
-    if (subtask.mainTaskId == mainTaskId) {
-      const loadedSubtask: Subtask = {
-        name: subtask.name,
-        done: subtask.isDone,
-      };
-      allSubtasks.push(loadedSubtask);
-    }
-  }
-  return allSubtasks;
-};
 type AppProps = {
   userID: number;
 };
-
-
-// Function which returns true if a username with a password exists
-const checkLogin = async (
-  name: string,
-  pw: string
-): Promise<boolean> => {
-  try {
-    const res = await axios.get(`${API_URL}/login-user`, { params: { name: name, pw: pw } })
-    return res.data.userExists;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-}
-//Example use
-// (async () => {
-//   const isLoggedIn = await checkLogin('testUser', 'winterMP');
-//   console.log(isLoggedIn); //isLoggedIn=true
-// })();
 
 function App({ userID }: AppProps) {
   //TODO: replace with proper task save and handling)
@@ -223,8 +147,6 @@ function App({ userID }: AppProps) {
   const [doneTasks, setDoneTasks] = useState(
     initialTasks.filter((task) => !task.deleted && task.done)
   );
-  // This is for the backendcall
-  //const [todos, setTodos] = useState<TaskProps[]>([]);
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
