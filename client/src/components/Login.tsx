@@ -1,14 +1,20 @@
 import "../styles/LoginSignup.css";
 type LoginProps = {
-  formData: {
-    name: string;
-    password: string;
-  };
-  onInputChange: (field: string, value: string) => void;
+  name: string;
+  password: string;
+  onPWChange: (field: string) => void;
+  onNameChange: (field: string) => void;
   onSubmit: () => void;
   status: "idle" | "loading" | "error";
 };
-function Login({ formData, onInputChange, onSubmit, status }: LoginProps) {
+function Login({
+  name,
+  password,
+  onPWChange,
+  onNameChange,
+  onSubmit,
+  status,
+}: LoginProps) {
   return (
     <div className="login_aligner">
       <div className="container">
@@ -21,8 +27,8 @@ function Login({ formData, onInputChange, onSubmit, status }: LoginProps) {
             <input
               type="text"
               placeholder="Name"
-              value={formData.name}
-              onChange={(e) => onInputChange("name", e.target.value.trim())}
+              value={name}
+              onChange={(e) => onNameChange(e.target.value.trim())}
               disabled={status === "loading"}
             />
           </div>
@@ -30,8 +36,8 @@ function Login({ formData, onInputChange, onSubmit, status }: LoginProps) {
             <input
               type="password"
               placeholder="Password"
-              value={formData.password}
-              onChange={(e) => onInputChange("password", e.target.value)}
+              value={password}
+              onChange={(e) => onPWChange(e.target.value)}
               disabled={status === "loading"}
             />
           </div>

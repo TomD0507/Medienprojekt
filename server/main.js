@@ -11,13 +11,17 @@ dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   port: process.env.MYSQL_PORT,
   database: process.env.MYSQL_DB,
+  waitForConnections: true,  // Wait for an available connection (default: true)
+  connectionLimit: 50,       // Maximum number of connections in the pool
+  queueLimit: 0              // Max number of queries allowed to wait in the queue before rejection
 });
+
 
 function initTodoDB() {
   // SQL query to create the database only if it does not exist
@@ -89,6 +93,7 @@ function initTodoDB() {
   const sql_createUserTable = `
     CREATE TABLE IF NOT EXISTS users_init (
       id INT NOT NULL AUTO_INCREMENT,
+      displayName VARCHAR(255) DEFAULT NULL,
       name VARCHAR(255) NOT NULL,
       password VARCHAR(255) NOT NULL,
       tasksCreated int NOT NULL DEFAULT 0,
@@ -101,106 +106,45 @@ function initTodoDB() {
     console.log("User Table successfully created");
   });
 
-  // SQL query to inititalize 5 dummy users and one developer user called "testUser"
-  // const sql_insertValue =
-  //   "INSERT INTO users_init (name, password) VALUES ?";
-  // const value = [
-  //   ["user1", "8g96c%MDjRrC:3Sw"],
-  //   ["user2", "<kn5%Vn!CwX-5?X$"],
-  //   ["user3", "Q>z<68aNqYZ3qta5"],
-  //   ["user4", "@#9C4-F4Ejq<.Ufe"],
-  //   ["user5", "R}jayT>2NMd7Sc)x"],
-  //   ["testUser", "winterMP"]
-  // ];
-  // connection.query(sql_insertValue, [value], (err, result) => {
-  //   if (err) throw err;
-  //   console.log("Users succesfully created.");
-  // });
 
-  // Delets all the values from a table
-  // connection.connect(function (err) {
-  //   if (err) throw err;
-  //   connection.query("DELETE FROM todos_init", function (err, result, fields) {
-  //     if (err) throw err;
-  //     console.log("Entries successfully deleted.");
-  //   });
-  // });
 
-  // SQL query to insert a value into a field
-  /*
-  const sql_insertValue =
-    "INSERT INTO todos_init (userId, todoId, title, description, deadline, dateCreated) VALUES ?";
-  const sql_insertSubtask =
-    "INSERT INTO subtasks_init (userId, mainTaskId, name) VALUES (1, 42, 'Das ist ein subtask')";
-  const value = [
-    [1, 42, "TestTodo", "Das ist ein TestTodo", "2008-11-11 13:23:44", "2007-10-12 12:01:34"],
-  ];
-  connection.query(sql_insertValue, [value], (err, result) => {
-    if (err) throw err;
-    console.log("Value succesfully inserted");
-  });
-  connection.query(sql_insertSubtask, (err, result) => {
-    if (err) throw err;
-    console.log("Subtask succesfully inserted");
-  });
-  */
-
-  // // Reads all the values from a table
-  // connection.connect(function(err) {
-  //     if (err) throw err;
-  //     connection.query("SELECT * FROM todos_init", function (err, result, fields) {
-  //       if (err) throw err;
-  //       console.log(result);
-  //     });
-  // });
-
-  // // Alters the value of a certain todo
-  // connection.connect(function(err) {
-  //     if (err) throw err;
-  //     var sql_update = "UPDATE todos_init SET description = 'Die Beschreibung wurde updated' WHERE title = 'TestTodo'";
-  //     connection.query(sql_update, function (err, result) {
-  //       if (err) throw err;
-  //       console.log(result.affectedRows + " record(s) updated");
-  //     });
-  //     connection.query("SELECT * FROM todos_init", function (err, result, fields) {
-  //         if (err) throw err;
-  //         console.log(result);
-  //       });
-  //   });
+  
 }
 
-// Checks if connected properly
-connection.connect(function (err) {
-  if (err) {
-    console.error("error connecting: " + err.stack);
-    return;
-  }
-  console.log("Connected as id " + connection.threadId);
+initTodoDB();
+app.post("/create-dummy-users", (req, res) => {
+  // SQL query to insert multiple users into the database
+  const sql_insertValue =
+    "INSERT INTO users_init (name, password, displayName) VALUES ?";
 
-  // Initialises the database
-  initTodoDB();
-  // Close the connection
-  // connection.end();
+  // Predefined values for users
+  const value = [
+    ["user1", "8g96c%MDjRrC:3Sw", "user1"],
+    ["user2", "<kn5%Vn!CwX-5?X$", "user2"],
+    ["user3", "Q>z<68aNqYZ3qta5", "user3"],
+    ["user4", "@#9C4-F4Ejq<.Ufe", "user4"],
+    ["user5", "R}jayT>2NMd7Sc)x", "user5"],
+    ["testUser", "winterMP", "testUser"]
+  ];
+
+  // Execute the query to insert users
+  connection.query(sql_insertValue, [value], (err, result) => {
+    if (err) {
+      console.error("Error inserting users:", err);
+      return res.status(500).json({ error: "Failed to create users" });
+    }
+    
+    console.log("Users successfully created.");
+    res.status(200).json({ message: "Users successfully created." });
+  });
 });
+
+// Checks if connected properly
+
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
-/*
-app.get("/api", (req, res) => {
-  // Reads all the values from a table
-  connection.connect(function (err) {
-    if (err) throw err;
-    connection.query(
-      "SELECT * FROM todos_init",
-      function (err, result, fields) {
-        if (err) throw err;
-        res.json(result);
-      }
-    );
-  });
-});
-*/
 
 // Function to create a NEW Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
@@ -375,7 +319,8 @@ app.get("/read-tasks", (req, res) => {
 
 // Gets all the subtasks in the database
 app.get("/read-subtasks", (req, res) => {
-  const sql = "SELECT * FROM subtasks_init";
+  const userId = req.query.id;
+  const sql = "SELECT * FROM subtasks_init WHERE userId = ?";
   connection.query(sql, function (err, result) {
     if (err) {
       console.log("Failed to read subtasks from Database");
@@ -396,8 +341,11 @@ app.get("/login-user", (req, res) => {
   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
     if (err) {
       console.log("Login call attempt failed!");
+    } else if (result.length === 0) {
+      // Kein Benutzer mit passendem Namen und Passwort gefunden
+      res.json({ id: -1, name: "" });
     } else {
-      res.json({ id: result[0].id, name: result[0].name });
+      res.json({ id: result[0].id, name: result[0].displayName });
     }
   });
 });

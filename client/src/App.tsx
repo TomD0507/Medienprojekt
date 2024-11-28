@@ -9,11 +9,14 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { checkLogin, usernameExists, registerUser } from "./helpers/loginHelper";
-import { getTasksFromArray, TaskInput, SubtaskInput } from "./helpers/taskHelper";
+import {
+  getTasksFromArray,
+  TaskInput,
+  SubtaskInput,
+} from "./helpers/taskHelper";
 
 import AddTask from "./components/AddTask";
-import { Priority, TaskProps } from "./components/Task";
+import { TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import "./styles/FilterMenu.css";
@@ -23,130 +26,20 @@ import axios from "axios";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
-const initialTasks = [
-  {
-    id: 1,
-    title: "Task 1",
-    description: "Description for Task 1",
-    subtasks: [
-      { name: "Subtask 1.1", done: false },
-      { name: "Subtask 1.2", done: true },
-    ],
-    deadline: new Date(2024, 11, 25),
-    priority: "high" as Priority,
-    done: false,
-    reminder: "Nie",
-    repeat: "Nie",
-    deleted: false,
-  },
-  {
-    id: 2,
-    title: "Task 2",
-    description: "Description for Task 2",
-    subtasks: [
-      { name: "Subtask 2.1", done: false },
-      { name: "Subtask 2.2", done: false },
-    ],
-    deadline: new Date(2024, 11, 30),
-    priority: "none" as Priority,
-    done: false,
-    reminder: "Täglich",
-    repeat: "Nie",
-    deleted: false,
-  },
-  {
-    id: 3,
-    title: "Done Task 1",
-    description: "Description for Task 1",
-    subtasks: [
-      { name: "Subtask 1.1", done: false },
-      { name: "Subtask 1.2", done: true },
-    ],
-    deadline: new Date(2024, 11, 25),
-    priority: "high" as Priority,
-    done: true,
-    reminder: "Nie",
-    repeat: "Nie",
-    deleted: false,
-  },
-  {
-    id: 4,
-    title: "Task 4",
-    description: "Description for Task 1",
-    subtasks: [
-      { name: "Subtask 1.1", done: false },
-      { name: "Subtask 1.2", done: true },
-    ],
-    deadline: new Date(2024, 10, 25),
-    priority: "high" as Priority,
-    done: false,
-    reminder: "Nie",
-    repeat: "Nie",
-    deleted: false,
-  },
-  {
-    id: 5,
-    title: "Task 5",
-    description: "Description for Task 2",
-    subtasks: [
-      { name: "Subtask 2.1", done: false },
-      { name: "Subtask 2.2", done: false },
-    ],
-    deadline: new Date(2024, 10, 30),
-    priority: "none" as Priority,
-    done: false,
-    reminder: "Täglich",
-    repeat: "Nie",
-    deleted: false,
-  },
-  {
-    id: 6,
-    title: "Task 6",
-    description: "Description for Task 2",
-    subtasks: [
-      { name: "Subtask 2.1", done: false },
-      { name: "Subtask 2.2", done: false },
-    ],
-    deadline: new Date(2024, 11, 1),
-    priority: "medium" as Priority,
-    done: false,
-    reminder: "Täglich",
-    repeat: "Nie",
-    deleted: false,
-  },
-
-  {
-    id: 7,
-    title: "Task 7",
-    description: "Description for Task 2",
-    subtasks: [
-      { name: "Subtask 2.1", done: false },
-      { name: "Subtask 2.2", done: false },
-    ],
-    deadline: new Date(2024, 11, 2),
-    priority: "medium" as Priority,
-    done: false,
-    reminder: "Täglich",
-    repeat: "Nie",
-    deleted: false,
-  },
-];
 
 // Const for UserID, TODO: Update to var and updated when logged in
 
 type AppProps = {
   userID: number;
+  displayName: string;
 };
 
 function App({ userID }: AppProps) {
   //TODO: replace with proper task save and handling)
   //todo: save user id for backendcalls
-  const [openTasks, setOpenTasks] = useState(
-    initialTasks.filter((task) => !task.deleted && !task.done)
-  );
-  const [doneTasks, setDoneTasks] = useState(
-    initialTasks.filter((task) => !task.deleted && task.done)
-  );
+  const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
+
+  const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -181,20 +74,6 @@ function App({ userID }: AppProps) {
       });
   };
 
-  // Function: Backend-Call
-  /*
-  const handleDeleteTask = (deletedTask: TaskProps) => {
-    // Hier könnten der frontend-Code stehen TODO()
-    axios
-      .post(`${API_URL}/delete-task`, { deletedTask, userID })
-      .then((r) => {
-        console.log(r);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-*/
   // Initialization call to the backend
   useEffect(() => {
     const fetchData = async () => {
@@ -228,9 +107,6 @@ function App({ userID }: AppProps) {
 
         setDoneTasks(doneTasks);
         setOpenTasks(openTasks);
-
-        console.log("Open Tasks:", openTasks);
-        console.log("Done Tasks:", doneTasks);
       } catch (error) {
         console.error("Error fetching tasks or subtasks:", error);
       }
@@ -239,7 +115,7 @@ function App({ userID }: AppProps) {
     fetchData();
   }, [userID]);
 
-  const [id, updateID] = useState(initialTasks.length + 1); //TODO: proper way to get taskID(backend counts?)
+  const [id, updateID] = useState(1);
   const incrementID = () => updateID((prevID) => (prevID += 1));
 
   const [isOpen, setOverlay] = useState(false);
@@ -335,7 +211,7 @@ function App({ userID }: AppProps) {
       return task.priority && task.priority !== "none";
     }
     if (filter === "done") {
-      return task.done === true;
+      return task.done;
     }
     return false;
   }
@@ -403,25 +279,46 @@ function App({ userID }: AppProps) {
       {isMenuOpen && (
         <div ref={menuRef} className="menu-overlay">
           <div className="filter-options">
-            <button onClick={() => setFilter("all")}>
+            <button
+              onClick={() => setFilter("all")}
+              disabled={filter === "all"}
+            >
               <FontAwesomeIcon icon={faBook} /> Alle
             </button>
-            <button onClick={() => setFilter("today")}>
+            <button
+              onClick={() => setFilter("today")}
+              disabled={filter === "today"}
+            >
               <FontAwesomeIcon icon={faCalendarDay} /> Heute
             </button>
-            <button onClick={() => setFilter("tomorrow")}>
+            <button
+              onClick={() => setFilter("tomorrow")}
+              disabled={filter === "tomorrow"}
+            >
               <FontAwesomeIcon icon={faCalendarDay} /> Morgen
             </button>
-            <button onClick={() => setFilter("week")}>
+            <button
+              onClick={() => setFilter("week")}
+              disabled={filter === "week"}
+            >
               <FontAwesomeIcon icon={faCalendarWeek} /> Diese Woche
             </button>
-            <button onClick={() => setFilter("nextWeek")}>
+            <button
+              onClick={() => setFilter("nextWeek")}
+              disabled={filter === "nextWeek"}
+            >
               <FontAwesomeIcon icon={faCalendarWeek} /> Nächste Woche
             </button>
-            <button onClick={() => setFilter("important")}>
+            <button
+              onClick={() => setFilter("important")}
+              disabled={filter === "important"}
+            >
               <FontAwesomeIcon icon={faExclamation} /> Wichtig
             </button>
-            <button onClick={() => setFilter("done")}>
+            <button
+              onClick={() => setFilter("done")}
+              disabled={filter === "done"}
+            >
               <FontAwesomeIcon icon={faCheckCircle} /> Erledigt
             </button>
             <button
@@ -429,6 +326,7 @@ function App({ userID }: AppProps) {
                 setFilter("all");
                 setSearchQuery("");
               }}
+              disabled={filter === "all" && searchQuery === ""}
             >
               <FontAwesomeIcon icon={faFilter} /> Filter entfernen
             </button>
