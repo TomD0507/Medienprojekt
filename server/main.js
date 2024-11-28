@@ -139,9 +139,6 @@ app.post("/create-dummy-users", (req, res) => {
   });
 });
 
-// Checks if connected properly
-
-
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
@@ -321,7 +318,7 @@ app.get("/read-tasks", (req, res) => {
 app.get("/read-subtasks", (req, res) => {
   const userId = req.query.id;
   const sql = "SELECT * FROM subtasks_init WHERE userId = ?";
-  connection.query(sql, function (err, result) {
+  connection.query(sql, [userId],function (err, result) {
     if (err) {
       console.log("Failed to read subtasks from Database");
     } else {
@@ -366,9 +363,9 @@ app.get("/exists-user", (req, res) => {
 // Registers a new user
 app.post("/register-user", (req, res) => {
   const sql =
-    "INSERT INTO users_init (name, password) VALUES (?, ?)";
+    "INSERT INTO users_init (name, password,displayName) VALUES (?, ?, ?)";
   console.log(req.body);
-  connection.query(sql, [req.body.name, req.body.pw], (err, result) => {
+  connection.query(sql, [req.body.name, req.body.pw,req.body.name], (err, result) => {
     if (err) throw err;
     console.log("User succesfully registered.");
   });
