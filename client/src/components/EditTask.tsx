@@ -38,9 +38,7 @@ function EditTask({
 }: EditTaskProps) {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
-  const [subtasks, setSubtasks] = useState(
-    initialSubtasks.map((subtask) => subtask.name)
-  );
+  const [subtasks, setSubtasks] = useState(initialSubtasks);
   const [priority, setPriority] = useState<Priority>(initialPriority);
   const [deadlineDate, setDeadlineDate] = useState(() => {
     if (isValidDate(initialDeadline)) {
@@ -59,10 +57,11 @@ function EditTask({
   const [reminder, setReminder] = useState(initialReminder);
   const [repeat, setRepeat] = useState(initialRepeat);
 
-  const addSubtask = () => setSubtasks([...subtasks, ""]);
+  const addSubtask = () =>
+    setSubtasks([...subtasks, { name: "", done: false }]);
   const updateSubtask = (index: number, value: string) => {
     const updatedSubtasks = [...subtasks];
-    updatedSubtasks[index] = value;
+    updatedSubtasks[index].name = value;
     setSubtasks(updatedSubtasks);
   };
 
@@ -78,9 +77,7 @@ function EditTask({
       id,
       title,
       description,
-      subtasks: subtasks
-        .filter((subtask) => subtask.trim() !== "")
-        .map((subtask) => ({ name: subtask, done: false })),
+      subtasks: subtasks.filter((subtask) => subtask.name.trim() !== ""),
       priority,
       deadline,
       done,
@@ -126,7 +123,7 @@ function EditTask({
               <div className="add_item" key={index}>
                 <input
                   type="text"
-                  value={subtask}
+                  value={subtask.name}
                   onChange={(e) => updateSubtask(index, e.target.value)}
                   placeholder={`Unteraufgabe ${index + 1}`}
                 />
