@@ -184,9 +184,12 @@ function EditTask({
                   onChange={(e) => setReminder(e.target.value)}
                 >
                   <option value="Nie">Nie</option>
-                  <option value="Täglich">Täglich</option>
-                  <option value="Wöchentlich">Wöchentlich</option>
-                  <option value="Monatlich">Monatlich</option>
+                  <option value="1 Stunde vorher">1 Stunde vorher</option>
+                  <option value="6 Stunden vorher">6 Stunden vorher</option>
+                  <option value="12 Stunden vorher">12 Stunden vorher</option>
+                  <option value="1 Tag vorher">1 Tag vorher</option>
+                  <option value="3 Tage vorher">3 Tage vorher</option>
+                  <option value="1 Woche vorher">1 Woche vorher</option>
                 </select>
               </div>
             </label>

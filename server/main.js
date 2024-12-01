@@ -59,7 +59,7 @@ function initTodoDB() {
         deadline DATETIME,
         priority ENUM('none', 'low', 'medium', 'high') NOT NULL DEFAULT 'none',
         isDone BOOL DEFAULT false,
-        todoReminder ENUM('Nie', 'Täglich', 'Wöchentlich', 'Monatlich') DEFAULT 'Nie',
+        todoReminder VARCHAR(255) DEFAULT 'Nie',
         todoRepeat ENUM('Nie', 'Täglich', 'Wöchentlich', 'Monatlich') DEFAULT 'Nie',
         todoDeleted BOOL DEFAULT 0,
         dateCreated DATETIME NOT NULL,
