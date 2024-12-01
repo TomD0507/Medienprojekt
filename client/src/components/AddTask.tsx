@@ -1,7 +1,10 @@
 import { useState } from "react";
 import Overlay from "./Overlay";
-import { TaskProps, Priority } from "./Task";
-
+import { TaskProps, Priority, isValidDate } from "./Task";
+export function isValidDateString(datestring: string) {
+  const date = new Date(datestring);
+  return date instanceof Date && !isNaN(date.getTime());
+}
 interface AddTaskProps {
   id: number;
   onClose: () => void;
@@ -33,6 +36,7 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
       alert("Bitte einen Titel hinzufügen.");
       return;
     }
+    const ddate = new Date(`${deadlineDate}`);
     const newTask = {
       id: id,
       title,
@@ -41,9 +45,9 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
         .filter((task) => task.trim() !== "")
         .map((task) => ({ name: task.trim(), done: false })),
       priority,
-      deadline: new Date(`${deadlineDate}`),
-      reminder,
-      repeat,
+      deadline: ddate,
+      reminder: isValidDate(ddate) ? reminder : "Nie",
+      repeat: isValidDate(ddate) ? repeat : "Nie",
       done: false,
       deleted: false,
     };
@@ -145,34 +149,38 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
               />
             </div>
           </label>
-          <label>
-            Erinnerung hinzufügen:
-            <div className="add_item">
-              <select
-                value={reminder}
-                onChange={(e) => setReminder(e.target.value)}
-              >
-                <option value="Nie">Nie</option>
-                <option value="Täglich">Täglich</option>
-                <option value="Wöchentlich">Wöchentlich</option>
-                <option value="Monatlich">Monatlich</option>
-              </select>
-            </div>
-          </label>
-          <label>
-            Wiederholen:
-            <div className="add_item">
-              <select
-                value={repeat}
-                onChange={(e) => setRepeat(e.target.value)}
-              >
-                <option value="Nie">Nie</option>
-                <option value="Täglich">Täglich</option>
-                <option value="Wöchentlich">Wöchentlich</option>
-                <option value="Monatlich">Monatlich</option>
-              </select>
-            </div>
-          </label>
+          {isValidDateString(deadlineDate) && (
+            <label>
+              Erinnerung hinzufügen:
+              <div className="add_item">
+                <select
+                  value={reminder}
+                  onChange={(e) => setReminder(e.target.value)}
+                >
+                  <option value="Nie">Nie</option>
+                  <option value="Täglich">Täglich</option>
+                  <option value="Wöchentlich">Wöchentlich</option>
+                  <option value="Monatlich">Monatlich</option>
+                </select>
+              </div>
+            </label>
+          )}
+          {isValidDateString(deadlineDate) && (
+            <label>
+              Wiederholen:
+              <div className="add_item">
+                <select
+                  value={repeat}
+                  onChange={(e) => setRepeat(e.target.value)}
+                >
+                  <option value="Nie">Nie</option>
+                  <option value="Täglich">Täglich</option>
+                  <option value="Wöchentlich">Wöchentlich</option>
+                  <option value="Monatlich">Monatlich</option>
+                </select>
+              </div>
+            </label>
+          )}
           <div style={{ display: "flex", gap: "10px" }}>
             <button
               className="taskMenuAbortButton"
