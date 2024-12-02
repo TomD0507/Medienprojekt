@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const cron = require("node-cron");
 const { format } = require("date-fns");
 
 const app = express();
@@ -64,6 +65,7 @@ function initTodoDB() {
         todoDeleted BOOL DEFAULT 0,
         dateCreated DATETIME NOT NULL,
         dateDeleted DATETIME,
+        isRepeated BOOL DEFAULT false,
         PRIMARY KEY (userId, todoId)
     )
     `;
@@ -256,6 +258,7 @@ function extractSubtasks(reqBody) {
 // Updates a already existing task
 app.post("/update-task", (req, res) => {
   res.sendStatus(200);
+  handleRepeatingTasks();
   const subtasks = extractSubtasks(req.body);
   const task = extractTodo(req.body);
   
@@ -305,8 +308,7 @@ app.get("/read-tasks", (req, res) => {
   const sql = "SELECT * FROM todos_init WHERE userId = ?";
   connection.query(sql, [userId], function (err, result) {
     if (err) {
-      console.log("Failed to read tasks from Database");
-      console.log(err);
+      console.log("Failed to read tasks from Database:", err);
     } else {
       console.log("Read tasks from database successfully");
       res.send(result);
@@ -360,11 +362,94 @@ app.get("/exists-user", (req, res) => {
   });
 });
 
+
+// Logic for handling repeatable tasks
+function handleRepeatingTasks() {
+  const sql_getTasks = `
+    SELECT userId, todoId, title, description, deadline, todoRepeat, dateCreated
+    FROM todos_init
+    WHERE deadline < NOW() AND todoRepeat != 'Nie' AND todoDeleted = FALSE AND isRepeated = FALSE
+  `;
+  // Query for getting all the relevant tasks
+  connection.query(sql_getTasks, function (err, result) {
+    if (err) {
+      console.log("Error when getting all the tasks:", err)
+    } else {
+      const repeatableTasks = result;
+      for (const task of repeatableTasks) {
+        const newDeadline = nextDeadline(task.deadline, task.todoRepeat);
+        const currentTime = format(Date.now(), "yyyy-MM-dd HH:mm:ss");
+        const prio = (task.priority == null) ? "none" : task.priority;
+        const reminder = (task.todoReminder == null) ? "Nie" : task.todoReminder
+        getMaxTodoId(function(err, maxId) {
+          if (err) {
+            console.error("Error fetching max TodoId:", err);
+          } else {
+            const taskArray = [task.userId, maxId, task.title, task.description, newDeadline, prio, reminder, task.todoRepeat, currentTime]
+            
+            // Query for creating the new repeated tasks
+            const sql_setRepeatedTask = `
+              INSERT INTO todos_init (userId, todoId, title, description, deadline, priority, todoReminder, todoRepeat, dateCreated) VALUES ?
+            `
+            connection.query(sql_setRepeatedTask, [[taskArray]], function (err_1, _) {
+              if (err_1) {
+                console.log("Error when inserting the new repeatable Tasks into DB:", err_1);
+              }
+            });
+            
+            // Query for updating the bool flag of the repeated tasks
+            const sql_update = "UPDATE todos_init SET isRepeated = TRUE WHERE todoId = ?";
+            connection.query(sql_update, [task.todoId], function(err_2, _) {
+              if (err_2) {
+                console.log("Error when updating bool flag for repeated:", err_2);
+              }
+            });
+          }
+        });
+      } 
+    };
+  });
+};
+
+// Helper function to calculate the next deadline (extendable for further reapeatable options)
+function nextDeadline(deadline, todoRepeat) {
+  const currentDeadline = new Date(deadline);
+  switch(todoRepeat) {
+    case "Täglich": {
+      currentDeadline.setDate(currentDeadline.getDate() + 1);
+      return format(new Date(currentDeadline.toISOString()), "yyyy-MM-dd HH:mm:ss");
+    }
+    case "Wöchentlich": {
+      currentDeadline.setDate(currentDeadline.getDate() + 7);
+      return format(new Date(currentDeadline.toISOString()), "yyyy-MM-dd HH:mm:ss");
+    }
+    case "Monatlich": {
+      currentDeadline.setMonth(currentDeadline.getMonth() + 1);
+      return format(new Date(currentDeadline.toISOString()), "yyyy-MM-dd HH:mm:ss");
+    }
+    default: return null;
+  }
+}
+
+// Helper function to get the highest ID from the table
+function getMaxTodoId(callback) {
+  const sql = "SELECT MAX(todoId) AS maxTodoId FROM todos_init"
+  connection.query(sql, function (err, result) {
+    if (err) {
+      console.log("Failed getting the highest id from the table!");
+      callback(err, null);
+    } else {
+      const maxIds = result[0];
+      const maxId = maxIds.maxTodoId + 1;
+      callback(null, maxId);
+    }
+  });
+}
+
 // Registers a new user
 app.post("/register-user", (req, res) => {
   const sql =
     "INSERT INTO users_init (name, password,displayName) VALUES (?, ?, ?)";
-  console.log(req.body);
   connection.query(sql, [req.body.name, req.body.pw,req.body.name], (err, result) => {
     if (err) throw err;
     console.log("User succesfully registered.");
@@ -373,4 +458,10 @@ app.post("/register-user", (req, res) => {
 
 app.listen(5000, '0.0.0.0', () => {
   console.log('Backend läuft auf Port 5000');
+});
+
+// Schedule the repeating task handler to run daily at midnight
+cron.schedule('0 0 * * *', () => {
+  console.log('Checking for repeating tasks...');
+  handleRepeatingTasks();
 });
