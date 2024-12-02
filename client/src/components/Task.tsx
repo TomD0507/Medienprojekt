@@ -43,9 +43,10 @@ export interface TaskProps {
 }
 interface TaskElProps {
   props: TaskProps;
+  currentTime: Date;
   onUpdateTask: (updatedTask: TaskProps) => void;
 }
-function Task({ props, onUpdateTask }: TaskElProps) {
+function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
   const [isEditing, setIsEditing] = useState(false);
   const toggleSubtask = (index: number) => {
     const updatedSubtasks = props.subtasks.map((subtask, i) =>
@@ -59,7 +60,7 @@ function Task({ props, onUpdateTask }: TaskElProps) {
       return "Ungültiges Datum"; // "Invalid date" in German
     }
 
-    const now = new Date();
+    const now = currentTime;
     const timeDifference = now.getTime() - date.getTime(); // Difference in milliseconds
 
     // Check if the date is today
@@ -150,18 +151,24 @@ function Task({ props, onUpdateTask }: TaskElProps) {
     onUpdateTask(updatedTask);
     setIsEditing(false); // Close the dialog
   };
-  /*
+
   const taskStatus = props.done
     ? "Done"
-    : props.deadline <= new Date()
+    : props.deadline <= currentTime
     ? "Overtime"
     : "Still to do";
-*/
+
   return (
     <>
-      <div className="task-element">
+      <div
+        className={
+          taskStatus === "Still to do"
+            ? "task-element"
+            : "overtime task-element"
+        }
+      >
         <div
-          className={props.done ? "grayout" : "no_grayout"}
+          className={taskStatus === "Done" ? "grayout" : "no_grayout"}
           onClick={() => setIsEditing(true)}
         ></div>
         <div className="side-by-side">

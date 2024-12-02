@@ -9,6 +9,7 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 
+import "./styles/Overlay.css";
 import {
   getTasksFromArray,
   TaskInput,
@@ -16,13 +17,15 @@ import {
 } from "./helpers/taskHelper";
 
 import AddTask from "./components/AddTask";
-import { TaskProps } from "./components/Task";
+import { isValidDate, TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import "./styles/FilterMenu.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import axios from "axios";
+import { faTimesCircle } from "@fortawesome/free-solid-svg-icons/faTimesCircle";
+import { faInfinity } from "@fortawesome/free-solid-svg-icons/faInfinity";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
@@ -35,8 +38,6 @@ type AppProps = {
 };
 
 function App({ userID }: AppProps) {
-  //TODO: replace with proper task save and handling)
-  //todo: save user id for backendcalls
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
 
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
@@ -213,8 +214,23 @@ function App({ userID }: AppProps) {
     if (filter === "done") {
       return task.done;
     }
+    if (filter === "missed") {
+      return !task.done && task.deadline <= currentTime;
+    }
+    if (filter === "noDeadline") {
+      return !isValidDate(task.deadline);
+    }
     return false;
   }
+  //update current time every 5 seconds
+  const [currentTime, updateTime] = useState(new Date());
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      updateTime(new Date());
+    }, 5000);
+    // Cleanup on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
   return (
     <div className="app">
       {/* Header */}
@@ -223,12 +239,13 @@ function App({ userID }: AppProps) {
         onSearchToggle={() => setIsSearchOpen(!isSearchOpen)}
         filter={filter}
       />
-
+      {/*<div>{currentTime.toString()}</div>*/}
       {/* Home Screen */}
       <main>
         <header>Aufgaben</header>
         <CollList title="Offene ToDos">
           <TaskList
+            currentTime={currentTime}
             tasks={openTasks
               .filter((task) => !task.deleted)
               .filter(
@@ -247,6 +264,7 @@ function App({ userID }: AppProps) {
         </CollList>
         <CollList title="Erledigte Aufgaben">
           <TaskList
+            currentTime={currentTime}
             tasks={doneTasks
               .filter((task) => !task.deleted)
               .filter(
@@ -277,74 +295,98 @@ function App({ userID }: AppProps) {
 
       {/* Menu */}
       {isMenuOpen && (
-        <div ref={menuRef} className="menu-overlay">
-          <div className="filter-options">
-            <button
-              onClick={() => setFilter("all")}
-              disabled={filter === "all"}
-            >
-              <FontAwesomeIcon icon={faBook} /> Alle
-            </button>
-            <button
-              onClick={() => setFilter("today")}
-              disabled={filter === "today"}
-            >
-              <FontAwesomeIcon icon={faCalendarDay} /> Heute
-            </button>
-            <button
-              onClick={() => setFilter("tomorrow")}
-              disabled={filter === "tomorrow"}
-            >
-              <FontAwesomeIcon icon={faCalendarDay} /> Morgen
-            </button>
-            <button
-              onClick={() => setFilter("week")}
-              disabled={filter === "week"}
-            >
-              <FontAwesomeIcon icon={faCalendarWeek} /> Diese Woche
-            </button>
-            <button
-              onClick={() => setFilter("nextWeek")}
-              disabled={filter === "nextWeek"}
-            >
-              <FontAwesomeIcon icon={faCalendarWeek} /> Nächste Woche
-            </button>
-            <button
-              onClick={() => setFilter("important")}
-              disabled={filter === "important"}
-            >
-              <FontAwesomeIcon icon={faExclamation} /> Wichtig
-            </button>
-            <button
-              onClick={() => setFilter("done")}
-              disabled={filter === "done"}
-            >
-              <FontAwesomeIcon icon={faCheckCircle} /> Erledigt
-            </button>
-            <button
-              onClick={() => {
-                setFilter("all");
-                setSearchQuery("");
-              }}
-              disabled={filter === "all" && searchQuery === ""}
-            >
-              <FontAwesomeIcon icon={faFilter} /> Filter entfernen
-            </button>
+        <div className="overlay">
+          <div
+            className="overlay-backdrop"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          ></div>
+          <div ref={menuRef} className="menu-overlay">
+            <div className="filter-options">
+              <button
+                onClick={() => setFilter("all")}
+                disabled={filter === "all"}
+              >
+                <FontAwesomeIcon icon={faBook} /> Alle
+              </button>
+              <button
+                onClick={() => setFilter("today")}
+                disabled={filter === "today"}
+              >
+                <FontAwesomeIcon icon={faCalendarDay} /> Heute
+              </button>
+              <button
+                onClick={() => setFilter("tomorrow")}
+                disabled={filter === "tomorrow"}
+              >
+                <FontAwesomeIcon icon={faCalendarDay} /> Bis morgen
+              </button>
+              <button
+                onClick={() => setFilter("week")}
+                disabled={filter === "week"}
+              >
+                <FontAwesomeIcon icon={faCalendarWeek} /> Diese Woche
+              </button>
+              <button
+                onClick={() => setFilter("nextWeek")}
+                disabled={filter === "nextWeek"}
+              >
+                <FontAwesomeIcon icon={faCalendarWeek} /> Nächste Woche
+              </button>
+              <button
+                onClick={() => setFilter("important")}
+                disabled={filter === "important"}
+              >
+                <FontAwesomeIcon icon={faExclamation} /> Wichtig
+              </button>
+              <button
+                onClick={() => setFilter("done")}
+                disabled={filter === "done"}
+              >
+                <FontAwesomeIcon icon={faCheckCircle} /> Erledigt
+              </button>
+              <button
+                onClick={() => setFilter("missed")}
+                disabled={filter === "missed"}
+              >
+                <FontAwesomeIcon icon={faTimesCircle} /> Verpasst
+              </button>
+              <button
+                onClick={() => setFilter("noDeadline")}
+                disabled={filter === "noDeadline"}
+              >
+                <FontAwesomeIcon icon={faInfinity} /> Ohne Deadline
+              </button>
+              <button
+                onClick={() => {
+                  setFilter("all");
+                  setSearchQuery("");
+                }}
+                disabled={filter === "all" && searchQuery === ""}
+              >
+                <FontAwesomeIcon icon={faFilter} /> Filter entfernen
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Searchbar */}
       {isSearchOpen && (
-        <div ref={searchBarRef} className="search-bar">
-          <input
-            type="text"
-            placeholder="Nach Keywords suchen.."
-            value={searchQuery}
-            onChange={(e) =>
-              setSearchQuery(e.target.value.trim().toLowerCase())
-            }
-          />
+        <div className="overlay">
+          <div
+            className="overlay-backdrop"
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+          ></div>
+          <div ref={searchBarRef} className="search-bar">
+            <input
+              type="text"
+              placeholder="Nach Keywords suchen.."
+              value={searchQuery}
+              onChange={(e) =>
+                setSearchQuery(e.target.value.trim().toLowerCase())
+              }
+            />
+          </div>
         </div>
       )}
     </div>
