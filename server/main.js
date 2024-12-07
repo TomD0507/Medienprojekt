@@ -258,7 +258,6 @@ function extractSubtasks(reqBody) {
 // Updates a already existing task
 app.post("/update-task", (req, res) => {
   res.sendStatus(200);
-  handleRepeatingTasks();
   const subtasks = extractSubtasks(req.body);
   const task = extractTodo(req.body);
   
@@ -362,6 +361,17 @@ app.get("/exists-user", (req, res) => {
   });
 });
 
+//get a list of all Usernames registered
+app.get("/get-user-list", (req, res)=>{
+  const sql="SELECT name,displayName FROM users_init";
+  connection.query(sql,[], function (err, result){
+    if (err) {
+      console.log("Error getting userlist!");
+    } else {
+      res.send(result);
+    }
+  });
+});
 
 // Logic for handling repeatable tasks
 function handleRepeatingTasks() {

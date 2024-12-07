@@ -1,25 +1,44 @@
+import { useState } from "react";
+import { registerUser } from "../helpers/loginHelper";
 import "../styles/LoginSignup.css";
 type LoginProps = {
-  name: string;
-  password: string;
-  onPWChange: (field: string) => void;
-  onNameChange: (field: string) => void;
-  onSubmit: () => void;
   status: "idle" | "loading" | "error";
 };
-function Login({
-  name,
-  password,
-  onPWChange,
-  onNameChange,
-  onSubmit,
-  status,
-}: LoginProps) {
+function Login() {
+  const [loginName, setName] = useState("");
+  const [password, setPw] = useState("");
+
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const handleSubmit = async () => {
+    setStatus("loading");
+    if (!loginName.trim()) {
+      alert("Bitte einen Namen hinzufügen.");
+      setStatus("idle");
+      return;
+    }
+    if (!password.trim()) {
+      alert("Bitte ein Passwort vergeben.");
+      setStatus("idle");
+      return;
+    }
+    const registered = await registerUser(loginName, password);
+
+    if (registered) {
+      console.log("User successfully created!");
+      setStatus("idle");
+    } else {
+      console.log("There already exists a User with that name.");
+      setStatus("error");
+    }
+    //input reset after login was checked
+    setName("");
+    setPw("");
+  };
   return (
     <div className="login_aligner">
       <div className="container">
         <div className="login_header">
-          <div className="text">Register a new User</div>
+          <div className="text">Register new User</div>
           <div className="underline"></div>
         </div>
         <div className="inputs">
@@ -27,8 +46,8 @@ function Login({
             <input
               type="text"
               placeholder="Name"
-              value={name}
-              onChange={(e) => onNameChange(e.target.value.trim())}
+              value={loginName}
+              onChange={(e) => setName(e.target.value.trim())}
               disabled={status === "loading"}
             />
           </div>
@@ -37,7 +56,7 @@ function Login({
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => onPWChange(e.target.value)}
+              onChange={(e) => setPw(e.target.value)}
               disabled={status === "loading"}
             />
           </div>
@@ -48,10 +67,10 @@ function Login({
         <div className="submit-container">
           <button
             className="submit"
-            onClick={onSubmit}
+            onClick={handleSubmit}
             disabled={status === "loading"}
           >
-            {status === "loading" ? "Loading..." : "Login"}
+            {status === "loading" ? "Loading..." : "Register"}
           </button>
         </div>
       </div>

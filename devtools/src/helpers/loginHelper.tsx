@@ -6,8 +6,7 @@ interface loginData {
   name: string;
 }
 
-/** Function which returns (id, name) if a username with that password exists, for example use press
- * on the function while holding STRG/CTRL
+/** Function which returns (id, name) if a username with that password exists
  */
 export const checkLogin = async (
   name: string,
@@ -27,14 +26,8 @@ export const checkLogin = async (
     throw err;
   }
 };
-//Example use
-//   (async () => {
-//     const loginData = await checkLogin('testUser', 'winterMP');
-//     console.log(loginData.id, loginData.name); //loginData = {id: 6, name: "testUser"}
-//   })();
 
-/** Function which returns true if that username already exists and false if not. For an example, click on the
- * function while holding STRQ/CTRL
+/** Function which returns true if that username already exists and false if not.
  */
 export const usernameExists = async (name: string): Promise<boolean> => {
   try {
@@ -48,14 +41,9 @@ export const usernameExists = async (name: string): Promise<boolean> => {
     return false;
   }
 };
-//Example use
-// (async () => {
-//   const exists = await usernameExists('testUser');
-//   console.log(exists); //exists = true
-// })();
 
 /** Function which first checks if the username already exists, if not then it prints out that it does not work and
- * returns false. For an example click on the function while holding STRG/CTRL.
+ * returns false.
  * */
 export const registerUser = async (
   name: string,
@@ -83,6 +71,3 @@ export const registerUser = async (
     }
   })();
 };
-// Example use:
-// registerUser('testUser', '123456'); // returns false since testUser already exists
-// registerUser('Frodo Baggins', '123456'); // returns true since it got registered correctly

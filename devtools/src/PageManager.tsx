@@ -1,48 +1,35 @@
-import { useState } from "react";
-
-import { registerUser } from "./helpers/loginHelper";
+import React, { useState } from "react";
 import Register from "./components/Register";
+import ShowUsers from "./components/ShowUsers";
+import "./styles/PageManager.css"; // Import the CSS file
+
 function PageManager() {
-  //userID wird bei login gesetzt
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
-
-  const [loginName, setName] = useState("");
-  const [password, setPw] = useState("");
-
-  const handleNameChange = (e: string) => {
-    setName(e);
-  };
-
-  const handlePwChange = (e: string) => {
-    setPw(e);
-  };
-
-  const handleSubmit = async () => {
-    setStatus("loading");
-
-    const registered = await registerUser(loginName, password);
-
-    if (registered) {
-      console.log("User successfully created!");
-      setStatus("idle");
-    } else {
-      console.log("There already exists a User with that name.");
-      setStatus("error");
-    }
-    //input reset after login was checked
-    handleNameChange("");
-    handlePwChange("");
-  };
+  // State to manage the current view
+  const [currentView, setCurrentView] = useState("register");
 
   return (
-    <Register
-      name={loginName}
-      password={password}
-      onNameChange={handleNameChange}
-      onPWChange={handlePwChange}
-      onSubmit={handleSubmit}
-      status={status}
-    />
+    <>
+      {/* Header with buttons for navigation */}
+      <header className="header">
+        {" "}
+        <button
+          className={currentView === "register" ? "active" : ""}
+          onClick={() => setCurrentView("register")}
+          disabled={currentView === "register"}
+        >
+          Register
+        </button>
+        <button
+          className={currentView === "showUsers" ? "active" : ""}
+          onClick={() => setCurrentView("showUsers")}
+          disabled={currentView === "showUsers"}
+        >
+          Show Users
+        </button>
+      </header>
+      {currentView === "register" && <Register />}
+      {currentView === "showUsers" && <ShowUsers />}
+    </>
   );
 }
 
