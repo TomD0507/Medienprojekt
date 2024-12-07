@@ -56,7 +56,7 @@ function Login() {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPw(e.target.value)}
+              onChange={(e) => setPw(e.target.value.trim())}
               disabled={status === "loading"}
             />
           </div>
