@@ -404,6 +404,8 @@ function handleRepeatingTasks() {
             connection.query(sql_setRepeatedTask, [[taskArray]], function (err_1, _) {
               if (err_1) {
                 console.log("Error when inserting the new repeatable Tasks into DB:", err_1);
+              } else {
+                console.log("Repeating tasks successfully initialized!");
               }
             });
             
@@ -414,6 +416,33 @@ function handleRepeatingTasks() {
                 console.log("Error when updating bool flag for repeated:", err_2);
               }
             });
+
+            // Query for getting all the subtasks to be repeated:
+            const sql_getSubtasks = `
+              SELECT userId, name
+              FROM subtasks_init
+              WHERE mainTaskId = ?
+            `;
+            connection.query(sql_getSubtasks, [task.todoId], function(err_sub, result_sub) {
+              if (err_sub) {
+                console.log("Error when fetching subtasks of repeatable task:", err_sub);
+              } else {
+                // Query for inserting repeating subtasks
+                subtasks = result_sub;
+                for (subtask of subtasks) {
+                  const sql_setRepeatedSubtask = `
+                    INSERT INTO subtasks_init (userId, mainTaskId, name) VALUES (?,?,?)
+                  `;
+                  connection.query(sql_setRepeatedSubtask, [task.userId, maxId, subtask.name], function(err_sub_insert, _) {
+                    if (err_sub_insert) {
+                      console.log("Error when inserting the new subtasks:", err_sub_insert);
+                    } else  {
+                      console.log("Repeating subtasks successfully initialized!");
+                    }
+                  });
+                }
+              }
+            })
           }
         });
       } 
