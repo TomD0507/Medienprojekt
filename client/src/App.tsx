@@ -231,6 +231,8 @@ function App({ userID }: AppProps) {
     // Cleanup on component unmount
     return () => clearInterval(intervalId);
   }, []);
+  const [selectedTaskTab, setSelectedTaskTab] = useState("open");
+
   return (
     <div className="app">
       {/* Header */}
@@ -243,56 +245,70 @@ function App({ userID }: AppProps) {
       {/* Home Screen */}
       <main>
         <header>Aufgaben</header>
-        <CollList title="Offene ToDos">
-          <TaskList
-            currentTime={currentTime}
-            tasks={openTasks
-              .filter((task) => !task.deleted)
-              .filter(
-                (task) =>
-                  task.title.toLowerCase().includes(searchQuery) || // Search in title
-                  (task.description &&
-                    task.description.toLowerCase().includes(searchQuery)) ||
-                  (task.subtasks &&
-                    task.subtasks.some((element) =>
-                      element.name.toLowerCase().includes(searchQuery)
-                    )) // Optionally search in description
-              )
-              .filter(filterByPredicates)}
-            onUpdateTask={handleUpdateTask}
-          />
-        </CollList>
-        <CollList title="Erledigte Aufgaben">
-          <TaskList
-            currentTime={currentTime}
-            tasks={doneTasks
-              .filter((task) => !task.deleted)
-              .filter(
-                (task) =>
-                  task.title.toLowerCase().includes(searchQuery) || // Search in title
-                  (task.description &&
-                    task.description.toLowerCase().includes(searchQuery)) ||
-                  (task.subtasks &&
-                    task.subtasks.some((element) =>
-                      element.name.toLowerCase().includes(searchQuery)
-                    )) // Optionally search in description
-              )
-              .filter(filterByPredicates)}
-            onUpdateTask={handleUpdateTask}
-          />
-        </CollList>
+        <div className="taskbutton_holder">
+          <button
+            className="taskbutton_left"
+            onClick={() => setSelectedTaskTab("open")}
+          >
+            {"Offene ToDos"}
+          </button>
+          <button
+            className="taskbutton_right"
+            onClick={() => setSelectedTaskTab("done")}
+          >
+            {"Erledigte ToDos"}
+          </button>
+        </div>
+        <div>
+          <CollList visible={"done" === selectedTaskTab}>
+            <TaskList
+              currentTime={currentTime}
+              tasks={doneTasks
+                .filter((task) => !task.deleted)
+                .filter(
+                  (task) =>
+                    task.title.toLowerCase().includes(searchQuery) || // Search in title
+                    (task.description &&
+                      task.description.toLowerCase().includes(searchQuery)) ||
+                    (task.subtasks &&
+                      task.subtasks.some((element) =>
+                        element.name.toLowerCase().includes(searchQuery)
+                      )) // Optionally search in description
+                )
+                .filter(filterByPredicates)}
+              onUpdateTask={handleUpdateTask}
+            />
+          </CollList>
+          <CollList visible={"open" === selectedTaskTab}>
+            <TaskList
+              currentTime={currentTime}
+              tasks={openTasks
+                .filter((task) => !task.deleted)
+                .filter(
+                  (task) =>
+                    task.title.toLowerCase().includes(searchQuery) || // Search in title
+                    (task.description &&
+                      task.description.toLowerCase().includes(searchQuery)) || // search in description
+                    (task.subtasks &&
+                      task.subtasks.some((element) =>
+                        element.name.toLowerCase().includes(searchQuery)
+                      )) // search in subtasks
+                )
+                .filter(filterByPredicates)}
+              onUpdateTask={handleUpdateTask}
+            />
+          </CollList>
+        </div>
         <AddTask
           id={id}
           onClose={closeOverlay}
           isOpen={isOpen}
           onSave={handleSaveTask}
         ></AddTask>
-
-        <button className="menu-button" onClick={() => setOverlay(true)}>
-          Aufgabe hinzufügen
-        </button>
       </main>
-
+      <button className="app_header" onClick={() => setOverlay(true)}>
+        Aufgabe hinzufügen
+      </button>
       {/* Menu */}
       {isMenuOpen && (
         <div className="overlay">

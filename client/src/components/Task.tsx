@@ -90,14 +90,16 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
       return date.toLocaleDateString("de-DE", {
         weekday: "short",
         month: "short",
-        day: "numeric",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     }
 
     // For older dates, show a more detailed format (e.g., "20. November 2024, 12:30")
     return date.toLocaleString("de-DE", {
       month: "long",
-      day: "numeric",
+      day: "2-digit",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",

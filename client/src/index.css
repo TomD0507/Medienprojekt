@@ -13,7 +13,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 header {
   text-align: center;
   font-size: large;
@@ -24,16 +23,16 @@ main {
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 2px;
   margin-top: 20px;
+  width: 100%;
 }
-
 
 body {
   background-color: #98bad5;
   margin: 0; /* Remove default margin */
   min-width: 100vw;
-  min-height: 100vh;/* Center vertically */
+  min-height: 100vh; /* Center vertically */
 }
 
 .app {
@@ -62,7 +61,25 @@ body {
   margin: 0;
   font-size: 18px;
 }
+.add-task-button {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 20x;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #304674;
+  position: sticky;
+  align-items: center;
+  justify-content: center; /* Centers items horizontally */
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
 
+.add-task-button:hover {
+  opacity: 0.8;
+}
 .menu-button,
 .search-button {
   width: 100%;
@@ -74,7 +91,7 @@ body {
   font-family: inherit;
   background-color: #304674;
   align-items: center;
-  justify-content: center;  /* Centers items horizontally */
+  justify-content: center; /* Centers items horizontally */
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -105,18 +122,42 @@ body {
   border-radius: 5px;
   overflow: hidden;
 }
+.taskbutton_holder {
+  display: flex; /* Stellt sicher, dass die Buttons nebeneinander angezeigt werden */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden; /* Entfernt Überschneidungen durch die Buttons */
+}
 
-.collapsible-header {
-  width: 100%;
+.taskbutton_left {
+  flex: 1;
   padding: 10px;
   background-color: #304674;
-  color: white;
   text-align: left;
   border: none;
   font-size: 16px;
   cursor: pointer;
 }
 
+.taskbutton_right {
+  flex: 1;
+  padding: 10px;
+  background-color: #304674;
+  text-align: left;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-left: 1px solid white; /* Weißer Trennstrich */
+}
+.taskbutton_left:hover,
+.taskbutton_right:hover {
+  background-color: #3b568a; /* Hellere Blautönung bei Hover */
+}
+
+.taskbutton_left:active,
+.taskbutton_right:active {
+  background-color: #2b3c5c; /* Dunklere Blautönung bei Aktivierung */
+}
 .collapsible-header:hover {
   opacity: 0.8;
 }
@@ -148,8 +189,6 @@ body {
   border: 1px solid #ddd;
   border-radius: 5px;
 }
-
-
 
 h1 {
   font-size: 3.2em;
