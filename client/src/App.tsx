@@ -396,7 +396,7 @@ function App({ userID }: AppProps) {
           <div ref={searchBarRef} className="search-bar">
             <input
               type="text"
-              placeholder="Nach Keywords suchen.."
+              placeholder="Nach Keywords suchen..."
               value={searchQuery}
               onChange={(e) =>
                 setSearchQuery(e.target.value.trim().toLowerCase())

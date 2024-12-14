@@ -141,15 +141,13 @@ function EditTask({
                 )}
               </div>
             ))}
-            {subtasks.length < 4 && (
-              <button
-                className="taskMenuButton"
-                type="button"
-                onClick={addSubtask}
-              >
-                + Unteraufgabe hinzufügen
-              </button>
-            )}
+            <button
+              className="taskMenuButton"
+              type="button"
+              onClick={addSubtask}
+            >
+              + Unteraufgabe hinzufügen
+            </button>
           </label>
           <label>
             Priorität:
