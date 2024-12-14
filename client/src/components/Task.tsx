@@ -155,24 +155,15 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
   };
 
   const taskStatus = props.done
-    ? "Done"
+    ? "task-element"
     : props.deadline <= currentTime
-    ? "Overtime"
-    : "Still to do";
+    ? "overtime task-element"
+    : "task-element";
 
   return (
     <>
-      <div
-        className={
-          taskStatus === "Still to do"
-            ? "task-element"
-            : "overtime task-element"
-        }
-      >
-        <div
-          className={taskStatus === "Done" ? "grayout" : "no_grayout"}
-          onClick={() => setIsEditing(true)}
-        ></div>
+      <div className={taskStatus}>
+        <div className={props.done ? "grayout" : "no_grayout"}></div>
         <div className="side-by-side">
           <div className="itemleft">
             <button className="checkbox over_grayout" onClick={toggleTaskdone}>
@@ -190,11 +181,9 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
                   key={subtask.name}
                   //onClick={() => toggleSubtask(index)}
                   className={"subtaskbox side-by-side"}
+                  onClick={() => toggleSubtask(index)}
                 >
-                  <button
-                    className="checkbox"
-                    onClick={() => toggleSubtask(index)}
-                  >
+                  <button className="checkbox">
                     {subtask.done ? <span>&#x2713;</span> : " "}
                   </button>
                   <div className={subtask.done ? "done-task" : "normal-task"}>
@@ -225,6 +214,12 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
             <span className="priority-display">
               {getPrioritySymbol(props.priority)}
             </span>
+            <div
+              className="task_edit_symbol"
+              onClick={() => setIsEditing(true)}
+            >
+              <span>edit</span>
+            </div>
           </div>
         </div>
       </div>

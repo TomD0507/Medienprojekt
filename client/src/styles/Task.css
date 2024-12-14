@@ -43,7 +43,6 @@
 /* Checkbox-Design */
 .checkbox {
   position: relative;
-
   display: flex;
   width: 2em;
   height: 2em;
@@ -88,6 +87,7 @@ li {
 .subtaskbox {
   align-self: center;
   font-size: 1em;
+  z-index: 2;
 }
 .subtaskbox button {
   align-self: center;
@@ -140,4 +140,29 @@ li {
 .priority-display {
   align-items: center;
   font-size: 1.2em; /* Größe anpassen */
+}
+.task_edit_symbol {
+  width: 2em;
+  height: 2em;
+  min-width: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
+  min-height: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
+  border: 1px solid;
+  border-radius: 50%; /* Rundes Design */
+  font-size: 1.5em; /*circle size multiplier*/
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); /* Schatten */
+  background-color: transparent; /* Hintergrundfarbe */
+  color: #727272; /* Textfarbe */
+  transition: transform 0.2s ease; /* Klickanimation */
+  z-index: 2;
+  justify-content: center;
+  align-items: center;
+}
+.task_edit_symbol span {
+  font-size: 2em; /* Symbolgröße */
+  display: inline-block; /* Wichtig für transform */
+  transform: scaleX(1.5); /* Horizontal strecken um 50% */
+}
+.task_edit_symbol:hover {
+  transform: scale(1.1); /* Vergrößerung beim Hover */
 }
