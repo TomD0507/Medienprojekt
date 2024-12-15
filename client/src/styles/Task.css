@@ -5,7 +5,7 @@
   margin: 0em 0em 1em 0em;
   border-radius: 1em;
   padding: 1%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
 }
 .side-by-side {
   /* Erlaubt elemente nebeneinander darzustellen*/
@@ -19,7 +19,6 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  border: 1px solid;
   padding: 0.2em 1em;
 }
 .item {
@@ -75,7 +74,7 @@
 ul {
   padding: 0;
   margin: 0;
-  font-size: 0.8em;
+  font-size: 1em;
 }
 li {
   padding: 0em 1em 1em 2em;
@@ -83,19 +82,36 @@ li {
 .descriptionbox {
   /*top right bot left*/
   padding: 0em 1em 0em 1em;
+  font-size: 1.1em;
 }
 .subtaskbox {
+  display: flex; /* Aktiviert Flexbox */
+  align-items: center; /* Vertikale Ausrichtung */
   align-self: center;
   font-size: 1em;
   z-index: 2;
+  gap: 8px;
+  border-radius: 1em;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1%;
+  background-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+  width: 95%;
+  padding: 10px; /* vergrößert die fläche */
+  cursor: pointer; /* Zeigt interaktive Fläche */
+  transition: transform 0.2s ease; /* Weicher Übergang beim Hover */
+  position: relative; /* Wichtig für absolute Positionierung von Kindern */
+  margin-bottom: 4px;
 }
-.subtaskbox button {
-  align-self: center;
-  font-size: 1em;
+
+.subtaskbox:hover {
+  transform: scale(1.01); /* Vergrößerung beim Hover */
 }
+
 .subtaskbox div {
   display: flex; /* Aktiviert Flexbox */
   flex-wrap: wrap; /* Elemente umbrechen bei kleiner Breite */
+  gap: 5px; /* Abstand zwischen Elementen */
 }
 .normal-task {
   color: #000000;

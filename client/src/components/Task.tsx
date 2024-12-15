@@ -178,7 +178,7 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
             <ul>
               {props.subtasks.map((subtask, index) => (
                 <li
-                  key={subtask.name}
+                  key={index + subtask.name}
                   //onClick={() => toggleSubtask(index)}
                   className={"subtaskbox side-by-side"}
                   onClick={() => toggleSubtask(index)}
@@ -218,7 +218,7 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
               className="task_edit_symbol"
               onClick={() => setIsEditing(true)}
             >
-              <span>edit</span>
+              <span>ed</span>
             </div>
           </div>
         </div>
