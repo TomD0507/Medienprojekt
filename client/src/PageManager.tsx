@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Login from "./components/Login";
 import App from "./App";
 
@@ -11,6 +11,26 @@ function PageManager() {
 
   const [loginName, setName] = useState("");
   const [password, setPw] = useState("");
+  //better login functionality
+  //logout a user
+  const handleLogout = () => {
+    setUserID(null);
+    setDisplayName("");
+
+    // Clear login info from localStorage
+    localStorage.removeItem("userID");
+    localStorage.removeItem("displayName");
+  };
+  //loads id an dpname from storage
+  useEffect(() => {
+    const storedUserID = localStorage.getItem("userID");
+    const storedDisplayName = localStorage.getItem("displayName");
+
+    if (storedUserID && storedDisplayName) {
+      setUserID(Number(storedUserID));
+      setDisplayName(storedDisplayName);
+    }
+  }, []);
 
   const handleNameChange = (e: string) => {
     setName(e);
@@ -32,6 +52,9 @@ function PageManager() {
       setStatus("idle");
       setUserID(id);
       setDisplayName(name);
+      // Save login info to localStorage
+      localStorage.setItem("userID", id.toString());
+      localStorage.setItem("displayName", name);
     } else {
       console.log("Login failed: incorrect username or password.");
       setStatus("error");
