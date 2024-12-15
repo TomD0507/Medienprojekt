@@ -108,6 +108,8 @@ function initTodoDB() {
     if (err) throw err;
     console.log("User Table successfully created");
   });
+  // deleteUser("testUser");
+  registerUser("testUser", "winterMP");
 }
 
 initTodoDB();
@@ -185,6 +187,7 @@ app.post("/new-task", (req, res) => {
   const sql =
     "INSERT INTO todos_init (userId, todoId, title, description, deadline, priority, todoReminder, todoRepeat, dateCreated) VALUES ?";
   const value = createTodo(req.body);
+  console.log(value);
   connection.query(sql, [value], (err, result) => {
     if (err) {
       console.log("Failed to store new task.");
@@ -346,20 +349,29 @@ function loginUser(username, password) {
   connection.query(sql, [username], function (err, result) {
     if (err) {
       console.log("Login call attempt failed!");
+      const resultArray = [-1, ""];
+      return resultArray;
     // } else if (result.length === 0) {
     //   // Kein Benutzer mit passendem Namen und Passwort gefunden
     //   res.json({ id: -1, name: "" });
     } else if (result.length === 0) {
       console.log("Did not find a user with this name.")
+      const resultArray = [-1, ""];
+      return resultArray;
     } else {
       const user = result[0];
-      console.log(user.name);
       const match = bcrypt.compareSync(password, user.password);
       if (match) {
         console.log("Login successful.");
         // res.json({ id: user.id, name: user.displayName });
+        const resultArray = [user.id, user.displayName]
+        console.log(resultArray);
+        return resultArray
       } else {
         console.log("Invalid password");
+        const resultArray = [-1, ""];
+        console.log(resultArray);
+        return resultArray;
       }
     }
   });
@@ -367,17 +379,40 @@ function loginUser(username, password) {
 
 // Checks if the username and password exist and returns id + name if it does
 app.get("/login-user", (req, res) => {
-  const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
+  const sql = "SELECT * FROM users_init WHERE name = ?";
   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
     if (err) {
       console.log("Login call attempt failed!");
+      res.json({ id: -1, name: "" });
+    // } else if (result.length === 0) {
+    //   // Kein Benutzer mit passendem Namen und Passwort gefunden
+    //   res.json({ id: -1, name: "" });
     } else if (result.length === 0) {
-      // Kein Benutzer mit passendem Namen und Passwort gefunden
+      console.log("Did not find a user with this name.")
       res.json({ id: -1, name: "" });
     } else {
-      res.json({ id: result[0].id, name: result[0].displayName });
+      const user = result[0];
+      const match = bcrypt.compareSync(req.query.pw, user.password);
+      if (match) {
+        console.log("Login successful.");
+        res.json({ id: user.id, name: user.displayName });
+      } else {
+        console.log("Invalid password");
+        res.json({ id: -1, name: "" });
+      }
     }
   });
+  // const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
+  // connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
+  //   if (err) {
+  //     console.log("Login call attempt failed!");
+  //   } else if (result.length === 0) {
+  //     // Kein Benutzer mit passendem Namen und Passwort gefunden
+  //     res.json({ id: -1, name: "" });
+  //   } else {
+  //     res.json({ id: result[0].id, name: result[0].displayName });
+  //   }
+  // });
 });
 
 // Checks if the username and password exist and returns id + name if it does
