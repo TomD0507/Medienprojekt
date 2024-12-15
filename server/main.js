@@ -4,6 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cron = require("node-cron");
+const bcrypt = require("bcrypt");
 const { format } = require("date-fns");
 
 const app = express();
@@ -107,10 +108,6 @@ function initTodoDB() {
     if (err) throw err;
     console.log("User Table successfully created");
   });
-
-
-
-  
 }
 
 initTodoDB();
@@ -256,40 +253,50 @@ function extractSubtasks(reqBody) {
 
 
 // Updates a already existing task
-app.post("/update-task", (req, res) => {
-  res.sendStatus(200);
-  const subtasks = extractSubtasks(req.body);
-  const task = extractTodo(req.body);
-  
-  // Deleting all the subtasks (they either get added back, extended or deleted after all), task[9] is userId and task[10] is taskId
-  const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
-  connection.query(sql_delete, [task[9], task[10]], function(err, result) {
-    if (err) throw err;
-    else console.log("Updating subtasks...");
-  });
+app.post("/update-task", async (req, res) => {
+  try {
+    res.sendStatus(200);
+    
+    const subtasks = extractSubtasks(req.body);
+    const task = extractTodo(req.body);
 
-  // Updating the main task nevertheless
-  const sql =
-    "UPDATE todos_init SET title = ?, description = ?, deadline = ?, priority = ?, isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND todoId = ?";
-  connection.query(sql, task, function(err, result) {
-    if (err) {
-      throw err;
-      console.log("Failed to update task.");
-    } else {
-      // task[8] is the maintaskID
-      console.log("Task with id:", task[10], "successfully updated.");
-    }
-  });
+    // Deleting all the subtasks (they either get added back, extended or deleted after all), task[9] is userId and task[10] is taskId
+    const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
+    await helperQuery(sql_delete, [task[9], task[10]]);
+    // connection.query(sql_delete, [task[9], task[10]], function(err, result) {
+    //   if (err) throw err;
+    //   else console.log("Updating subtasks...");
+    // });
 
-  // Updating the subtasks
-  if (subtasks.length != 0) {
-    const sql_newSubtasks = "INSERT INTO subtasks_init (userId, mainTaskId, name, isDone) VALUES ?";
-    connection.query(sql_newSubtasks, [subtasks], function(err, result) {
-      if (err) throw err;
-      else console.log("Subtasks were successfully updated!");
-    });
+    
+    // Updating the main task nevertheless
+    const sql_update =
+      "UPDATE todos_init SET title = ?, description = ?, deadline = ?, priority = ?, isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND todoId = ?";
+    await helperQuery(sql_update, task);
+    // connection.query(sql, task, function(err, result) {
+    //   if (err) {
+    //     throw err;
+    //     console.log("Failed to update task.");
+    //   } else {
+    //     // task[8] is the maintaskID
+    //     console.log("Task with id:", task[10], "successfully updated.");
+    //   }
+    // });
+    
+
+    // Updating the subtasks
+    if (subtasks.length != 0) {
+      const sql_newSubtasks = "INSERT INTO subtasks_init (userId, mainTaskId, name, isDone) VALUES ?";
+      await helperQuery(sql_newSubtasks, [subtasks]);
+      // connection.query(sql_newSubtasks, [subtasks], function(err, result) {
+      //   if (err) throw err;
+      //   else console.log("Subtasks were successfully updated!");
+      // });
+    } 
+  } catch (err) {
+    console.log(err);
   }
-})
+});
 
 
 // Deletes an existing todo
@@ -332,6 +339,31 @@ app.get("/read-subtasks", (req, res) => {
     }
   });
 });
+
+// Helper function to login a user
+function loginUser(username, password) {
+  const sql = "SELECT * FROM users_init WHERE name = ?";
+  connection.query(sql, [username], function (err, result) {
+    if (err) {
+      console.log("Login call attempt failed!");
+    // } else if (result.length === 0) {
+    //   // Kein Benutzer mit passendem Namen und Passwort gefunden
+    //   res.json({ id: -1, name: "" });
+    } else if (result.length === 0) {
+      console.log("Did not find a user with this name.")
+    } else {
+      const user = result[0];
+      console.log(user.name);
+      const match = bcrypt.compareSync(password, user.password);
+      if (match) {
+        console.log("Login successful.");
+        // res.json({ id: user.id, name: user.displayName });
+      } else {
+        console.log("Invalid password");
+      }
+    }
+  });
+}
 
 // Checks if the username and password exist and returns id + name if it does
 app.get("/login-user", (req, res) => {
@@ -485,14 +517,49 @@ function getMaxTodoId(callback) {
   });
 }
 
-// Registers a new user
-app.post("/register-user", (req, res) => {
+// Helper function to get hash a password
+function hashPassword(password) {
+  const saltRounds = 10; // Value between 10 and 12 is considered safe
+  return bcrypt.hashSync(password, saltRounds);
+}
+
+// Helper function to delete user
+function deleteUser(username) {
+  const sql = 
+    "DELETE FROM users_init WHERE name = ?"
+  connection.query(sql, [username], (err, result) => {
+    if (err) {
+      console.log("Could not delete username:", err)
+    } else {
+      console.log("Successfully deleted user with username:", username);
+    }
+  })
+}
+
+// Helper function to register a new user
+function registerUser(userName, password) {
   const sql =
-    "INSERT INTO users_init (name, password,displayName) VALUES (?, ?, ?)";
-  connection.query(sql, [req.body.name, req.body.pw,req.body.name], (err, result) => {
+    "INSERT INTO users_init (name, password, displayName) VALUES (?, ?, ?)";
+  const passwordHash = hashPassword(password);
+  connection.query(sql, [userName, passwordHash, userName], (err, result) => {
     if (err) throw err;
     console.log("User succesfully registered.");
   });
+}
+
+// Helper function for queries
+async function helperQuery(sql, params) {
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (err, result) => {
+      if (err) reject(err);
+      else resolve(err);
+    })
+  })
+}
+
+// Registers a new user
+app.post("/register-user", (req, res) => {
+  registerUser(req.body.name, req.body.pw);
 })
 
 app.listen(5000, '0.0.0.0', () => {
