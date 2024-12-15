@@ -128,7 +128,20 @@ function App({ userID }: AppProps) {
 
   const menuRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (isOpen || isMenuOpen || isSearchOpen) {
+      // Scrollen verhindern
+      document.body.style.overflow = "hidden";
+    } else {
+      // Scrollen erlauben
+      document.body.style.overflow = "";
+    }
 
+    // Cleanup-Funktion: Scrollen wieder aktivieren, falls Overlay entfernt wird
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, isMenuOpen, isSearchOpen]);
   // This is a hook to close components when you click outside of them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
