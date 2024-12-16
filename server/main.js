@@ -5,6 +5,20 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cron = require("node-cron");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+
+
+// Transport for e-mail notification
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+})
+
 const { format } = require("date-fns");
 
 const app = express();
@@ -109,7 +123,7 @@ function initTodoDB() {
     console.log("User Table successfully created");
   });
   // deleteUser("testUser");
-  registerUser("testUser", "winterMP");
+  // registerUser("testUser", "winterMP");
 }
 
 initTodoDB();
@@ -344,41 +358,40 @@ app.get("/read-subtasks", (req, res) => {
 
 // Checks if the username and password exist and returns id + name if it does
 app.get("/login-user", (req, res) => {
-  const sql = "SELECT * FROM users_init WHERE name = ?";
+  const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
     if (err) {
       console.log("Login call attempt failed!");
-      res.json({ id: -1, name: "" });
-    // } else if (result.length === 0) {
-    //   // Kein Benutzer mit passendem Namen und Passwort gefunden
-    //   res.json({ id: -1, name: "" });
     } else if (result.length === 0) {
-      console.log("Did not find a user with this name.")
+      // Kein Benutzer mit passendem Namen und Passwort gefunden
       res.json({ id: -1, name: "" });
     } else {
-      const user = result[0];
-      const match = bcrypt.compareSync(req.query.pw, user.password);
-      if (match) {
-        console.log("Login successful.");
-        res.json({ id: user.id, name: user.displayName });
-      } else {
-        console.log("Invalid password");
-        res.json({ id: -1, name: "" });
-      }
+      res.json({ id: result[0].id, name: result[0].displayName });
     }
   });
-  // const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
-  // connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
-  //   if (err) {
-  //     console.log("Login call attempt failed!");
-  //   } else if (result.length === 0) {
-  //     // Kein Benutzer mit passendem Namen und Passwort gefunden
-  //     res.json({ id: -1, name: "" });
-  //   } else {
-  //     res.json({ id: result[0].id, name: result[0].displayName });
-  //   }
-  // });
 });
+// Beneath is the part if it needs to work with hashes (currently not working on uberspace)
+//   const sql = "SELECT * FROM users_init WHERE name = ?";
+//   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
+//     if (err) {
+//       console.log("Login call attempt failed!");
+//       res.json({ id: -1, name: "" });
+//     } else if (result.length === 0) {
+//       console.log("Did not find a user with this name.")
+//       res.json({ id: -1, name: "" });
+//     } else {
+//       const user = result[0];
+//       const match = bcrypt.compareSync(req.query.pw, user.password);
+//       if (match) {
+//         console.log("Login successful.");
+//         res.json({ id: user.id, name: user.displayName });
+//       } else {
+//         console.log("Invalid password");
+//         res.json({ id: -1, name: "" });
+//       }
+//     }
+//   });
+// });
 
 // Checks if the username and password exist and returns id + name if it does
 app.get("/exists-user", (req, res) => {
@@ -540,8 +553,8 @@ function deleteUser(username) {
 function registerUser(userName, password) {
   const sql =
     "INSERT INTO users_init (name, password, displayName) VALUES (?, ?, ?)";
-  const passwordHash = hashPassword(password);
-  connection.query(sql, [userName, passwordHash, userName], (err, result) => {
+  // const passwordHash = hashPassword(password);
+  connection.query(sql, [userName, password, userName], (err, result) => {
     if (err) throw err;
     console.log("User succesfully registered.");
   });
@@ -571,3 +584,23 @@ cron.schedule('0 0 * * *', () => {
   console.log('Checking for repeating tasks...');
   handleRepeatingTasks();
 });
+
+// Function for sending an email
+const sendMail = async (to, subject, text, html) => {
+  try {
+    const info = await transporter.sendMail({
+      from: '"Motivierende Todoliste" <${process.env.EMAIL_USER}>',
+      to,
+      subject,
+      text,
+      html,
+    });
+    console.log('Email successfully sent: %s', info.messageId);
+    return info;
+  } catch (err) {
+    console.error('Error occurred while sending:', error);
+    throw error;
+  }
+};
+
+module.exports = sendMail;
