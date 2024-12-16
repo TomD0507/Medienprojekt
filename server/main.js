@@ -7,18 +7,6 @@ const cron = require("node-cron");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 
-
-// Transport for e-mail notification
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-})
-
 const { format } = require("date-fns");
 
 const app = express();
@@ -26,6 +14,19 @@ const app = express();
 dotenv.config();
 app.use(cors());
 app.use(bodyParser.json());
+
+
+// Transport for e-mail notification
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  // secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+})
+
 
 const connection = mysql.createPool({
   host: process.env.MYSQL_HOST,
@@ -124,6 +125,21 @@ function initTodoDB() {
   });
   // deleteUser("testUser");
   // registerUser("testUser", "winterMP");
+  // console.log(process.env.EMAIL_USER);
+  // console.log(process.env.EMAIL_PASS);
+  // transporter.verify().then(console.log).catch(console.error)
+  // transporter.sendMail({
+  //   from: process.env.EMAIL_USER,
+  //   to: process.env.EMAIL_RECIPENT,
+  //   subject: 'Message',
+  //   text: 'I hope this message gets delivered!'
+  // }, (err, info) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log(info);
+  //   }
+  // });
 }
 
 initTodoDB();
@@ -579,17 +595,35 @@ app.listen(5000, '0.0.0.0', () => {
   console.log('Backend läuft auf Port 5000');
 });
 
+
 // Schedule the repeating task handler to run daily at midnight
 cron.schedule('0 0 * * *', () => {
   console.log('Checking for repeating tasks...');
   handleRepeatingTasks();
 });
 
+
+/**
+ * API for sending an E-Mail 
+ * @param { to, subject, text, html}, the frontend it needs an e-mail (receiver) as to,
+ * the subject, a text and optionally an html body 
+ */
+app.post("/send-email", async (req, res) => {
+  const { to, subject, text, html } = req.body;
+  try {
+    const result = await sendMail(to, subject, text, html);
+    res.status(200).json({ message: "Email sent succfessfully", result});
+  } catch (err) {
+    res.status(500).json({ message: "Error while sending an email", err })
+  }
+});
+
+
 // Function for sending an email
 const sendMail = async (to, subject, text, html) => {
   try {
     const info = await transporter.sendMail({
-      from: '"Motivierende Todoliste" <${process.env.EMAIL_USER}>',
+      from: process.env.EMAIL_USER,
       to,
       subject,
       text,
@@ -602,5 +636,231 @@ const sendMail = async (to, subject, text, html) => {
     throw error;
   }
 };
+
+// Helper that checks if you need a reminder
+function needRemind(deadline, todoRepeat) {
+  const deadlineDate = new Date(deadline);
+  const currentDate = new Date(Date.now());
+  switch(todoRepeat) {
+    case "1 Stunde vorher": {
+      const oneHourEarlier = new Date(deadlineDate.getTime() - 60 * 60 * 1000); // Current time - 1 hour in ms
+      if (
+        currentDate.getFullYear() === oneHourEarlier.getFullYear() &&
+        currentDate.getMonth() === oneHourEarlier.getMonth() &&
+        currentDate.getDate() === oneHourEarlier.getDate() &&
+        currentDate.getHours() === oneHourEarlier.getHours() &&
+        currentDate.getMinutes() === oneHourEarlier.getMinutes()
+      ) {
+        console.log("Reminder für eine Stunde vorher triggered!");
+        return 1;
+      }else {
+        return -1;
+      }
+    }
+    case "6 Stunden vorher": {
+      const sixHoursEarlier = new Date(deadlineDate.getTime() - 6 * 60 * 60 * 1000); // Current time - 6 hour in ms
+      if (
+        currentDate.getFullYear() === sixHoursEarlier.getFullYear() &&
+        currentDate.getMonth() === sixHoursEarlier.getMonth() &&
+        currentDate.getDate() === sixHoursEarlier.getDate() &&
+        currentDate.getHours() === sixHoursEarlier.getHours() &&
+        currentDate.getMinutes() === sixHoursEarlier.getMinutes()
+      ) {
+        console.log("Reminder für sechs Stunden vorher triggered!");
+        return 6;
+      } else {
+        return -1;
+      }
+    }
+    case "12 Stunden vorher": {
+      const twelveHoursEarlier = new Date(deadlineDate.getTime() - 12 * 60 * 60 * 1000); // Current time - 12 hour in ms
+      if (
+        currentDate.getFullYear() === twelveHoursEarlier.getFullYear() &&
+        currentDate.getMonth() === twelveHoursEarlier.getMonth() &&
+        currentDate.getDate() === twelveHoursEarlier.getDate() &&
+        currentDate.getHours() === twelveHoursEarlier.getHours() &&
+        currentDate.getMinutes() === twelveHoursEarlier.getMinutes()
+      ) {
+        console.log("Reminder für zwölf Stunden vorher triggered!");
+        return 12;
+      } else {
+        return -1;
+      }
+    }
+    case "1 Tag vorher": {
+      const oneDayEarlier = new Date(deadlineDate.getTime() - 24 * 60 * 60 * 1000); // Current time - 1 day in ms
+      if (
+        currentDate.getFullYear() === oneDayEarlier.getFullYear() &&
+        currentDate.getMonth() === oneDayEarlier.getMonth() &&
+        currentDate.getDate() === oneDayEarlier.getDate() &&
+        currentDate.getHours() === oneDayEarlier.getHours() &&
+        currentDate.getMinutes() === oneDayEarlier.getMinutes()
+      ) {
+        console.log("Reminder für einen Tag vorher triggered!");
+        return 24;
+      } else {
+        return -1;
+      }
+    }
+    case "3 Tage vorher": {
+      const threeDaysEarlier = new Date(deadlineDate.getTime() - 3 * 24 * 60 * 60 * 1000); // Current time - 3 days in ms
+      if (
+        currentDate.getFullYear() === threeDaysEarlier.getFullYear() &&
+        currentDate.getMonth() === threeDaysEarlier.getMonth() &&
+        currentDate.getDate() === threeDaysEarlier.getDate() &&
+        currentDate.getHours() === threeDaysEarlier.getHours() &&
+        currentDate.getMinutes() === threeDaysEarlier.getMinutes()
+      ) {
+        console.log("Reminder für drei Tage vorher triggered!");
+        return 72;
+      } else {
+        return -1;
+      }
+    }
+    case "1 Woche vorher": {
+      const oneWeekEarlier = new Date(deadlineDate.getTime() - 7 * 24 * 60 * 60 * 1000); // Current time - 3 days in ms
+      if (
+        currentDate.getFullYear() === oneWeekEarlier.getFullYear() &&
+        currentDate.getMonth() === oneWeekEarlier.getMonth() &&
+        currentDate.getDate() === oneWeekEarlier.getDate() &&
+        currentDate.getHours() === oneWeekEarlier.getHours() &&
+        currentDate.getMinutes() === oneWeekEarlier.getMinutes()
+      ) {
+        console.log("Reminder für eine Woche vorher triggered!");
+        return 168;
+      } else {
+        return -1;
+      }
+    }
+    default: return -1;
+  }
+}
+
+// Logic for handling reminder
+function handleReminder() {
+  const sql_getTasks = `
+    SELECT userId, title, deadline, todoReminder
+    FROM todos_init
+    WHERE isDone = FALSE AND todoReminder != 'Nie' AND todoDeleted = FALSE
+  `;
+  // Query for getting all the relevant tasks
+  connection.query(sql_getTasks, function (error, result) {
+    if (error) {
+      console.log("Error when getting all the tasks for reminding:", error)
+    } else {
+      const reminderTasks = result;
+      for (const task of reminderTasks) {
+        const needsReminder = needRemind(task.deadline, task.todoReminder);
+        console.log(needsReminder);
+        switch(needsReminder) {
+          case 1: {
+            transporter.sendMail({
+              from: process.env.EMAIL_USER,
+              to: process.env.EMAIL_RECIPENT,
+              subject: 'Reminder für einen deiner Tasks!',
+              text: `Dein Task ${task.title} fällt in 1 Stunde an!`
+            }, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+            break;
+          }
+          case 6: {
+            transporter.sendMail({
+              from: process.env.EMAIL_USER,
+              to: process.env.EMAIL_RECIPENT,
+              subject: 'Reminder für einen deiner Tasks!',
+              text: `Dein Task ${task.title} fällt in 6 Stunden an!`
+            }, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+            break;
+          }
+          case 12: {
+            transporter.sendMail({
+              from: process.env.EMAIL_USER,
+              to: process.env.EMAIL_RECIPENT,
+              subject: 'Reminder für einen deiner Tasks!',
+              text: `Dein Task ${task.title} fällt in 12 Stunden an!`
+            }, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+            break;
+          }
+          case 24: {
+            transporter.sendMail({
+              from: process.env.EMAIL_USER,
+              to: process.env.EMAIL_RECIPENT,
+              subject: 'Reminder für einen deiner Tasks!',
+              text: `Dein Task ${task.title} fällt in 1 Tag an!`
+            }, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+            break;
+          }
+          case 72: {
+            transporter.sendMail({
+              from: process.env.EMAIL_USER,
+              to: process.env.EMAIL_RECIPENT,
+              subject: 'Reminder für einen deiner Tasks!',
+              text: `Dein Task ${task.title} fällt in 3 Tagen an!`
+            }, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+            break;
+          }
+          case 168: {
+            transporter.sendMail({
+              from: process.env.EMAIL_USER,
+              to: process.env.EMAIL_RECIPENT,
+              subject: 'Reminder für einen deiner Tasks!',
+              text: `Dein Task ${task.title} fällt in 1 Woche an!`
+            }, (err, info) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(info);
+              }
+            });
+            break;
+          }
+          case -1: {
+            console.log("-1 was returned");
+            break;
+          }
+          default: {
+            console.log("Weird values...");
+            break;
+          }
+        };
+      };
+    };
+  });
+};
+
+
+cron.schedule('* * * * *', () => {
+  console.log("New minute");
+  handleReminder(); // Check every minute
+});
 
 module.exports = sendMail;
