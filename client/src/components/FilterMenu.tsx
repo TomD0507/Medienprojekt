@@ -36,7 +36,7 @@ function FilterMenu({
           <div className="filter-options">
             <div className="search-bar">
               <input
-                type="text"
+                type="search"
                 placeholder={placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
