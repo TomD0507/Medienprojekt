@@ -4,6 +4,8 @@
 import { useState } from "react";
 import "../styles/Task.css";
 import EditTask from "./EditTask"; //prioritäten
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons/faGear";
 const getPrioritySymbol = (priority: Priority) => {
   switch (priority) {
     case "none":
@@ -218,7 +220,7 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
               className="task_edit_symbol"
               onClick={() => setIsEditing(true)}
             >
-              <span>ed</span>
+              <span className="faGear">  <FontAwesomeIcon icon={faGear} /> </span>
             </div>
           </div>
         </div>

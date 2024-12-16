@@ -170,26 +170,6 @@ body {
   overflow: hidden;
 }
 
-/* Suchleiste */
-.search-bar {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  background: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 10px 20px;
-  z-index: 10;
-}
-
-.search-bar input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

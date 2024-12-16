@@ -14,12 +14,12 @@ function PageManager() {
   //better login functionality
   //logout a user
   const handleLogout = () => {
-    setUserID(null);
-    setDisplayName("");
-
     // Clear login info from localStorage
     localStorage.removeItem("userID");
     localStorage.removeItem("displayName");
+    console.log("Logged out.");
+    setUserID(null);
+    setDisplayName("");
   };
   //loads id an dpname from storage
   useEffect(() => {
@@ -74,7 +74,7 @@ function PageManager() {
       status={status}
     />
   ) : (
-    <App userID={userID} displayName={displayName} />
+    <App userID={userID} displayName={displayName} onLogout={handleLogout} />
   );
 }
 
