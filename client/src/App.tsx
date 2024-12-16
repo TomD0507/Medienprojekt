@@ -7,6 +7,7 @@ import {
   faExclamation,
   faCheckCircle,
   faFilter,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./styles/Overlay.css";
@@ -35,9 +36,10 @@ export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom ba
 type AppProps = {
   userID: number;
   displayName: string;
+  onLogout: () => void;
 };
 
-function App({ userID }: AppProps) {
+function App({ userID, onLogout }: AppProps) {
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
 
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
@@ -335,55 +337,62 @@ function App({ userID }: AppProps) {
                 onClick={() => setFilter("all")}
                 disabled={filter === "all"}
               >
-                <FontAwesomeIcon icon={faBook} /> Alle
+                <FontAwesomeIcon icon={faBook} className="icon" /> Alle
               </button>
               <button
                 onClick={() => setFilter("today")}
                 disabled={filter === "today"}
               >
-                <FontAwesomeIcon icon={faCalendarDay} /> Heute
+                <FontAwesomeIcon icon={faCalendarDay} className="icon" /> Heute
               </button>
               <button
                 onClick={() => setFilter("tomorrow")}
                 disabled={filter === "tomorrow"}
               >
-                <FontAwesomeIcon icon={faCalendarDay} /> Bis morgen
+                <FontAwesomeIcon icon={faCalendarDay} className="icon" /> Bis
+                morgen
               </button>
               <button
                 onClick={() => setFilter("week")}
                 disabled={filter === "week"}
               >
-                <FontAwesomeIcon icon={faCalendarWeek} /> Diese Woche
+                <FontAwesomeIcon icon={faCalendarWeek} className="icon" /> Diese
+                Woche
               </button>
               <button
                 onClick={() => setFilter("nextWeek")}
                 disabled={filter === "nextWeek"}
               >
-                <FontAwesomeIcon icon={faCalendarWeek} /> Nächste Woche
+                <FontAwesomeIcon icon={faCalendarWeek} className="icon" />{" "}
+                Nächste Woche
               </button>
               <button
                 onClick={() => setFilter("important")}
                 disabled={filter === "important"}
               >
-                <FontAwesomeIcon icon={faExclamation} /> Wichtig
+                <FontAwesomeIcon icon={faExclamation} className="icon" />{" "}
+                Wichtig
               </button>
               <button
                 onClick={() => setFilter("done")}
                 disabled={filter === "done"}
               >
-                <FontAwesomeIcon icon={faCheckCircle} /> Erledigt
+                <FontAwesomeIcon icon={faCheckCircle} className="icon" />{" "}
+                Erledigt
               </button>
               <button
                 onClick={() => setFilter("missed")}
                 disabled={filter === "missed"}
               >
-                <FontAwesomeIcon icon={faTimesCircle} /> Verpasst
+                <FontAwesomeIcon icon={faTimesCircle} className="icon" />{" "}
+                Verpasst
               </button>
               <button
                 onClick={() => setFilter("noDeadline")}
                 disabled={filter === "noDeadline"}
               >
-                <FontAwesomeIcon icon={faInfinity} /> Ohne Deadline
+                <FontAwesomeIcon icon={faInfinity} className="icon" />
+                Ohne Deadline
               </button>
               <button
                 onClick={() => {
@@ -392,7 +401,17 @@ function App({ userID }: AppProps) {
                 }}
                 disabled={filter === "all" && searchQuery === ""}
               >
-                <FontAwesomeIcon icon={faFilter} /> Filter entfernen
+                <FontAwesomeIcon icon={faFilter} className="icon" />
+                Filter entfernen
+              </button>
+              <button
+                className="logout"
+                onClick={() => {
+                  onLogout();
+                }}
+              >
+                <FontAwesomeIcon icon={faRightFromBracket} className="icon" />
+                <text>Abmelden</text>
               </button>
             </div>
           </div>

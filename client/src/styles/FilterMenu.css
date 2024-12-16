@@ -6,7 +6,9 @@
 }
 
 .filter-options button {
+  height: 3em;
   display: flex;
+  flex-grow: unset;
   align-items: center;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -14,15 +16,17 @@
   background-color: #304674;
   cursor: pointer;
   transition: all 0.3s ease; /* Ensure items start from the same position */
-
-  padding: 8px 20%; /* Offsets the content to the right */
+  padding: 10px; /* Offsets the content to the right */
 }
-
+.filter-options .icon {
+  min-width: 15%;
+  color: #cdcccc;
+  align-self: center;
+}
 .filter-options button:hover {
   opacity: 0.8;
 }
-
-.filter-options button i {
-  font-size: 16px; /* Adjust icon size */
-  color: #555; /* Icon color */
+.logout {
+  position: sticky;
+  bottom: 0px;
 }
