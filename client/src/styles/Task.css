@@ -1,4 +1,6 @@
 /* Styles für Task-Komponente */
+
+
 .task-element {
   position: relative;
   background: #fff; /* Weißer Hintergrund */
@@ -158,27 +160,32 @@ li {
   font-size: 1.2em; /* Größe anpassen */
 }
 .task_edit_symbol {
-  width: 2em;
-  height: 2em;
+  width: 3em;
+  height: 3em;
   min-width: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
   min-height: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
-  border: 1px solid;
   border-radius: 50%; /* Rundes Design */
+  border: 2px solid transparent;
   font-size: 1.5em; /*circle size multiplier*/
   cursor: pointer;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); /* Schatten */
+  position:absolute;
+  top:33%; 
+  right:2%; 
   background-color: transparent; /* Hintergrundfarbe */
   color: #727272; /* Textfarbe */
   transition: transform 0.2s ease; /* Klickanimation */
   z-index: 2;
   justify-content: center;
   align-items: center;
+  display:flex;
 }
+
 .task_edit_symbol span {
   font-size: 2em; /* Symbolgröße */
   display: inline-block; /* Wichtig für transform */
-  transform: scaleX(1.5); /* Horizontal strecken um 50% */
+  
 }
 .task_edit_symbol:hover {
   transform: scale(1.1); /* Vergrößerung beim Hover */
 }
+
