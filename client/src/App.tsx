@@ -25,8 +25,6 @@ import "./styles/FilterMenu.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import axios from "axios";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons/faTimesCircle";
-import { faInfinity } from "@fortawesome/free-solid-svg-icons/faInfinity";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
@@ -126,7 +124,8 @@ function App({ userID, onLogout }: AppProps) {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpenQuery, setSearchOpenQuery] = useState("");
+  const [searchClosedQuery, setSearchClosedQuery] = useState("");
 
   const menuRef = useRef<HTMLDivElement>(null);
   const searchBarRef = useRef<HTMLDivElement>(null);
@@ -171,9 +170,15 @@ function App({ userID, onLogout }: AppProps) {
   }, [isMenuOpen, isSearchOpen]);
 
   // filter außerhalb von searchquery
-  const [filter, setFilter] = useState("all");
-
-  function filterByPredicates(task: TaskProps) {
+  const [openFilter, setOpenFilter] = useState("all");
+  const [closedFilter, setClosedFilter] = useState("all");
+  function handleFilterOpen(task: TaskProps) {
+    return filterByPredicates(task, openFilter);
+  }
+  function handleFilterClosed(task: TaskProps) {
+    return filterByPredicates(task, closedFilter);
+  }
+  function filterByPredicates(task: TaskProps, filter: string) {
     const today = new Date();
 
     if (filter === "all") {
@@ -254,7 +259,7 @@ function App({ userID, onLogout }: AppProps) {
       <Header
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         onSearchToggle={() => setIsSearchOpen(!isSearchOpen)}
-        filter={filter}
+        filter=""
       />
       {/*<div>{currentTime.toString()}</div>*/}
       {/* Home Screen */}
@@ -282,15 +287,17 @@ function App({ userID, onLogout }: AppProps) {
                 .filter((task) => !task.deleted)
                 .filter(
                   (task) =>
-                    task.title.toLowerCase().includes(searchQuery) || // Search in title
+                    task.title.toLowerCase().includes(searchClosedQuery) || // Search in title
                     (task.description &&
-                      task.description.toLowerCase().includes(searchQuery)) ||
+                      task.description
+                        .toLowerCase()
+                        .includes(searchClosedQuery)) ||
                     (task.subtasks &&
                       task.subtasks.some((element) =>
-                        element.name.toLowerCase().includes(searchQuery)
+                        element.name.toLowerCase().includes(searchClosedQuery)
                       )) // Optionally search in description
                 )
-                .filter(filterByPredicates)}
+                .filter(handleFilterOpen)}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
@@ -301,15 +308,17 @@ function App({ userID, onLogout }: AppProps) {
                 .filter((task) => !task.deleted)
                 .filter(
                   (task) =>
-                    task.title.toLowerCase().includes(searchQuery) || // Search in title
+                    task.title.toLowerCase().includes(searchOpenQuery) || // Search in title
                     (task.description &&
-                      task.description.toLowerCase().includes(searchQuery)) || // search in description
+                      task.description
+                        .toLowerCase()
+                        .includes(searchOpenQuery)) || // search in description
                     (task.subtasks &&
                       task.subtasks.some((element) =>
-                        element.name.toLowerCase().includes(searchQuery)
+                        element.name.toLowerCase().includes(searchOpenQuery)
                       )) // search in subtasks
                 )
-                .filter(filterByPredicates)}
+                .filter(handleFilterClosed)}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
@@ -334,77 +343,6 @@ function App({ userID, onLogout }: AppProps) {
           <div ref={menuRef} className="menu-overlay">
             <div className="filter-options">
               <button
-                onClick={() => setFilter("all")}
-                disabled={filter === "all"}
-              >
-                <FontAwesomeIcon icon={faBook} className="icon" /> Alle
-              </button>
-              <button
-                onClick={() => setFilter("today")}
-                disabled={filter === "today"}
-              >
-                <FontAwesomeIcon icon={faCalendarDay} className="icon" /> Heute
-              </button>
-              <button
-                onClick={() => setFilter("tomorrow")}
-                disabled={filter === "tomorrow"}
-              >
-                <FontAwesomeIcon icon={faCalendarDay} className="icon" /> Bis
-                morgen
-              </button>
-              <button
-                onClick={() => setFilter("week")}
-                disabled={filter === "week"}
-              >
-                <FontAwesomeIcon icon={faCalendarWeek} className="icon" /> Diese
-                Woche
-              </button>
-              <button
-                onClick={() => setFilter("nextWeek")}
-                disabled={filter === "nextWeek"}
-              >
-                <FontAwesomeIcon icon={faCalendarWeek} className="icon" />{" "}
-                Nächste Woche
-              </button>
-              <button
-                onClick={() => setFilter("important")}
-                disabled={filter === "important"}
-              >
-                <FontAwesomeIcon icon={faExclamation} className="icon" />{" "}
-                Wichtig
-              </button>
-              <button
-                onClick={() => setFilter("done")}
-                disabled={filter === "done"}
-              >
-                <FontAwesomeIcon icon={faCheckCircle} className="icon" />{" "}
-                Erledigt
-              </button>
-              <button
-                onClick={() => setFilter("missed")}
-                disabled={filter === "missed"}
-              >
-                <FontAwesomeIcon icon={faTimesCircle} className="icon" />{" "}
-                Verpasst
-              </button>
-              <button
-                onClick={() => setFilter("noDeadline")}
-                disabled={filter === "noDeadline"}
-              >
-                <FontAwesomeIcon icon={faInfinity} className="icon" />
-                Ohne Deadline
-              </button>
-              <button
-                onClick={() => {
-                  setFilter("all");
-                  setSearchQuery("");
-                }}
-                disabled={filter === "all" && searchQuery === ""}
-              >
-                <FontAwesomeIcon icon={faFilter} className="icon" />
-                Filter entfernen
-              </button>
-              <button
                 className="logout"
                 onClick={() => {
                   onLogout();
@@ -428,10 +366,18 @@ function App({ userID, onLogout }: AppProps) {
           <div ref={searchBarRef} className="search-bar">
             <input
               type="text"
-              placeholder="Nach Keywords suchen..."
-              value={searchQuery}
+              placeholder={
+                "done" === selectedTaskTab
+                  ? "Durchsuche deine erledigten Aufgaben:"
+                  : "Durchsuche deine offenen Aufgaben:"
+              }
+              value={
+                "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
+              }
               onChange={(e) =>
-                setSearchQuery(e.target.value.trim().toLowerCase())
+                "done" === selectedTaskTab
+                  ? setSearchClosedQuery(e.target.value.trim().toLowerCase())
+                  : setSearchOpenQuery(e.target.value.trim().toLowerCase())
               }
             />
           </div>
