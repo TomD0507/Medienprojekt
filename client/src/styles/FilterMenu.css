@@ -4,7 +4,23 @@
   flex-direction: column;
   gap: 10px; /* Add spacing between buttons */
 }
+.search-bar {
+  top: 60px;
+  left: 0;
+  width: 100%;
+  background: transparent;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  z-index: 10;
+}
 
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
 .filter-options button {
   height: 3em;
   display: flex;

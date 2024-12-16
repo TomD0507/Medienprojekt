@@ -1,14 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBook,
-  faCalendarDay,
-  faCalendarWeek,
-  faExclamation,
-  faCheckCircle,
-  faFilter,
-  faRightFromBracket,
-} from "@fortawesome/free-solid-svg-icons";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 import "./styles/Overlay.css";
 import {
@@ -25,6 +17,7 @@ import "./styles/FilterMenu.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import axios from "axios";
+import FilterMenu from "./components/FilterMenu";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
@@ -123,14 +116,29 @@ function App({ userID, onLogout }: AppProps) {
   const closeOverlay = () => setOverlay(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchOpenQuery, setSearchOpenQuery] = useState("");
+
+  // filter für closed task
+  const [closedFilter, setClosedFilter] = useState("all");
+
+  const [isSearchClosedOpen, setIsSearchClosedOpen] = useState(false);
+  function closeClosedOptions() {
+    setIsSearchClosedOpen(false);
+  }
   const [searchClosedQuery, setSearchClosedQuery] = useState("");
 
+  // filter für open task
+  const [openFilter, setOpenFilter] = useState("all");
+
+  const [isSearchOpenOpen, setIsSearchOpenOpen] = useState(false);
+  function closeOpenOptions() {
+    setIsSearchOpenOpen(false);
+  }
+  const [searchOpenQuery, setSearchOpenQuery] = useState("");
+
   const menuRef = useRef<HTMLDivElement>(null);
-  const searchBarRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (isOpen || isMenuOpen || isSearchOpen) {
+    if (isOpen || isMenuOpen || isSearchOpenOpen || isSearchClosedOpen) {
       // Scrollen verhindern
       document.body.style.overflow = "hidden";
     } else {
@@ -142,7 +150,7 @@ function App({ userID, onLogout }: AppProps) {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen, isMenuOpen, isSearchOpen]);
+  }, [isOpen, isMenuOpen, isSearchOpenOpen, isSearchClosedOpen]);
   // This is a hook to close components when you click outside of them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -153,34 +161,48 @@ function App({ userID, onLogout }: AppProps) {
       ) {
         setIsMenuOpen(false);
       }
-
-      if (
-        searchBarRef.current &&
-        !searchBarRef.current.contains(event.target as Node) &&
-        isSearchOpen
-      ) {
-        setIsSearchOpen(false);
-      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isMenuOpen, isSearchOpen]);
+  }, [isMenuOpen]);
 
-  // filter außerhalb von searchquery
-  const [openFilter, setOpenFilter] = useState("all");
-  const [closedFilter, setClosedFilter] = useState("all");
   function handleFilterOpen(task: TaskProps) {
-    return filterByPredicates(task, openFilter);
+    return filterByPredicates(
+      task,
+      openFilter,
+      searchOpenQuery.trim().toLowerCase()
+    );
   }
   function handleFilterClosed(task: TaskProps) {
-    return filterByPredicates(task, closedFilter);
+    return filterByPredicates(
+      task,
+      closedFilter,
+      searchClosedQuery.trim().toLowerCase()
+    );
   }
-  function filterByPredicates(task: TaskProps, filter: string) {
+  function filterByPredicates(
+    task: TaskProps,
+    filter: string,
+    searchQuery: string
+  ) {
     const today = new Date();
 
+    if (
+      !(
+        task.title.toLowerCase().includes(searchQuery) || // Search in title
+        (task.description &&
+          task.description.toLowerCase().includes(searchQuery)) ||
+        (task.subtasks &&
+          task.subtasks.some((element) =>
+            element.name.toLowerCase().includes(searchQuery)
+          ))
+      )
+    ) {
+      return false;
+    }
     if (filter === "all") {
       return true; // Show all tasks
     }
@@ -258,7 +280,11 @@ function App({ userID, onLogout }: AppProps) {
       {/* Header */}
       <Header
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
-        onSearchToggle={() => setIsSearchOpen(!isSearchOpen)}
+        onSearchToggle={
+          "open" === selectedTaskTab
+            ? () => setIsSearchOpenOpen(true)
+            : () => setIsSearchClosedOpen(true)
+        }
         filter=""
       />
       {/*<div>{currentTime.toString()}</div>*/}
@@ -285,19 +311,8 @@ function App({ userID, onLogout }: AppProps) {
               currentTime={currentTime}
               tasks={doneTasks
                 .filter((task) => !task.deleted)
-                .filter(
-                  (task) =>
-                    task.title.toLowerCase().includes(searchClosedQuery) || // Search in title
-                    (task.description &&
-                      task.description
-                        .toLowerCase()
-                        .includes(searchClosedQuery)) ||
-                    (task.subtasks &&
-                      task.subtasks.some((element) =>
-                        element.name.toLowerCase().includes(searchClosedQuery)
-                      )) // Optionally search in description
-                )
-                .filter(handleFilterOpen)}
+
+                .filter(handleFilterClosed)}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
@@ -306,19 +321,8 @@ function App({ userID, onLogout }: AppProps) {
               currentTime={currentTime}
               tasks={openTasks
                 .filter((task) => !task.deleted)
-                .filter(
-                  (task) =>
-                    task.title.toLowerCase().includes(searchOpenQuery) || // Search in title
-                    (task.description &&
-                      task.description
-                        .toLowerCase()
-                        .includes(searchOpenQuery)) || // search in description
-                    (task.subtasks &&
-                      task.subtasks.some((element) =>
-                        element.name.toLowerCase().includes(searchOpenQuery)
-                      )) // search in subtasks
-                )
-                .filter(handleFilterClosed)}
+
+                .filter(handleFilterOpen)}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
@@ -333,7 +337,7 @@ function App({ userID, onLogout }: AppProps) {
       <button className="app_header" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
-      {/* Menu */}
+      {/* burgerMenu */}
       {isMenuOpen && (
         <div className="overlay">
           <div
@@ -356,33 +360,25 @@ function App({ userID, onLogout }: AppProps) {
         </div>
       )}
 
-      {/* Searchbar */}
-      {isSearchOpen && (
-        <div className="overlay">
-          <div
-            className="overlay-backdrop"
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-          ></div>
-          <div ref={searchBarRef} className="search-bar">
-            <input
-              type="text"
-              placeholder={
-                "done" === selectedTaskTab
-                  ? "Durchsuche deine erledigten Aufgaben:"
-                  : "Durchsuche deine offenen Aufgaben:"
-              }
-              value={
-                "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
-              }
-              onChange={(e) =>
-                "done" === selectedTaskTab
-                  ? setSearchClosedQuery(e.target.value.trim().toLowerCase())
-                  : setSearchOpenQuery(e.target.value.trim().toLowerCase())
-              }
-            />
-          </div>
-        </div>
-      )}
+      {/* Searchmenus */}
+      <FilterMenu
+        filter={openFilter}
+        setFilter={setOpenFilter}
+        searchQuery={searchOpenQuery}
+        setSearchQuery={setSearchOpenQuery}
+        isMenuOpen={isSearchOpenOpen}
+        closeMenu={closeOpenOptions}
+        placeholder={"Durchsuche deine offenen Aufgaben:"}
+      />
+      <FilterMenu
+        filter={closedFilter}
+        setFilter={setClosedFilter}
+        searchQuery={searchClosedQuery}
+        setSearchQuery={setSearchClosedQuery}
+        isMenuOpen={isSearchClosedOpen}
+        closeMenu={closeClosedOptions}
+        placeholder={"Durchsuche deine erledigten Aufgaben:"}
+      />
     </div>
   );
 }
