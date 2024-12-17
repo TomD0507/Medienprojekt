@@ -758,7 +758,7 @@ function handleReminder() {
               from: process.env.EMAIL_USER,
               to: process.env.EMAIL_RECIPENT,
               subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task ${task.title} fällt in 1 Stunde an!`
+              text: `Dein Task "${task.title}" fällt in 1 Stunde an!`
             }, (err, info) => {
               if (err) {
                 console.log(err);
@@ -773,7 +773,7 @@ function handleReminder() {
               from: process.env.EMAIL_USER,
               to: process.env.EMAIL_RECIPENT,
               subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task ${task.title} fällt in 6 Stunden an!`
+              text: `Dein Task "${task.title}" fällt in 6 Stunden an!`
             }, (err, info) => {
               if (err) {
                 console.log(err);
@@ -788,7 +788,7 @@ function handleReminder() {
               from: process.env.EMAIL_USER,
               to: process.env.EMAIL_RECIPENT,
               subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task ${task.title} fällt in 12 Stunden an!`
+              text: `Dein Task "${task.title}" fällt in 12 Stunden an!`
             }, (err, info) => {
               if (err) {
                 console.log(err);
@@ -803,7 +803,7 @@ function handleReminder() {
               from: process.env.EMAIL_USER,
               to: process.env.EMAIL_RECIPENT,
               subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task ${task.title} fällt in 1 Tag an!`
+              text: `Dein Task "${task.title}" fällt in 1 Tag an!`
             }, (err, info) => {
               if (err) {
                 console.log(err);
@@ -818,7 +818,7 @@ function handleReminder() {
               from: process.env.EMAIL_USER,
               to: process.env.EMAIL_RECIPENT,
               subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task ${task.title} fällt in 3 Tagen an!`
+              text: `Dein Task "${task.title}" fällt in 3 Tagen an!`
             }, (err, info) => {
               if (err) {
                 console.log(err);
@@ -833,7 +833,7 @@ function handleReminder() {
               from: process.env.EMAIL_USER,
               to: process.env.EMAIL_RECIPENT,
               subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task ${task.title} fällt in 1 Woche an!`
+              text: `Dein Task "${task.title}" fällt in 1 Woche an!`
             }, (err, info) => {
               if (err) {
                 console.log(err);
