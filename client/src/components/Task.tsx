@@ -220,7 +220,9 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
               className="task_edit_symbol"
               onClick={() => setIsEditing(true)}
             >
-              <span className="faGear">  <FontAwesomeIcon icon={faGear} /> </span>
+              <span>
+                <FontAwesomeIcon icon={faGear} />
+              </span>
             </div>
           </div>
         </div>

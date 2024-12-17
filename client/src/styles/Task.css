@@ -39,7 +39,8 @@
   display: flex;
   flex-direction: column;
   flex-grow: 0;
-  padding-top: 2%;
+  min-height: 100%;
+  padding-top: 2px;
 }
 /* Checkbox-Design */
 .checkbox {
@@ -156,21 +157,21 @@ li {
   color: #777777;
 }
 .priority-display {
-  align-items: center;
+  align-self: center;
+  border: 2px solid transparent;
   font-size: 1.2em; /* Größe anpassen */
+  top: 0px;
 }
 .task_edit_symbol {
   width: 3em;
   height: 3em;
+  position: relative;
   min-width: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
   min-height: 2em; /* Stellt sicher, dass es nicht kleiner als 2em wird */
   border-radius: 50%; /* Rundes Design */
   border: 2px solid transparent;
   font-size: 1.5em; /*circle size multiplier*/
   cursor: pointer;
-  position:absolute;
-  top:33%; 
-  right:2%; 
   background-color: transparent; /* Hintergrundfarbe */
   color: #727272; /* Textfarbe */
   transition: transform 0.2s ease; /* Klickanimation */
@@ -178,14 +179,14 @@ li {
   justify-content: center;
   align-items: center;
   display:flex;
+  z-index: 4; margin-top: auto;
 }
 
 .task_edit_symbol span {
   font-size: 2em; /* Symbolgröße */
   display: inline-block; /* Wichtig für transform */
-  
 }
 .task_edit_symbol:hover {
   transform: scale(1.1); /* Vergrößerung beim Hover */
-}
+} 
 
