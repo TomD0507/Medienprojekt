@@ -30,9 +30,8 @@ main {
 
 body {
   background-color: #98bad5;
-  margin: 0; /* Remove default margin */
-  min-width: 100vw;
-  min-height: 100vh; /* Center vertically */
+  width: 98vw;
+  min-height: 100vh; 
 }
 
 .app {

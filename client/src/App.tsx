@@ -286,6 +286,7 @@ function App({ userID, onLogout }: AppProps) {
             : () => setIsSearchClosedOpen(true)
         }
         filter=""
+        title={"done" === selectedTaskTab ? "Erledigte ToDos" : "Offene ToDos"}
       />
       {/*<div>{currentTime.toString()}</div>*/}
       {/* Home Screen */}
