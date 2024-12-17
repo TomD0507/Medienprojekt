@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cron = require("node-cron");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 
 
@@ -533,7 +533,7 @@ function getMaxTodoId(callback) {
 // Helper function to get hash a password
 function hashPassword(password) {
   const saltRounds = 10; // Value between 10 and 12 is considered safe
-  return bcrypt.hashSync(password, saltRounds);
+  return password//bcrypt.hashSync(password, saltRounds);
 }
 
 // Helper function to delete user
