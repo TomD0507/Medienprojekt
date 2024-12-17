@@ -1,5 +1,5 @@
 import React from "react";
-
+import "../styles/Header.css";
 type HeaderProps = {
   onMenuToggle: () => void;
   onSearchToggle: () => void;
@@ -14,13 +14,17 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="app_header">
-      <button className="menu-button" onClick={onMenuToggle}>
-        ☰
-      </button>
+      <div className="buttoncontainer">
+        <button className="menu-button" onClick={onMenuToggle}>
+          ☰
+        </button>
+      </div>
       <h1 className="header-title">{title}</h1>
-      <button className="search-button" onClick={onSearchToggle}>
-        🔍
-      </button>
+      <div className="buttoncontainer">
+        <button className="search-button" onClick={onSearchToggle}>
+          Filtern 🔍
+        </button>
+      </div>
     </header>
   );
 };

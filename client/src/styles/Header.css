@@ -1,0 +1,43 @@
+/* Header */
+.app_header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: #304674;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .header-title {
+    margin: 0;
+    font-size: 18px;
+  }
+  .buttoncontainer{
+    width: 100%;
+  }
+  .menu-button,
+  .search-button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1em;
+    font-size: 20x;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #273a63;
+    align-items: center;
+    justify-content: center; /* Centers items horizontally */
+    cursor: pointer;
+    transition: border-color 0.25s;
+  }
+  
+  .menu-button:hover,
+  .search-button:hover {
+    opacity: 0.8;
+  }
+  
