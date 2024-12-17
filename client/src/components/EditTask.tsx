@@ -164,7 +164,7 @@ function EditTask({
             </div>
           </label>
           <label>
-            Deadline:
+            Termin:
             <div className="add_item">
               <input
                 type="datetime-local"

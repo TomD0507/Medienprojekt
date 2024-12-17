@@ -138,7 +138,7 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
             </div>
           </label>
           <label>
-            Deadline:
+            Termin:
             <div className="add_item">
               <input
                 type="datetime-local"
