@@ -141,13 +141,15 @@ function EditTask({
                 )}
               </div>
             ))}
-            <button
-              className="taskMenuButton"
-              type="button"
-              onClick={addSubtask}
-            >
-              + Unteraufgabe hinzufügen
-            </button>
+            <label className="add_item">
+              <button
+                className="taskMenuButton"
+                type="button"
+                onClick={addSubtask}
+              >
+                + Unteraufgabe hinzufügen
+              </button>
+            </label>
           </label>
           <label>
             Priorität:

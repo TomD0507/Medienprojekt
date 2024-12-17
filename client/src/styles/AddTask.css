@@ -14,10 +14,11 @@
 .add_item {
   display: flex;
   width: 100%;
-  padding: 1em;
+  padding: 0.5em  0em 1em 1em;
 }
 .taskMenuButton {
   width: 100%;
+  align-self: center;
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -54,15 +55,25 @@
 .taskMenuButton:hover {
   opacity: 0.8;
 }
-textarea {
-  width: 100%;
-}
-input {
-  flex-grow: 1;
-}
+/* Shared styles for form elements */
+textarea, 
+input, 
 select {
-  flex-grow: 1;
+  width: 100%; /* Make them take up full width by default */
+  background-color: #595959; /* Shared background color */
+  box-sizing: border-box; /* Include padding and border in width */
+  padding: 0.5em; /* Add some padding for better appearance */
+  border: 1px solid #444; /* Optional: subtle border for clarity */
+  border-radius: 4px; /* Optional: rounded corners */
+  color: #fff; /* Optional: text color for contrast */
+  font-size: 1em; /* Ensure consistent font size */
+  line-height: 1.2;
 }
+textarea{
+  height: 2.4em;
+  resize: vertical;
+}
+
 .deleteButton {
   background-color: red;
 }

@@ -111,7 +111,7 @@ function FilterMenu({
               disabled={filter === "all" && searchQuery === ""}
             >
               <FontAwesomeIcon icon={faFilter} className="icon" />
-              Filter entfernen
+              Alle Filter entfernen
             </button>
           </div>
         </div>
