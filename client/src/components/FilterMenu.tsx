@@ -9,6 +9,16 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
+
+const [isVisible, setIsVisible] = useState(false);
+
+
+//Funktion für Visibility des X
+const toggleVisibility = () => {
+  setIsVisible(!isVisible);
+};
+
 type FilterMenuProps = {
   filter: string;
   setFilter: (e: string) => void;
