@@ -27,6 +27,8 @@ function FilterMenu({
   isMenuOpen,
   placeholder,
 }: FilterMenuProps) {
+  if (!isMenuOpen) return null; // Nur wenn geöffnet rendern
+
   return (
     isMenuOpen && (
       <div className="overlay">

@@ -1,8 +1,14 @@
 .filter-options {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
   gap: 10px; /* Add spacing between buttons */
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 20px;
+  height: 100%;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  overflow: auto; /* Ermöglicht Scrollen */
 }
 .search-bar {
   top: 60px;
@@ -13,7 +19,18 @@
   padding: 10px 20px;
   z-index: 10;
 }
-
+/* Menü-Overlay */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  color: white;
+  padding: 1px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
 .search-bar input {
   width: 100%;
   padding: 10px;

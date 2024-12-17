@@ -60,19 +60,7 @@ body {
 .add-task-button:hover {
   opacity: 0.8;
 }
-/* Menü-Overlay */
-.menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  z-index: 20;
-}
+
 
 /* Erledigte und offene ToDos*/
 .collapsible-list {
