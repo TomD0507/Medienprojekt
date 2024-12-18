@@ -285,7 +285,20 @@ function App({ userID, onLogout }: AppProps) {
             ? () => setIsSearchOpenOpen(true)
             : () => setIsSearchClosedOpen(true)
         }
-        filter=""
+        deleteSearchQuery={
+          "done" === selectedTaskTab
+            ? () => setSearchClosedQuery("")
+            : () => setSearchOpenQuery("")
+        }
+        delteFilter={
+          "done" === selectedTaskTab
+            ? () => setClosedFilter("all")
+            : () => setOpenFilter("all")
+        }
+        filter={"done" === selectedTaskTab ? closedFilter : openFilter}
+        searchQuery={
+          "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
+        }
         title={"done" === selectedTaskTab ? "Erledigte ToDos" : "Offene ToDos"}
       />
       {/*<div>{currentTime.toString()}</div>*/}
