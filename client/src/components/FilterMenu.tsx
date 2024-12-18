@@ -4,12 +4,12 @@ import {
   faBook,
   faCalendarDay,
   faCalendarWeek,
-  faExclamation,
   faCheckCircle,
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isValidDate } from "./Task";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 type FilterMenuProps = {
   filter: string;
@@ -111,20 +111,20 @@ export const filterOptions = [
   },
   {
     key: "low",
-    text: "🟢 Niedrige Priorität",
-    icon: faExclamation,
+    text: "Niedrige Priorität",
+    icon: "🟢",
     condition: (task: { priority: string }) => task.priority === "low",
   },
   {
     key: "medium",
-    text: "🟠 Mittlere Priorität",
-    icon: faExclamation,
+    text: "Mittlere Priorität",
+    icon: "🟠",
     condition: (task: { priority: string }) => task.priority === "medium",
   },
   {
     key: "high",
-    text: "🔴 Hohe Priorität",
-    icon: faExclamation,
+    text: " Hohe Priorität",
+    icon: "🔴",
     condition: (task: { priority: string }) => task.priority === "high",
   },
 ];
@@ -165,7 +165,16 @@ function FilterMenu({
                 onClick={() => setFilter(key)}
                 disabled={filter === key}
               >
-                <FontAwesomeIcon icon={icon} className="icon" /> {text}
+                {icon instanceof Object ? (
+                  <FontAwesomeIcon
+                    icon={icon as IconDefinition}
+                    className="icon"
+                  />
+                ) : (
+                  <div className="icon">{icon}</div>
+                )}
+
+                {text}
               </button>
             ))}
             <button
