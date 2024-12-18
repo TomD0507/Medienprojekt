@@ -301,10 +301,12 @@ function App({ userID, onLogout }: AppProps) {
           <CollList visible={"done" === selectedTaskTab}>
             <TaskList
               currentTime={currentTime}
-              tasks={doneTasks
-                .filter((task) => !task.deleted)
+              tasks={handleSortTasks(
+                doneTasks
+                  .filter((task) => !task.deleted)
 
-                .filter(handleFilterClosed)}
+                  .filter(handleFilterClosed)
+              )}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
