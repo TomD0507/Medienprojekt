@@ -10,7 +10,7 @@ import {
 } from "./helpers/taskHelper";
 
 import AddTask from "./components/AddTask";
-import { isValidDate, TaskProps } from "./components/Task";
+import { TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
 import "./index.css";
 import "./styles/FilterMenu.css";
