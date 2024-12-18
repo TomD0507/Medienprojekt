@@ -9,6 +9,9 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
+
+
 
 type FilterMenuProps = {
   filter: string;
@@ -19,6 +22,8 @@ type FilterMenuProps = {
   closeMenu: () => void;
   placeholder: string;
 };
+
+
 function FilterMenu({
   filter,
   setFilter,
@@ -29,6 +34,7 @@ function FilterMenu({
   placeholder,
 }: FilterMenuProps) {
   if (!isMenuOpen) return null; // Nur wenn geöffnet rendern
+  const [filterButtonShow, setFilterButtonShow] = useState(false);
 
   return (
     isMenuOpen && (
@@ -44,60 +50,76 @@ function FilterMenu({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              <div> 
+                 {filterButtonShow && <div> <button onClick={()=>{setFilterButtonShow(!filterButtonShow);
+                  setFilter("all");setSearchQuery("");}}>X</button>
+              </div>}
+  
+              </div>
             </div>
             <button
-              onClick={() => setFilter("all")}
+              onClick={() => {setFilter("all"); if(filterButtonShow){setFilterButtonShow(!filterButtonShow)}}}
               disabled={filter === "all"}
             >
               <FontAwesomeIcon icon={faBook} className="icon" /> Alle
             </button>
             <button
-              onClick={() => setFilter("today")}
+              onClick={() =>{ setFilter("today");
+                setFilterButtonShow(!filterButtonShow);
+              }}
               disabled={filter === "today"}
             >
               <FontAwesomeIcon icon={faCalendarDay} className="icon" /> Heute
             </button>
             <button
-              onClick={() => setFilter("tomorrow")}
+              onClick={() =>{ setFilter("tomorrow");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
+              
               disabled={filter === "tomorrow"}
             >
               <FontAwesomeIcon icon={faCalendarDay} className="icon" /> Bis
               morgen
             </button>
             <button
-              onClick={() => setFilter("week")}
+              onClick={() =>{ setFilter("week");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
               disabled={filter === "week"}
             >
               <FontAwesomeIcon icon={faCalendarWeek} className="icon" /> Diese
               Woche
             </button>
             <button
-              onClick={() => setFilter("nextWeek")}
+              onClick={() => { setFilter("nextWeek");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
               disabled={filter === "nextWeek"}
             >
               <FontAwesomeIcon icon={faCalendarWeek} className="icon" /> Nächste
               Woche
             </button>
             <button
-              onClick={() => setFilter("important")}
+              onClick={() => { setFilter("important");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
               disabled={filter === "important"}
             >
               <FontAwesomeIcon icon={faExclamation} className="icon" /> Wichtig
             </button>
             <button
-              onClick={() => setFilter("done")}
+              onClick={() => { setFilter("done");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
               disabled={filter === "done"}
             >
               <FontAwesomeIcon icon={faCheckCircle} className="icon" /> Erledigt
             </button>
             <button
-              onClick={() => setFilter("missed")}
+              onClick={() => { setFilter("missed");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
               disabled={filter === "missed"}
             >
               <FontAwesomeIcon icon={faTimesCircle} className="icon" /> Verpasst
             </button>
             <button
-              onClick={() => setFilter("noDeadline")}
+              onClick={() => { setFilter("noDeadline");if(!filterButtonShow){setFilterButtonShow(!filterButtonShow)};
+              }}
               disabled={filter === "noDeadline"}
             >
               <FontAwesomeIcon icon={faInfinity} className="icon" />
