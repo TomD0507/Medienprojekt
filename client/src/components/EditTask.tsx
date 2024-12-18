@@ -210,7 +210,7 @@ function EditTask({
               </div>
             </label>
           )}
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div>
             <button
               className="taskMenuButton deleteButton"
               type="button"

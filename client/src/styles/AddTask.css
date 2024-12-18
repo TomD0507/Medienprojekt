@@ -1,4 +1,5 @@
 .add-task-form {
+  padding: auto;
   display: flex;
   flex-direction: column;
   gap: 1em; /* Adds spacing between form sections */
@@ -9,6 +10,9 @@
   display: flex;
   flex-direction: column; /* Stack fields vertically */
   gap: 0em; /* Optional: spacing between Title and Description */
+}.add-task-form div {
+  display: flex;
+  gap: 5px; /* Optional: spacing between Title and Description */
 }
 /* Item-Container  wenn kompletter bereich eingenommen werden soll*/
 .add_item {
@@ -16,38 +20,36 @@
   width: 100%;
   padding: 0.5em  0em 1em 1em;
 }
-.taskMenuButton {
+.contain_menu_buttons {
+  display: flex;
+  height: 4em;
+  gap: 10px; /* Abstand zwischen den Buttons */
+}
+
+.taskMenuButton,
+.taskMenuAbortButton {
   width: 100%;
+  height: 100%;
   align-self: center;
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
   font-size: 1.3em;
   font-weight: 500;
   font-family: inherit;
   background-color: #304674;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Zentriert den Text vertikal */
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 .taskMenuAbortButton {
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1.3em;
-  font-weight: 500;
-  font-family: inherit;
+  
   background-color: #595959;
-  cursor: pointer;
-  transition: border-color 0.25s;
 }
 .deleteSubTaskButton {
-  background: none;
-  border: none;
   color: red;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 1.5em;
 }
 .deleteSubTaskButton:hover {
   opacity: 0.8;

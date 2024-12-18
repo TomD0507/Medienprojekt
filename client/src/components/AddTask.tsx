@@ -184,7 +184,7 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
               </div>
             </label>
           )}
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className="contain_menu_buttons">
             <button
               className="taskMenuAbortButton"
               type="button"
