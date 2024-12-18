@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClock,
+  faRightFromBracket,
+  faSortAmountDown,
+} from "@fortawesome/free-solid-svg-icons";
 
 import "./styles/Overlay.css";
 import {
@@ -29,6 +33,25 @@ type AppProps = {
   displayName: string;
   onLogout: () => void;
 };
+function sortTasks(
+  tasks: TaskProps[],
+  criteria: "deadline" | "added",
+  reverse: boolean = false
+): TaskProps[] {
+  let sortedTasks;
+  if (criteria === "deadline") {
+    sortedTasks = [...tasks].sort(
+      (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
+    );
+  } else if (criteria === "added") {
+    sortedTasks = [...tasks]; // Standardreihenfolge beibehalten
+  } else {
+    sortedTasks = tasks;
+  }
+
+  // Wenn reverse true ist, kehre die Reihenfolge um
+  return reverse ? sortedTasks.reverse() : sortedTasks;
+}
 
 function App({ userID, onLogout }: AppProps) {
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
@@ -221,6 +244,15 @@ function App({ userID, onLogout }: AppProps) {
   }, []);
   const [selectedTaskTab, setSelectedTaskTab] = useState("open");
 
+  const [sortArg, setSortArg] = useState("deadline");
+  function handleSortTasks(tasks: TaskProps[]): TaskProps[] {
+    if (sortArg === "added") {
+      return sortTasks(tasks, "added", true); // Umgekehrte Reihenfolge für "added"
+    } else {
+      return sortTasks(tasks, "deadline", false); // Normale Reihenfolge für "deadline"
+    }
+  }
+
   return (
     <div className="app">
       {/* Header */}
@@ -279,10 +311,12 @@ function App({ userID, onLogout }: AppProps) {
           <CollList visible={"open" === selectedTaskTab}>
             <TaskList
               currentTime={currentTime}
-              tasks={openTasks
-                .filter((task) => !task.deleted)
+              tasks={handleSortTasks(
+                openTasks
+                  .filter((task) => !task.deleted)
 
-                .filter(handleFilterOpen)}
+                  .filter(handleFilterOpen)
+              )}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
@@ -305,16 +339,44 @@ function App({ userID, onLogout }: AppProps) {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           ></div>
           <div ref={menuRef} className="menu-overlay">
-            <div className="filter-options">
-              <button
-                className="logout"
-                onClick={() => {
-                  onLogout();
-                }}
-              >
-                <FontAwesomeIcon icon={faRightFromBracket} className="icon" />
-                <text>Abmelden</text>
-              </button>
+            <div className="app-options">
+              {/* Überschrift für Sortier-Buttons */}
+              <div>
+                <h3 className="sort-title">Sortieren</h3>
+
+                {/* Sortier-Buttons */}
+                <div className="sort-buttons">
+                  <button
+                    onClick={() => setSortArg("deadline")}
+                    disabled={sortArg === "deadline"}
+                  >
+                    <FontAwesomeIcon icon={faClock} className="icon" />
+                    {"Nächste Deadline"}
+                  </button>
+                  <button
+                    onClick={() => setSortArg("added")}
+                    disabled={sortArg === "added"}
+                  >
+                    <FontAwesomeIcon icon={faSortAmountDown} className="icon" />
+                    <span>Zuletzt hinzugefügt</span>
+                  </button>
+                </div>
+              </div>
+              <div>
+                {/* Trennlinie */}
+                <hr className="divider" />
+
+                {/* Logout-Button */}
+                <button
+                  className="logout"
+                  onClick={() => {
+                    onLogout();
+                  }}
+                >
+                  <FontAwesomeIcon icon={faRightFromBracket} className="icon" />
+                  Abmelden
+                </button>
+              </div>
             </div>
           </div>
         </div>
