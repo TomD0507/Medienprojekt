@@ -9,6 +9,7 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { isValidDate } from "./Task";
 
 type FilterMenuProps = {
   filter: string;
@@ -19,17 +20,115 @@ type FilterMenuProps = {
   closeMenu: () => void;
   placeholder: string;
 };
-const filterOptions = [
-  { key: "all", text: "Alle", icon: faBook },
-  { key: "today", text: "Heute", icon: faCalendarDay },
-  { key: "tomorrow", text: "Bis morgen", icon: faCalendarDay },
-  { key: "week", text: "Diese Woche", icon: faCalendarWeek },
-  { key: "nextWeek", text: "Nächste Woche", icon: faCalendarWeek },
-  { key: "important", text: "Wichtig", icon: faExclamation },
-  { key: "done", text: "Erledigt", icon: faCheckCircle },
-  { key: "missed", text: "Verpasst", icon: faTimesCircle },
-  { key: "noDeadline", text: "Ohne Deadline", icon: faInfinity },
+export const filterOptions = [
+  {
+    key: "all",
+    text: "Alle",
+    icon: faBook,
+    condition: () => true, // Show all tasks
+  },
+  {
+    key: "today",
+    text: "Heute",
+    icon: faCalendarDay,
+    condition: (
+      task: {
+        deadline: Date;
+      },
+      today: Date
+    ) =>
+      task.deadline.getDate() === today.getDate() &&
+      task.deadline.getMonth() === today.getMonth() &&
+      task.deadline.getFullYear() === today.getFullYear(),
+  },
+  {
+    key: "tomorrow",
+    text: "Bis morgen",
+    icon: faCalendarDay,
+    condition: (
+      task: {
+        deadline: Date;
+      },
+      today: Date
+    ) =>
+      task.deadline.getDate() === today.getDate() ||
+      (task.deadline.getDate() === today.getDate() + 1 &&
+        task.deadline.getMonth() === today.getMonth() &&
+        task.deadline.getFullYear() === today.getFullYear()),
+  },
+  {
+    key: "week",
+    text: "Diese Woche",
+    icon: faCalendarWeek,
+    condition: (task: { deadline: Date }, today: Date) => {
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      const taskDate = new Date(task.deadline);
+      return taskDate >= startOfWeek && taskDate <= endOfWeek;
+    },
+  },
+  {
+    key: "nextWeek",
+    text: "Nächste Woche",
+    icon: faCalendarWeek,
+    condition: (task: { deadline: Date }, today: Date) => {
+      const startOfNextWeek = new Date(today);
+      startOfNextWeek.setDate(today.getDate() - today.getDay() + 8);
+      startOfNextWeek.setHours(0, 0, 0, 0);
+
+      const endOfNextWeek = new Date(startOfNextWeek);
+      endOfNextWeek.setDate(startOfNextWeek.getDate() + 6);
+      endOfNextWeek.setHours(23, 59, 59, 999);
+
+      const taskDate = new Date(task.deadline);
+      return taskDate >= startOfNextWeek && taskDate <= endOfNextWeek;
+    },
+  },
+  {
+    key: "done",
+    text: "Erledigt",
+    icon: faCheckCircle,
+    condition: (task: { done: boolean }) => task.done,
+  },
+  {
+    key: "missed",
+    text: "Verpasst",
+    icon: faTimesCircle,
+    condition: (task: { done: boolean; deadline: Date }, today: Date) =>
+      !task.done && task.deadline <= today,
+  },
+  {
+    key: "noDeadline",
+    text: "Ohne Deadline",
+    icon: faInfinity,
+    condition: (task: { deadline: Date }) => !isValidDate(task.deadline),
+  },
+  {
+    key: "low",
+    text: "🟢 Niedrige Priorität",
+    icon: faExclamation,
+    condition: (task: { priority: string }) => task.priority === "low",
+  },
+  {
+    key: "medium",
+    text: "🟠 Mittlere Priorität",
+    icon: faExclamation,
+    condition: (task: { priority: string }) => task.priority === "medium",
+  },
+  {
+    key: "high",
+    text: "🔴 Hohe Priorität",
+    icon: faExclamation,
+    condition: (task: { priority: string }) => task.priority === "high",
+  },
 ];
+
 export function getFilterTextByKey(key: string) {
   const option = filterOptions.find((option) => option.key === key);
   return option ? option.text : "Unbekannt";

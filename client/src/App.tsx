@@ -17,7 +17,7 @@ import "./styles/FilterMenu.css";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import axios from "axios";
-import FilterMenu from "./components/FilterMenu";
+import FilterMenu, { filterOptions } from "./components/FilterMenu";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
@@ -189,80 +189,26 @@ function App({ userID, onLogout }: AppProps) {
     searchQuery: string
   ) {
     const today = new Date();
-
-    if (
-      !(
-        task.title.toLowerCase().includes(searchQuery) || // Search in title
-        (task.description &&
-          task.description.toLowerCase().includes(searchQuery)) ||
-        (task.subtasks &&
-          task.subtasks.some((element) =>
-            element.name.toLowerCase().includes(searchQuery)
-          ))
-      )
-    ) {
-      return false;
+    if (searchQuery.trim() != "") {
+      if (
+        !(
+          task.title.toLowerCase().includes(searchQuery) || // Search in title
+          (task.description &&
+            task.description.toLowerCase().includes(searchQuery)) ||
+          (task.subtasks &&
+            task.subtasks.some((element) =>
+              element.name.toLowerCase().includes(searchQuery)
+            ))
+        )
+      ) {
+        return false;
+      }
     }
-    if (filter === "all") {
-      return true; // Show all tasks
+    const filterOption = filterOptions.find((option) => option.key === filter);
+    if (!filterOption) {
+      return false; // Fallback: Zeige alle Tasks
     }
-
-    if (filter === "today") {
-      return (
-        task.deadline.getDate() === today.getDate() &&
-        task.deadline.getMonth() === today.getMonth() &&
-        task.deadline.getFullYear() === today.getFullYear()
-      );
-    }
-    if (filter === "tomorrow") {
-      return (
-        task.deadline.getDate() === today.getDate() ||
-        (task.deadline.getDate() === today.getDate() + 1 &&
-          task.deadline.getMonth() === today.getMonth() &&
-          task.deadline.getFullYear() === today.getFullYear())
-      );
-    }
-    if (filter === "week") {
-      // "This Week" filter
-
-      const startOfWeek = new Date();
-      startOfWeek.setDate(today.getDate() - today.getDay() + 1);
-      startOfWeek.setHours(0, 0, 0, 0);
-
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-      endOfWeek.setHours(23, 59, 59, 999);
-
-      const taskDate = new Date(task.deadline);
-      return taskDate >= startOfWeek && taskDate <= endOfWeek;
-    }
-
-    if (filter === "nextWeek") {
-      // "Next Week" filter
-      const startOfNextWeek = new Date();
-      startOfNextWeek.setDate(today.getDate() - today.getDay() + 8);
-      startOfNextWeek.setHours(0, 0, 0, 0);
-
-      const endOfNextWeek = new Date(startOfNextWeek);
-      endOfNextWeek.setDate(startOfNextWeek.getDate() + 6);
-      endOfNextWeek.setHours(23, 59, 59, 999);
-
-      const taskDate = new Date(task.deadline);
-      return taskDate >= startOfNextWeek && taskDate <= endOfNextWeek;
-    }
-    if (filter === "important") {
-      return task.priority && task.priority !== "none";
-    }
-    if (filter === "done") {
-      return task.done;
-    }
-    if (filter === "missed") {
-      return !task.done && task.deadline <= currentTime;
-    }
-    if (filter === "noDeadline") {
-      return !isValidDate(task.deadline);
-    }
-    return false;
+    return filterOption.condition(task, today);
   }
   //update current time every 5 seconds
   const [currentTime, updateTime] = useState(new Date());
@@ -348,7 +294,7 @@ function App({ userID, onLogout }: AppProps) {
           onSave={handleSaveTask}
         ></AddTask>
       </main>
-      <button className="app_header" onClick={() => setOverlay(true)}>
+      <button className="add-task-button" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
       {/* burgerMenu */}

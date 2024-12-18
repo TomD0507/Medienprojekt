@@ -46,16 +46,20 @@ body {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 20x;
+  font-size: 20px;
   font-weight: 500;
   font-family: inherit;
   background-color: #304674;
   position: sticky;
+  bottom: 0; /* Fixiert den Button unten */
+  display: flex; /* Stellt sicher, dass Flexbox-Eigenschaften funktionieren */
   align-items: center;
-  justify-content: center; /* Centers items horizontally */
+  justify-content: center; /* Zentriert den Inhalt horizontal */
   cursor: pointer;
   transition: border-color 0.25s;
+  z-index: 4;
 }
+
 
 .add-task-button:hover {
   opacity: 0.8;
@@ -116,7 +120,14 @@ body {
   transition: max-height 0.3s ease-out;
   overflow: hidden;
 }
-
+.no_task{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  font-size: auto;
+}
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
