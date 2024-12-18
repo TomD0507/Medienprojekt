@@ -10,7 +10,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   overflow: auto; /* Ermöglicht Scrollen */
 }
-.search-bar {
+.search-bar input {
   top: 60px;
   left: 0;
   width: 100%;
@@ -18,6 +18,10 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 10px 20px;
   z-index: 10;
+}
+
+.search-bar button{
+  position: relative;
 }
 /* Menü-Overlay */
 .menu-overlay {
@@ -64,4 +68,8 @@
 .logout {
   position: sticky;
   bottom: 0px;
+}
+
+.xbutton{
+  align-items:end;
 }

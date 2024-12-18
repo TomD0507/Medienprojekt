@@ -7,6 +7,7 @@ import {
   faExclamation,
   faCheckCircle,
   faFilter,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -51,8 +52,11 @@ function FilterMenu({
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <div> 
-                 {filterButtonShow && <div> <button onClick={()=>{setFilterButtonShow(!filterButtonShow);
-                  setFilter("all");setSearchQuery("");}}>X</button>
+                 {filterButtonShow && <div> <button   onClick={()=>{setFilterButtonShow(!filterButtonShow);
+                  setFilter("all");setSearchQuery("");}}>
+                  
+                  <FontAwesomeIcon icon={faXmark} className = "icon"/>
+                  </button>
               </div>}
   
               </div>
