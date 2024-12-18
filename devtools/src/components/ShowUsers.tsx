@@ -23,14 +23,14 @@ function ShowUsers() {
   }, []);
 
   return (
-    <div>
-      {userList.map((user, index) => (
-        <>
-          <div key={index}>{user.name}</div>{" "}
-          <div key={index}>{user.displayName}</div>
-        </>
+    <>
+      {userList.map((user) => (
+        <div className="side_by_side">
+          <div>{"Name: " + user.name}</div>
+          <div>{"Displayname: " + user.displayName}</div>
+        </div>
       ))}
-    </div>
+    </>
   );
 }
 

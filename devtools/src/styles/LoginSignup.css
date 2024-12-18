@@ -1,3 +1,12 @@
+.side_by_side{
+    display: flex;
+    gap: 10px;
+    justify-content:flex-start;
+}
+.side_by_side div{
+    border: 1px solid;
+    size: 50%;
+}
 .login_aligner{
     margin: 0; /* Remove default margin */
     min-width: 100vw;
