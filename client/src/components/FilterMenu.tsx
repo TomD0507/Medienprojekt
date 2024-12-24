@@ -123,7 +123,7 @@ export const filterOptions = [
   },
   {
     key: "high",
-    text: " Hohe Priorität",
+    text: "Hohe Priorität",
     icon: "🔴",
     condition: (task: { priority: string }) => task.priority === "high",
   },
@@ -159,24 +159,30 @@ function FilterMenu({
                 onChange={(e) => setSearchQuery(e.target.value)}
               ></input>
             </div>
-            {filterOptions.map(({ key, text, icon }) => (
-              <button
-                key={key}
-                onClick={() => setFilter(key)}
-                disabled={filter === key}
-              >
-                {icon instanceof Object ? (
-                  <FontAwesomeIcon
-                    icon={icon as IconDefinition}
-                    className="icon"
-                  />
-                ) : (
-                  <div className="icon">{icon}</div>
-                )}
 
-                {text}
-              </button>
-            ))}
+            <div className="sort-buttons">
+              {filterOptions.map(({ key, text, icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setFilter(key)}
+                  disabled={filter === key}
+                  className="text_leftbound"
+                >
+                  {icon instanceof Object ? (
+                    <FontAwesomeIcon
+                      icon={icon as IconDefinition}
+                      className="icon"
+                    />
+                  ) : (
+                    <div className="icon">{icon}</div>
+                  )}
+                  {text}
+                </button>
+              ))}
+            </div>
+
+            {/* Trennlinie */}
+            <hr className="divider" />
             <button
               onClick={() => {
                 setFilter("all");

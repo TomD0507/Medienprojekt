@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -7,5 +7,5 @@ export default defineConfig({
   /*server: {
     host: true, // Listen on all addresses, including LAN
     port: 5173, // Optional: Change port if needed
-  },*/// uncommentieren um im lan zu öffnen
-})
+  },*/ // uncommentieren um im lan zu öffnen
+});
