@@ -351,6 +351,7 @@ function App({ userID, onLogout }: AppProps) {
                   <button
                     onClick={() => setSortArg("deadline")}
                     disabled={sortArg === "deadline"}
+                    className="text_leftbound"
                   >
                     <FontAwesomeIcon icon={faClock} className="icon" />
                     {"Nächste Deadline"}
@@ -358,9 +359,10 @@ function App({ userID, onLogout }: AppProps) {
                   <button
                     onClick={() => setSortArg("added")}
                     disabled={sortArg === "added"}
+                    className="text_leftbound"
                   >
                     <FontAwesomeIcon icon={faSortAmountDown} className="icon" />
-                    <span>Zuletzt hinzugefügt</span>
+                    Zuletzt hinzugefügt
                   </button>
                 </div>
               </div>
