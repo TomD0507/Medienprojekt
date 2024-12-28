@@ -5,6 +5,7 @@ export function // PixelWall(userID:number) {
 PixelWall() {
   const rows = 35; // Number of rows
   const cols = 35; // Number of columns
+  const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
 
   // Initialize a 2D array
   const createGrid = () => {
@@ -23,20 +24,30 @@ PixelWall() {
   };
 
   return (
-    <div className="drawing-board">
-      {grid.map((row, rowIndex) => (
-        <div key={rowIndex} className="row">
-          {row.map((cell, colIndex) => (
-            <Pixel
-              key={colIndex}
-              colIndex={colIndex}
-              rowIndex={rowIndex}
-              className={cell}
-              handleCellClick={() => handleCellClick(rowIndex, colIndex)}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
+    <>
+      <label>
+        Wähle eine Farbe:{" "}
+        <input
+          type="color"
+          value={selectedColor}
+          onChange={(e) => setSelectedColor(e.target.value)}
+        />
+      </label>
+      <div className="drawing-board">
+        {grid.map((row, rowIndex) => (
+          <div key={rowIndex} className="row">
+            {row.map((cell, colIndex) => (
+              <Pixel
+                key={colIndex}
+                colIndex={colIndex}
+                rowIndex={rowIndex}
+                className={cell}
+                handleCellClick={() => handleCellClick(rowIndex, colIndex)}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
