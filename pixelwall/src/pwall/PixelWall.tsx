@@ -3,6 +3,8 @@ import { Pixel } from "./CustomPixel";
 import "./PixelWall.css";
 export function // PixelWall(userID:number) {
 PixelWall() {
+  //todo: pixel count
+  //todo : auswahl für stif und radierer
   const rows = 35; // Number of rows
   const cols = 35; // Number of columns
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
@@ -10,7 +12,10 @@ PixelWall() {
   // Initialize a 2D array
   const createGrid = () => {
     return Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => "")
+      Array.from({ length: cols }, () => ({
+        frontcolor: "",
+        backcolor: "white",
+      }))
     );
   };
 
@@ -18,9 +23,19 @@ PixelWall() {
 
   // Handle cell click
   const handleCellClick = (row: number, col: number) => {
-    const newGrid = [...grid];
-    newGrid[row][col] = newGrid[row][col] === "active" ? "" : "active";
-    setGrid(newGrid);
+    //todo: überprüfen radierer oder stift
+    //todo: wenn stift dann nur ändern, wenn bereits bemalt oder wenn pixel übrig und dann auch pixel -1
+    setGrid((prev) => {
+      return [
+        ...prev.slice(0, row),
+        [
+          ...prev[row].slice(0, col),
+          { frontcolor: selectedColor, backcolor: prev[row][col].backcolor },
+          ...prev[row].slice(col + 1),
+        ],
+        ...prev.slice(row + 1),
+      ];
+    });
   };
 
   return (
@@ -41,8 +56,10 @@ PixelWall() {
                 key={colIndex}
                 colIndex={colIndex}
                 rowIndex={rowIndex}
-                className={cell}
+                className={cell.frontcolor === "" ? "" : "active"}
                 handleCellClick={() => handleCellClick(rowIndex, colIndex)}
+                frontcolor={cell.frontcolor}
+                backcolor={cell.backcolor}
               />
             ))}
           </div>
