@@ -10,15 +10,34 @@
 .row {
   display: flex;
 }
-
-.cell {
+.pixelcontainer {
+  position: relative;
   width: 20px;
   height: 20px;
+}
+.bgcell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
   border: 1px solid #ccc;
   background-color: white;
+  z-index: 0;
+}
+.fgcell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border: 1px solid #ccc;
+  background-color: white;
+  opacity: 80%;
+  z-index: 1;
 }
 
-.cell.active {
+.fgcell.active {
   border: 1px solid #ffb41e;
 }
 .color_picker {

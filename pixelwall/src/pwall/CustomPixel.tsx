@@ -14,6 +14,20 @@ export function Pixel({
 }: PixelProps) {
   //TODO: darstellung front und background. front ev. mit alphavalue und back ohne. müssen übereinander liegen
   return (
-    <div className={`cell ${className}`} onClick={() => handleCellClick()} />
+    <div className="pixelcontainer">
+      <div
+        className="bgcell"
+        style={{
+          backgroundColor: backcolor,
+        }}
+      />
+      <div
+        className={`fgcell ${className}`}
+        style={{
+          backgroundColor: frontcolor,
+        }}
+        onClick={() => handleCellClick()}
+      />
+    </div>
   );
 }
