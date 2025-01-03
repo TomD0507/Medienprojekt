@@ -5,7 +5,7 @@ export function // PixelWall(userID:number) {
 PixelWall() {
   //todo: pixel count
   //todo : auswahl für stif und radierer
-  const rows = 35; // Number of rows
+  const rows = 45; // Number of rows
   const cols = 35; // Number of columns
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
 
@@ -13,14 +13,28 @@ PixelWall() {
   const createGrid = () => {
     return Array.from({ length: rows }, () =>
       Array.from({ length: cols }, () => ({
-        frontcolor: "",
+        frontcolor: "transparent",
         backcolor: "white",
       }))
     );
   };
 
   const [grid, setGrid] = useState(createGrid());
-
+  function pushDrawing() {
+    setGrid((prev) => {
+      return prev.map((row) => {
+        return row.map((cell) => {
+          return {
+            backcolor:
+              cell.frontcolor === "transparent"
+                ? cell.backcolor
+                : cell.frontcolor,
+            frontcolor: "transparent",
+          };
+        });
+      });
+    });
+  }
   // Handle cell click
   const handleCellClick = (row: number, col: number) => {
     //todo: überprüfen radierer oder stift
@@ -48,6 +62,10 @@ PixelWall() {
           onChange={(e) => setSelectedColor(e.target.value)}
         />
       </label>
+      <label>
+        {" "}
+        <button onClick={pushDrawing}>Push change:</button>
+      </label>
       <div className="drawing-board">
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="row">
@@ -56,7 +74,9 @@ PixelWall() {
                 key={colIndex}
                 colIndex={colIndex}
                 rowIndex={rowIndex}
-                className={cell.frontcolor === "" ? "" : "active"}
+                className={
+                  cell.frontcolor === "transparent" ? "transparent" : "active"
+                }
                 handleCellClick={() => handleCellClick(rowIndex, colIndex)}
                 frontcolor={cell.frontcolor}
                 backcolor={cell.backcolor}

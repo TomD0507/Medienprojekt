@@ -12,7 +12,6 @@ export function Pixel({
   className,
   handleCellClick,
 }: PixelProps) {
-  //TODO: darstellung front und background. front ev. mit alphavalue und back ohne. müssen übereinander liegen
   return (
     <div className="pixelcontainer">
       <div
