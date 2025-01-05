@@ -24,6 +24,8 @@ import axios from "axios";
 import FilterMenu, { filterOptions } from "./components/FilterMenu";
 
 import Dialogue from "./taskville-components/Dialogue"; 
+import AvatarCustomization from "./taskville-components/AvatarCustomization";
+import "./styles/TaskVille/AvatarCustomization.css";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
@@ -60,7 +62,6 @@ function App({ userID, onLogout }: AppProps) {
 
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
 
-  const isTesting = false;
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -257,6 +258,29 @@ function App({ userID, onLogout }: AppProps) {
     }
   }
 
+  const headAssets = [
+    { path: "/src/assets/Taskville/head-testZagreus.png", title: "headZagreus"},
+    { path: "/src/assets/Taskville/head-testMelinoe.png", title: "headMelinoe"},
+    { path: "/src/assets/Taskville/head-testPrometheus.png", title: "headPrometheus"},
+    { path: "/src/assets/Taskville/head-testHades.png", title: "headHades"}
+  ];
+
+  const bodyAssets = [
+    { path: "/src/assets/Taskville/body-testSpongebob.png", title: "bodySpongebob"},
+    { path: "/src/assets/Taskville/body-testSquidward.png", title: "bodySquidward"},
+    { path: "/src/assets/Taskville/body-testKrabs.png", title: "bodyKrabs"},
+    { path: "/src/assets/Taskville/body-testPlankton.png", title: "bodyPlankton"}
+  ];
+
+  const legAssets = [
+    { path: "/src/assets/Taskville/leg-testAragorn.png", title: "legAragorn"},
+    { path: "/src/assets/Taskville/leg-testLegolas.png", title: "legLegolas"},
+    { path: "/src/assets/Taskville/leg-testGimmli.png", title: "legGimmli"},
+    { path: "/src/assets/Taskville/leg-testGandalf.png", title: "legGandalf"}
+  ];
+  
+  const isTesting = false;
+
   return (
     <div className="app">
       {/* Header */}
@@ -337,7 +361,18 @@ function App({ userID, onLogout }: AppProps) {
       <button className="add-task-button" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
-      {isTesting && <Dialogue></Dialogue>} 
+      {isTesting && 
+        <div>
+          <Dialogue></Dialogue>
+        </div>
+      }
+      {isTesting && 
+        <div className="sliderContainer">
+          <AvatarCustomization assets={headAssets}></AvatarCustomization>
+          <AvatarCustomization assets={bodyAssets}></AvatarCustomization>
+          <AvatarCustomization assets={legAssets}></AvatarCustomization>
+        </div>
+      }
       {/* burgerMenu */}
       {isMenuOpen && (
         <div className="overlay">
