@@ -124,7 +124,7 @@ function initTodoDB() {
     console.log("User Table successfully created");
   });
   // deleteUser("testUser");
-  registerUser("testPascal", "testPascal");
+  // registerUser("testPascal", "testPascal");
   // console.log(process.env.EMAIL_USER);
   // console.log(process.env.EMAIL_PASS);
   // transporter.verify().then(console.log).catch(console.error)
