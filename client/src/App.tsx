@@ -23,6 +23,8 @@ import TaskList from "./components/TaskList";
 import axios from "axios";
 import FilterMenu, { filterOptions } from "./components/FilterMenu";
 
+import Dialogue from "./taskville-components/Dialogue"; 
+
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
 
@@ -57,6 +59,8 @@ function App({ userID, onLogout }: AppProps) {
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
 
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
+
+  const isTesting = false;
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -333,6 +337,7 @@ function App({ userID, onLogout }: AppProps) {
       <button className="add-task-button" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
+      {isTesting && <Dialogue></Dialogue>} 
       {/* burgerMenu */}
       {isMenuOpen && (
         <div className="overlay">
