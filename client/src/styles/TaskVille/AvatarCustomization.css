@@ -1,0 +1,30 @@
+.slider{
+    height: 100px;
+    position: relative;
+}
+
+.leftArrow{
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    left: 5%;
+    color: white;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.rightArrow{
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    right: 5%;
+    color: white;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.sliderContainer{
+    width: 100px;
+    height: 400px;
+    margin: 0 auto;
+}

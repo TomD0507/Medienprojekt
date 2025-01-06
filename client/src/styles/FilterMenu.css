@@ -1,4 +1,5 @@
-.filter-options {
+.filter-options,
+.app-options {
   display: flex;
   flex-direction: column;
   gap: 10px; /* Add spacing between buttons */
@@ -10,19 +11,10 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   overflow: auto; /* Ermöglicht Scrollen */
 }
-.search-bar input {
-  top: 60px;
-  left: 0;
-  width: 100%;
-  background: transparent;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 10px 20px;
-  z-index: 10;
+.app-options {
+  justify-content: space-between; /* größt möglicher abstand zwischen hauptelementen*/
 }
 
-.search-bar button{
-  position: relative;
-}
 /* Menü-Overlay */
 .menu-overlay {
   position: fixed;
@@ -35,17 +27,18 @@
   z-index: 20;
 }
 .search-bar input {
-  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 10px;
-  color:black;
+  color: black;
   font-size: 17px;
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: rgb(255, 255, 255);
 }
 
-.filter-options button ,.app-options button{
-  height: 3em;
+.filter-options button,
+.app-options button {
+  height: 3.1em;
   display: flex;
   flex-grow: unset;
   align-items: center;
@@ -57,45 +50,35 @@
   transition: all 0.3s ease; /* Ensure items start from the same position */
   padding: 10px; /* Offsets the content to the right */
 }
-.filter-options .icon ,.app-options .icon{
-  min-width: 18%;
+.filter-options .icon,
+.app-options .icon {
+  text-align: center;
+  min-width: 22%;
   color: #cdcccc;
   align-self: center;
 }
-.filter-options button:hover ,.app-options button:hover{
+.filter-options button:hover,
+.app-options button:hover {
   opacity: 0.8;
-}
-.app-options {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%; /* Stellt sicher, dass der Logout-Button am unteren Rand bleibt */ 
-  gap: 10px; /* Add spacing between buttons */
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 8px;
-  padding: 20px;
-  height: 100%;
-  width: 100%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  overflow: auto; /* Ermöglicht Scrollen */
 }
 
 .sort-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Abstand zwischen den Sortier-Buttons */
-  
+  gap: 7px; /* Abstand zwischen den Sortier-Buttons */
 }
 .app-options div {
   display: flex;
   flex-direction: column;
-
 }
 .logout {
   position: sticky;
   bottom: 0px;
 }
 
-.xbutton{
-  align-items:end;
+.xbutton {
+  align-items: end;
+}
+.text_leftbound {
+  text-align: left;
 }

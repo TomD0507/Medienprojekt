@@ -7,5 +7,5 @@ export default defineConfig({
   server: {
     host: true, // Listen on all addresses, including LAN
     port: 5173, // Optional: Change port if needed
-  }, // uncommentieren um im lan zu öffnen
+  },
 });

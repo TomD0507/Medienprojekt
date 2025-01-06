@@ -1,0 +1,27 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    grid-auto-rows: minmax(50px, auto);
+    gap: 5px;
+    padding: 1px;
+    margin-top: 5px;
+    border-radius: 10px;
+}
+
+.grid-container > div {
+    background-color: #304674;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.textbox {
+    text-align: center;
+    align-content: center;
+    color: white;
+}
+
+.image {
+    display: flex;
+    justify-content: center;
+    /* align-items: end; */
+}

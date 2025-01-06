@@ -1,0 +1,50 @@
+.drawing-board {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+}
+.pixelcontainer {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+.bgcell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 0;
+}
+.fgcell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border: 1px solid #ccc;
+  background-color: white;
+  opacity: 80%;
+  z-index: 1;
+}
+
+.fgcell.active {
+  border: 1px solid #ffb41e;
+}
+.color_picker {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  background-color: rgb(201, 51, 51);
+  color: green;
+}
