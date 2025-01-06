@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faClock,
-  faRightFromBracket,
-  faSortAmountDown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 import "./styles/Overlay.css";
 import {
@@ -23,7 +19,7 @@ import TaskList from "./components/TaskList";
 import axios from "axios";
 import FilterMenu, { filterOptions } from "./components/FilterMenu";
 
-import Dialogue from "./taskville-components/Dialogue"; 
+import Dialogue from "./taskville-components/Dialogue";
 import AvatarCustomization from "./taskville-components/AvatarCustomization";
 import "./styles/TaskVille/AvatarCustomization.css";
 import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
@@ -63,7 +59,6 @@ function App({ userID, onLogout }: AppProps) {
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
 
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
-
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -261,26 +256,44 @@ function App({ userID, onLogout }: AppProps) {
   }
 
   const headAssets = [
-    { path: "/src/assets/Taskville/head-testZagreus.png", title: "headZagreus"},
-    { path: "/src/assets/Taskville/head-testMelinoe.png", title: "headMelinoe"},
-    { path: "/src/assets/Taskville/head-testPrometheus.png", title: "headPrometheus"},
-    { path: "/src/assets/Taskville/head-testHades.png", title: "headHades"}
+    {
+      path: "/src/assets/Taskville/head-testZagreus.png",
+      title: "headZagreus",
+    },
+    {
+      path: "/src/assets/Taskville/head-testMelinoe.png",
+      title: "headMelinoe",
+    },
+    {
+      path: "/src/assets/Taskville/head-testPrometheus.png",
+      title: "headPrometheus",
+    },
+    { path: "/src/assets/Taskville/head-testHades.png", title: "headHades" },
   ];
 
   const bodyAssets = [
-    { path: "/src/assets/Taskville/body-testSpongebob.png", title: "bodySpongebob"},
-    { path: "/src/assets/Taskville/body-testSquidward.png", title: "bodySquidward"},
-    { path: "/src/assets/Taskville/body-testKrabs.png", title: "bodyKrabs"},
-    { path: "/src/assets/Taskville/body-testPlankton.png", title: "bodyPlankton"}
+    {
+      path: "/src/assets/Taskville/body-testSpongebob.png",
+      title: "bodySpongebob",
+    },
+    {
+      path: "/src/assets/Taskville/body-testSquidward.png",
+      title: "bodySquidward",
+    },
+    { path: "/src/assets/Taskville/body-testKrabs.png", title: "bodyKrabs" },
+    {
+      path: "/src/assets/Taskville/body-testPlankton.png",
+      title: "bodyPlankton",
+    },
   ];
 
   const legAssets = [
-    { path: "/src/assets/Taskville/leg-testAragorn.png", title: "legAragorn"},
-    { path: "/src/assets/Taskville/leg-testLegolas.png", title: "legLegolas"},
-    { path: "/src/assets/Taskville/leg-testGimmli.png", title: "legGimmli"},
-    { path: "/src/assets/Taskville/leg-testGandalf.png", title: "legGandalf"}
+    { path: "/src/assets/Taskville/leg-testAragorn.png", title: "legAragorn" },
+    { path: "/src/assets/Taskville/leg-testLegolas.png", title: "legLegolas" },
+    { path: "/src/assets/Taskville/leg-testGimmli.png", title: "legGimmli" },
+    { path: "/src/assets/Taskville/leg-testGandalf.png", title: "legGandalf" },
   ];
-  
+
   const isTesting = false;
 
   return (
@@ -363,23 +376,23 @@ function App({ userID, onLogout }: AppProps) {
       <button className="add-task-button" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
-      {isTesting && 
+      {isTesting && (
         <div>
           <Dialogue></Dialogue>
         </div>
-      }
-      {isTesting && 
+      )}
+      {isTesting && (
         <div className="sliderContainer">
           <AvatarCustomization assets={headAssets}></AvatarCustomization>
           <AvatarCustomization assets={bodyAssets}></AvatarCustomization>
           <AvatarCustomization assets={legAssets}></AvatarCustomization>
         </div>
-      }
-      {isTesting &&
+      )}
+      {isTesting && (
         <div className="taskville-container">
           <TaskvilleAvatars userID={1}></TaskvilleAvatars>
         </div>
-      }
+      )}
       {/* burgerMenu */}
       {isMenuOpen && (
         <div className="overlay">
@@ -389,30 +402,7 @@ function App({ userID, onLogout }: AppProps) {
           ></div>
           <div ref={menuRef} className="menu-overlay">
             <div className="app-options">
-              {/* Überschrift für Sortier-Buttons */}
-              <div>
-                <h3 className="sort-title">Sortieren</h3>
-
-                {/* Sortier-Buttons */}
-                <div className="sort-buttons">
-                  <button
-                    onClick={() => setSortArg("deadline")}
-                    disabled={sortArg === "deadline"}
-                    className="text_leftbound"
-                  >
-                    <FontAwesomeIcon icon={faClock} className="icon" />
-                    {"Nächste Deadline"}
-                  </button>
-                  <button
-                    onClick={() => setSortArg("added")}
-                    disabled={sortArg === "added"}
-                    className="text_leftbound"
-                  >
-                    <FontAwesomeIcon icon={faSortAmountDown} className="icon" />
-                    Zuletzt hinzugefügt
-                  </button>
-                </div>
-              </div>
+              <div></div>
               <div>
                 {/* Trennlinie */}
                 <hr className="divider" />
@@ -437,6 +427,8 @@ function App({ userID, onLogout }: AppProps) {
       <FilterMenu
         filter={openFilter}
         setFilter={setOpenFilter}
+        sortArg={sortArg}
+        setSortArg={setSortArg}
         searchQuery={searchOpenQuery}
         setSearchQuery={setSearchOpenQuery}
         isMenuOpen={isSearchOpenOpen}
@@ -446,6 +438,8 @@ function App({ userID, onLogout }: AppProps) {
       <FilterMenu
         filter={closedFilter}
         setFilter={setClosedFilter}
+        sortArg={sortArg}
+        setSortArg={setSortArg}
         searchQuery={searchClosedQuery}
         setSearchQuery={setSearchClosedQuery}
         isMenuOpen={isSearchClosedOpen}
