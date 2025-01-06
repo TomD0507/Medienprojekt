@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/Header.css";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getFilterTextByKey } from "./FilterMenu";
 type HeaderProps = {
@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
         <h1 className="header-title">{title}</h1>
         <button className="search-button" onClick={onSearchToggle}>
-          Filtern 🔍
+          <FontAwesomeIcon icon={faFilter} className="icon" />
         </button>
       </div>
       <div className="currentfilterview">

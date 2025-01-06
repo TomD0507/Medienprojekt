@@ -84,7 +84,7 @@ body {
   flex: 1;
   padding: 10px;
   background-color: #304674;
-  text-align: left;
+  text-align: center;
   border: none;
   font-size: 16px;
   cursor: pointer;
@@ -94,7 +94,7 @@ body {
   flex: 1;
   padding: 10px;
   background-color: #304674;
-  text-align: left;
+  text-align: center;
   border: none;
   font-size: 16px;
   cursor: pointer;

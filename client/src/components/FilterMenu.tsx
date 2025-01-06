@@ -191,6 +191,7 @@ function FilterMenu({
             {/* Trennlinie */}
             <hr className="divider" />
             <button
+              className="text_leftbound"
               onClick={() => {
                 setFilter("all");
                 setSearchQuery("");
