@@ -26,6 +26,8 @@ import FilterMenu, { filterOptions } from "./components/FilterMenu";
 import Dialogue from "./taskville-components/Dialogue"; 
 import AvatarCustomization from "./taskville-components/AvatarCustomization";
 import "./styles/TaskVille/AvatarCustomization.css";
+import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
+import "./styles/TaskVille/TaskvilleAvatars.css";
 
 export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
@@ -371,6 +373,11 @@ function App({ userID, onLogout }: AppProps) {
           <AvatarCustomization assets={headAssets}></AvatarCustomization>
           <AvatarCustomization assets={bodyAssets}></AvatarCustomization>
           <AvatarCustomization assets={legAssets}></AvatarCustomization>
+        </div>
+      }
+      {isTesting &&
+        <div className="taskville-container">
+          <TaskvilleAvatars userID={1}></TaskvilleAvatars>
         </div>
       }
       {/* burgerMenu */}

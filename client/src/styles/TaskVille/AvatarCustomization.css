@@ -1,5 +1,5 @@
 .slider{
-    height: 100%;
+    height: 100px;
     position: relative;
 }
 
@@ -25,6 +25,6 @@
 
 .sliderContainer{
     width: 100px;
-    height: 100px;
+    height: 400px;
     margin: 0 auto;
 }
