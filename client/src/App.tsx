@@ -1,34 +1,42 @@
+/** Frameworks */
 import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+
+/** Fonts */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
-import "./styles/Overlay.css";
+/** Helper functions */
 import {
   getTasksFromArray,
   TaskInput,
   SubtaskInput,
 } from "./helpers/taskHelper";
 
-import AddTask from "./components/AddTask";
+/** Components */
 import { TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
-import "./index.css";
-import "./styles/FilterMenu.css";
+import AddTask from "./components/AddTask";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
-import axios from "axios";
-import FilterMenu, { filterOptions } from "./components/FilterMenu";
-
 import Dialogue from "./taskville-components/Dialogue";
+import FilterMenu, { filterOptions } from "./components/FilterMenu";
+// import MailModal from "./components/MailModal";
+import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
+
+
+/** Styles */
+import "./index.css";
+import "./styles/Overlay.css";
+import "./styles/FilterMenu.css";
+import "./styles/BurgerMenu.css";
+
 import AvatarCustomization from "./taskville-components/AvatarCustomization";
 import "./styles/TaskVille/AvatarCustomization.css";
-import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
 import "./styles/TaskVille/TaskvilleAvatars.css";
 
-export const API_URL = "https://devstate.uber.space/api"; // auf was die url vom backend dann ist
-// export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
-
-// Const for UserID, TODO: Update to var and updated when logged in
+export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom Backend dann ist
+// export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
 
 type AppProps = {
   userID: number;
@@ -56,9 +64,11 @@ function sortTasks(
 }
 
 function App({ userID, onLogout }: AppProps) {
+  /** State Hooks */
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
-
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
+  const [id, updateID] = useState(1);
+
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -79,6 +89,7 @@ function App({ userID, onLogout }: AppProps) {
       });
   };
 
+ 
   // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
     setOpenTasks((prevTasks) => [...prevTasks, newTask]);
@@ -134,7 +145,6 @@ function App({ userID, onLogout }: AppProps) {
     fetchData();
   }, [userID]);
 
-  const [id, updateID] = useState(1);
   const incrementID = () => updateID((prevID) => (prevID += 1));
 
   const [isOpen, setOverlay] = useState(false);
@@ -296,6 +306,15 @@ function App({ userID, onLogout }: AppProps) {
 
   const isTesting = false;
 
+  
+
+  // const [mailModal, setMailModal] = useState(false);
+
+  // const toggleMailModal = () => {
+  //   setMailModal(!mailModal);
+  //   setIsMenuOpen(!isMenuOpen);
+  // }
+
   return (
     <div className="app">
       {/* Header */}
@@ -402,7 +421,17 @@ function App({ userID, onLogout }: AppProps) {
           ></div>
           <div ref={menuRef} className="menu-overlay">
             <div className="app-options">
-              <div></div>
+               { /* E-Mail Modal Button*/}   
+              {/* <button
+                className="button-menu"
+                onClick={toggleMailModal}
+              >
+                <div className="button-icon">
+                  <FontAwesomeIcon icon={faAt} />
+                </div>
+                <p className="button-text">E-Mail hinzufügen/ändern</p>
+              </button>
+               */}
               <div>
                 {/* Trennlinie */}
                 <hr className="divider" />
@@ -423,6 +452,11 @@ function App({ userID, onLogout }: AppProps) {
         </div>
       )}
 
+      {/** Mail Modal */}
+      {/* { mailModal && (
+        <MailModal></MailModal>
+      )}
+       */}
       {/* Searchmenus */}
       <FilterMenu
         filter={openFilter}
