@@ -73,6 +73,11 @@
   font-size: 1em; /* Ensure consistent font size */
   line-height: 1.2;
 }
+.add_item textarea::placeholder,
+.add_item input::placeholder,
+.add_item select::placeholder {
+  color: rgb(210, 210, 210);
+}
 textarea {
   height: 2.4em;
   resize: vertical;

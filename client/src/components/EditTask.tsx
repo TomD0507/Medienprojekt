@@ -173,6 +173,7 @@ function EditTask({
             <div className="add_item">
               <input
                 type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)} // limitsDatepicker to current date
                 value={deadlineDate}
                 onChange={(e) => setDeadlineDate(e.target.value)}
               />

@@ -78,12 +78,15 @@ body {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   overflow: hidden; /* Entfernt Überschneidungen durch die Buttons */
+  border-bottom: 3px solid;
+  border-color: #304674;
 }
 
-.taskbutton_left {
+.taskbutton_left,.taskbutton_right {
   flex: 1;
   padding: 10px;
-  background-color: #304674;
+  color: #242424;
+  background-color: #364871ac;
   text-align: center;
   border: none;
   font-size: 16px;
@@ -91,18 +94,13 @@ body {
 }
 
 .taskbutton_right {
-  flex: 1;
-  padding: 10px;
-  background-color: #304674;
-  text-align: center;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
+  
   border-left: 1px solid white; /* Weißer Trennstrich */
 }
-.taskbutton_left:hover,
-.taskbutton_right:hover {
-  background-color: #3b568a; /* Hellere Blautönung bei Hover */
+.taskbutton_left:disabled,
+.taskbutton_right:disabled {
+  background-color: #304674;
+  color: white;
 }
 
 .taskbutton_left:active,

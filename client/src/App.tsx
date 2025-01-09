@@ -24,7 +24,6 @@ import FilterMenu, { filterOptions } from "./components/FilterMenu";
 // import MailModal from "./components/MailModal";
 import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
 
-
 /** Styles */
 import "./index.css";
 import "./styles/Overlay.css";
@@ -69,7 +68,6 @@ function App({ userID, onLogout }: AppProps) {
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
   const [id, updateID] = useState(1);
 
-
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
     setOpenTasks((prevTasks) =>
@@ -89,7 +87,6 @@ function App({ userID, onLogout }: AppProps) {
       });
   };
 
- 
   // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
     setOpenTasks((prevTasks) => [...prevTasks, newTask]);
@@ -306,8 +303,6 @@ function App({ userID, onLogout }: AppProps) {
 
   const isTesting = false;
 
-  
-
   // const [mailModal, setMailModal] = useState(false);
 
   // const toggleMailModal = () => {
@@ -339,7 +334,9 @@ function App({ userID, onLogout }: AppProps) {
         searchQuery={
           "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
         }
-        title={"done" === selectedTaskTab ? "Erledigte ToDos" : "Offene ToDos"}
+        title={
+          "done" === selectedTaskTab ? "Erledigte Aufgaben" : "Offene Aufgaben"
+        }
       />
       {/*<div>{currentTime.toString()}</div>*/}
       {/* Home Screen */}
@@ -348,15 +345,17 @@ function App({ userID, onLogout }: AppProps) {
         <div className="taskbutton_holder">
           <button
             className="taskbutton_left"
+            disabled={selectedTaskTab === "open"}
             onClick={() => setSelectedTaskTab("open")}
           >
-            {"Offene ToDos"}
+            {"Offene Aufgaben"}
           </button>
           <button
             className="taskbutton_right"
+            disabled={selectedTaskTab === "done"}
             onClick={() => setSelectedTaskTab("done")}
           >
-            {"Erledigte ToDos"}
+            {"Erledigte Aufgaben"}
           </button>
         </div>
         <div>
@@ -421,7 +420,7 @@ function App({ userID, onLogout }: AppProps) {
           ></div>
           <div ref={menuRef} className="menu-overlay">
             <div className="app-options">
-               { /* E-Mail Modal Button*/}   
+              {/* E-Mail Modal Button*/}
               {/* <button
                 className="button-menu"
                 onClick={toggleMailModal}
