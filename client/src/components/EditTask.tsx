@@ -3,6 +3,8 @@ import "../styles/AddTask.css"; // Wiederverwendung des AddTask-Stils
 import Overlay from "./Overlay";
 import { isValidDate, Priority, TaskProps } from "./Task";
 import { isValidDateString } from "./AddTask";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface EditTaskProps {
   id: number;
@@ -147,7 +149,8 @@ function EditTask({
                 type="button"
                 onClick={addSubtask}
               >
-                + Unteraufgabe hinzufügen
+                <FontAwesomeIcon icon={faPlus} />
+                Unteraufgabe hinzufügen
               </button>
             </label>
           </label>
@@ -170,6 +173,7 @@ function EditTask({
             <div className="add_item">
               <input
                 type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)} // limitsDatepicker to current date
                 value={deadlineDate}
                 onChange={(e) => setDeadlineDate(e.target.value)}
               />

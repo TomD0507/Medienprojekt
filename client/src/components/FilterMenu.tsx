@@ -5,7 +5,9 @@ import {
   faCalendarDay,
   faCalendarWeek,
   faCheckCircle,
+  faClock,
   faFilter,
+  faSortAmountDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { isValidDate } from "./Task";
@@ -14,6 +16,8 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 type FilterMenuProps = {
   filter: string;
   setFilter: (e: string) => void;
+  sortArg: string;
+  setSortArg: (e: string) => void;
   searchQuery: string;
   setSearchQuery: (e: string) => void;
   isMenuOpen: boolean;
@@ -136,6 +140,8 @@ export function getFilterTextByKey(key: string) {
 function FilterMenu({
   filter,
   setFilter,
+  sortArg,
+  setSortArg,
   closeMenu,
   searchQuery,
   setSearchQuery,
@@ -160,6 +166,7 @@ function FilterMenu({
               ></input>
             </div>
 
+            <h3 className="sort-title">Filter</h3>
             <div className="sort-buttons">
               {filterOptions.map(({ key, text, icon }) => (
                 <button
@@ -184,6 +191,7 @@ function FilterMenu({
             {/* Trennlinie */}
             <hr className="divider" />
             <button
+              className="text_leftbound"
               onClick={() => {
                 setFilter("all");
                 setSearchQuery("");
@@ -193,6 +201,32 @@ function FilterMenu({
               <FontAwesomeIcon icon={faFilter} className="icon" />
               Alle Filter entfernen
             </button>
+            {/* Trennlinie */}
+            <hr className="divider" />
+            {/* Überschrift für Sortier-Buttons */}
+            <div>
+              <h3 className="sort-title">Sortieren</h3>
+
+              {/* Sortier-Buttons */}
+              <div className="sort-buttons">
+                <button
+                  onClick={() => setSortArg("deadline")}
+                  disabled={sortArg === "deadline"}
+                  className="text_leftbound"
+                >
+                  <FontAwesomeIcon icon={faClock} className="icon" />
+                  {"Nächste Deadline"}
+                </button>
+                <button
+                  onClick={() => setSortArg("added")}
+                  disabled={sortArg === "added"}
+                  className="text_leftbound"
+                >
+                  <FontAwesomeIcon icon={faSortAmountDown} className="icon" />
+                  Zuletzt hinzugefügt
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

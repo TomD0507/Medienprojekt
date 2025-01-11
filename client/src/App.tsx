@@ -1,32 +1,41 @@
+/** Frameworks */
 import { useEffect, useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faClock,
-  faRightFromBracket,
-  faSortAmountDown,
-} from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
-import "./styles/Overlay.css";
+/** Fonts */
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+
+/** Helper functions */
 import {
   getTasksFromArray,
   TaskInput,
   SubtaskInput,
 } from "./helpers/taskHelper";
 
-import AddTask from "./components/AddTask";
+/** Components */
 import { TaskProps } from "./components/Task";
 import { Header } from "./components/Header";
-import "./index.css";
-import "./styles/FilterMenu.css";
+import AddTask from "./components/AddTask";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
-import axios from "axios";
+import Dialogue from "./taskville-components/Dialogue";
 import FilterMenu, { filterOptions } from "./components/FilterMenu";
+// import MailModal from "./components/MailModal";
+import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
 
-export const API_URL = "https://tesdo.uber.space/api"; // auf was die url vom backend dann ist
-// export const API_URL = "http://localhost:5000"; // wenn local( auf computer)
+/** Styles */
+import "./index.css";
+import "./styles/Overlay.css";
+import "./styles/FilterMenu.css";
+import "./styles/BurgerMenu.css";
 
-// Const for UserID, TODO: Update to var and updated when logged in
+import AvatarCustomization from "./taskville-components/AvatarCustomization";
+import "./styles/TaskVille/AvatarCustomization.css";
+import "./styles/TaskVille/TaskvilleAvatars.css";
+
+export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom Backend dann ist
+// export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
 
 type AppProps = {
   userID: number;
@@ -54,9 +63,10 @@ function sortTasks(
 }
 
 function App({ userID, onLogout }: AppProps) {
+  /** State Hooks */
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
-
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
+  const [id, updateID] = useState(1);
 
   // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
   const handleUpdateTask = (updatedTask: TaskProps) => {
@@ -132,7 +142,6 @@ function App({ userID, onLogout }: AppProps) {
     fetchData();
   }, [userID]);
 
-  const [id, updateID] = useState(1);
   const incrementID = () => updateID((prevID) => (prevID += 1));
 
   const [isOpen, setOverlay] = useState(false);
@@ -253,6 +262,54 @@ function App({ userID, onLogout }: AppProps) {
     }
   }
 
+  const headAssets = [
+    {
+      path: "/src/assets/Taskville/head-testZagreus.png",
+      title: "headZagreus",
+    },
+    {
+      path: "/src/assets/Taskville/head-testMelinoe.png",
+      title: "headMelinoe",
+    },
+    {
+      path: "/src/assets/Taskville/head-testPrometheus.png",
+      title: "headPrometheus",
+    },
+    { path: "/src/assets/Taskville/head-testHades.png", title: "headHades" },
+  ];
+
+  const bodyAssets = [
+    {
+      path: "/src/assets/Taskville/body-testSpongebob.png",
+      title: "bodySpongebob",
+    },
+    {
+      path: "/src/assets/Taskville/body-testSquidward.png",
+      title: "bodySquidward",
+    },
+    { path: "/src/assets/Taskville/body-testKrabs.png", title: "bodyKrabs" },
+    {
+      path: "/src/assets/Taskville/body-testPlankton.png",
+      title: "bodyPlankton",
+    },
+  ];
+
+  const legAssets = [
+    { path: "/src/assets/Taskville/leg-testAragorn.png", title: "legAragorn" },
+    { path: "/src/assets/Taskville/leg-testLegolas.png", title: "legLegolas" },
+    { path: "/src/assets/Taskville/leg-testGimmli.png", title: "legGimmli" },
+    { path: "/src/assets/Taskville/leg-testGandalf.png", title: "legGandalf" },
+  ];
+
+  const isTesting = false;
+
+  // const [mailModal, setMailModal] = useState(false);
+
+  // const toggleMailModal = () => {
+  //   setMailModal(!mailModal);
+  //   setIsMenuOpen(!isMenuOpen);
+  // }
+
   return (
     <div className="app">
       {/* Header */}
@@ -277,7 +334,9 @@ function App({ userID, onLogout }: AppProps) {
         searchQuery={
           "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
         }
-        title={"done" === selectedTaskTab ? "Erledigte ToDos" : "Offene ToDos"}
+        title={
+          "done" === selectedTaskTab ? "Erledigte Aufgaben" : "Offene Aufgaben"
+        }
       />
       {/*<div>{currentTime.toString()}</div>*/}
       {/* Home Screen */}
@@ -286,15 +345,17 @@ function App({ userID, onLogout }: AppProps) {
         <div className="taskbutton_holder">
           <button
             className="taskbutton_left"
+            disabled={selectedTaskTab === "open"}
             onClick={() => setSelectedTaskTab("open")}
           >
-            {"Offene ToDos"}
+            {"Offene Aufgaben"}
           </button>
           <button
             className="taskbutton_right"
+            disabled={selectedTaskTab === "done"}
             onClick={() => setSelectedTaskTab("done")}
           >
-            {"Erledigte ToDos"}
+            {"Erledigte Aufgaben"}
           </button>
         </div>
         <div>
@@ -333,6 +394,23 @@ function App({ userID, onLogout }: AppProps) {
       <button className="add-task-button" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
+      {isTesting && (
+        <div>
+          <Dialogue></Dialogue>
+        </div>
+      )}
+      {isTesting && (
+        <div className="sliderContainer">
+          <AvatarCustomization assets={headAssets}></AvatarCustomization>
+          <AvatarCustomization assets={bodyAssets}></AvatarCustomization>
+          <AvatarCustomization assets={legAssets}></AvatarCustomization>
+        </div>
+      )}
+      {isTesting && (
+        <div className="taskville-container">
+          <TaskvilleAvatars userID={1}></TaskvilleAvatars>
+        </div>
+      )}
       {/* burgerMenu */}
       {isMenuOpen && (
         <div className="overlay">
@@ -342,30 +420,17 @@ function App({ userID, onLogout }: AppProps) {
           ></div>
           <div ref={menuRef} className="menu-overlay">
             <div className="app-options">
-              {/* Überschrift für Sortier-Buttons */}
-              <div>
-                <h3 className="sort-title">Sortieren</h3>
-
-                {/* Sortier-Buttons */}
-                <div className="sort-buttons">
-                  <button
-                    onClick={() => setSortArg("deadline")}
-                    disabled={sortArg === "deadline"}
-                    className="text_leftbound"
-                  >
-                    <FontAwesomeIcon icon={faClock} className="icon" />
-                    {"Nächste Deadline"}
-                  </button>
-                  <button
-                    onClick={() => setSortArg("added")}
-                    disabled={sortArg === "added"}
-                    className="text_leftbound"
-                  >
-                    <FontAwesomeIcon icon={faSortAmountDown} className="icon" />
-                    Zuletzt hinzugefügt
-                  </button>
+              {/* E-Mail Modal Button*/}
+              {/* <button
+                className="button-menu"
+                onClick={toggleMailModal}
+              >
+                <div className="button-icon">
+                  <FontAwesomeIcon icon={faAt} />
                 </div>
-              </div>
+                <p className="button-text">E-Mail hinzufügen/ändern</p>
+              </button>
+               */}
               <div>
                 {/* Trennlinie */}
                 <hr className="divider" />
@@ -386,10 +451,17 @@ function App({ userID, onLogout }: AppProps) {
         </div>
       )}
 
+      {/** Mail Modal */}
+      {/* { mailModal && (
+        <MailModal></MailModal>
+      )}
+       */}
       {/* Searchmenus */}
       <FilterMenu
         filter={openFilter}
         setFilter={setOpenFilter}
+        sortArg={sortArg}
+        setSortArg={setSortArg}
         searchQuery={searchOpenQuery}
         setSearchQuery={setSearchOpenQuery}
         isMenuOpen={isSearchOpenOpen}
@@ -399,6 +471,8 @@ function App({ userID, onLogout }: AppProps) {
       <FilterMenu
         filter={closedFilter}
         setFilter={setClosedFilter}
+        sortArg={sortArg}
+        setSortArg={setSortArg}
         searchQuery={searchClosedQuery}
         setSearchQuery={setSearchClosedQuery}
         isMenuOpen={isSearchClosedOpen}

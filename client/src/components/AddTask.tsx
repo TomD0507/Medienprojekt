@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Overlay from "./Overlay";
 import { TaskProps, Priority, isValidDate } from "./Task";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 export function isValidDateString(datestring: string) {
   const date = new Date(datestring);
   return date instanceof Date && !isNaN(date.getTime());
@@ -121,7 +123,8 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
                 type="button"
                 onClick={addSubtask}
               >
-                + Unteraufgabe hinzufügen
+                <FontAwesomeIcon icon={faPlus} />
+                Unteraufgabe hinzufügen
               </button>
             </label>
           </label>
@@ -144,6 +147,7 @@ const AddTask = ({ id, onClose, isOpen, onSave }: AddTaskProps) => {
             <div className="add_item">
               <input
                 type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)} // limitsDatepicker to current date
                 value={deadlineDate}
                 onChange={(e) => setDeadlineDate(e.target.value)}
               />

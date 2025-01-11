@@ -1,0 +1,16 @@
+.button-menu{
+    height: auto !important;
+    display: flex;
+}   
+  
+.button-menu .button-icon{
+    width: 10%;
+}
+
+.button-menu .button-text{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+}
+  

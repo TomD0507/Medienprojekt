@@ -8,7 +8,7 @@ function Login() {
   const [loginName, setName] = useState("");
   const [password, setPw] = useState("");
 
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("error");
   const handleSubmit = async () => {
     setStatus("loading");
     if (!loginName.trim()) {
@@ -62,7 +62,11 @@ function Login() {
           </div>
         </div>
 
-        {status === "error" && <div className="error-message"></div>}
+        {status === "error" && (
+          <div className="error-message">
+            There already exists a user with that name.
+          </div>
+        )}
 
         <div className="submit-container">
           <button
