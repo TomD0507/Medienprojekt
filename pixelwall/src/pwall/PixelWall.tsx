@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faPen } from "@fortawesome/free-solid-svg-icons";
 async function fetchPixelData() {
   try {
-    const response = await fetch("/api/pixels");
+    const response = await fetch("/api/pixels/get");
 
     // Check if response is JSON
     if (!response.ok) {
@@ -45,8 +45,11 @@ const createFrontendGrid = () => {
     Array.from({ length: cols }, () => "transparent")
   );
 };
+type PixelWallProps = {
+  currentUserID: number;
+};
 export function // PixelWall(userID:number) {
-PixelWall(currentUserId: number) {
+PixelWall({ currentUserID }: PixelWallProps) {
   //todo: pixel count
 
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
@@ -60,9 +63,13 @@ PixelWall(currentUserId: number) {
     }[];
   }>({});
   // Map of userId -> list of pixels
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]); // List of userIds to display
+  const [selectedUsers, setSelectedUsers] = useState<Map<number, boolean>>(
+    new Map([[currentUserID, true]])
+  );
+
   const [grid, setGrid] = useState(createGrid()); // Rendered grid based on filtered users
 
+  // get own drawing into the backend and wall
   const [drawing, setDrawing] = useState(true);
   function pushDrawing() {
     const changes: {
@@ -72,11 +79,12 @@ PixelWall(currentUserId: number) {
       color: string;
       timestamp: Date;
     }[] = [];
+    // Filter all pixels, that the user drawed to
     frontendPixels.forEach((row, y) => {
       row.forEach((cell, x) => {
         if (cell !== "transparent") {
           changes.push({
-            userId: currentUserId,
+            userId: currentUserID,
             xCoordinate: x,
             yCoordinate: y,
             color: cell,
@@ -85,9 +93,28 @@ PixelWall(currentUserId: number) {
         }
       });
     });
-    //todo: übertragung zu userpixe struktur
 
-    fetch("/api/pixels", {
+    // Update local userPixelData immediately
+    setUserPixelData((prev) => {
+      const updatedData = { ...prev };
+      if (!updatedData[currentUserID]) {
+        updatedData[currentUserID] = [];
+      }
+      updatedData[currentUserID] = [
+        ...updatedData[currentUserID],
+        ...changes.map((pixel) => ({
+          userId: pixel.userId,
+          xCoordinate: pixel.xCoordinate,
+          yCoordinate: pixel.yCoordinate,
+          color: pixel.color,
+          timestamp: pixel.timestamp,
+        })),
+      ];
+      return updatedData;
+    });
+
+    // Send pixels to the backend
+    fetch("/api/pixels/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(changes),
@@ -98,14 +125,55 @@ PixelWall(currentUserId: number) {
 
   useEffect(() => {
     const fetchAndSetData = async () => {
-      const data = await fetchPixelData(); // Await the fetched data
+      const data = await fetchPixelData();
       if (data) {
-        setUserPixelData(data); // Update state only if data is valid
+        setUserPixelData(data);
       }
+
+      // only users that have drawn (and the current user) are supposed to be an option
+      setSelectedUsers((prev) => {
+        const updatedUsers = new Map(); //
+        let updated = false; // Track if there's any change
+        // Add users from the backend, preserving their `active` status if they already exist
+        if (data) {
+          Object.keys(data).forEach((userIdStr) => {
+            const userId = Number(userIdStr);
+            if (!prev.has(userId)) {
+              updatedUsers.set(userId, true); // Set to true if user is new
+              updated = true;
+            } else {
+              updatedUsers.set(userId, prev.get(userId)); //set to old value if already existing
+            }
+          });
+        }
+        // Always ensure the `currentUserID` is present
+        if (!updatedUsers.has(currentUserID)) {
+          if (prev.has(currentUserID)) {
+            updatedUsers.set(currentUserID, prev.get(currentUserID));
+          } else {
+            updatedUsers.set(currentUserID, true);
+            updated = true;
+          } // Set to true for currentUserID if not already existing
+        }
+
+        console.log(prev);
+        console.log(updatedUsers);
+
+        console.log(updated);
+        return updated ? updatedUsers : prev;
+      });
     };
 
-    fetchAndSetData(); // Call the async function inside useEffect
-  }, []);
+    // Fetch data initially
+    fetchAndSetData();
+
+    // Set up periodic fetching
+    const intervalId = setInterval(fetchAndSetData, 5000); // Fetch every 5 seconds
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [currentUserID]);
+
   const [frontendPixels, setFrontendPixels] = useState<string[][]>(
     createFrontendGrid()
   ); // Lokale Frontend-Pixel
@@ -114,29 +182,31 @@ PixelWall(currentUserId: number) {
     const combinedGrid = createGrid();
 
     // Iterate over selected users
-    selectedUsers.forEach((userId) => {
-      const userPixels: {
-        userId: number;
-        xCoordinate: number;
-        yCoordinate: number;
-        color: string;
-        timestamp: Date;
-      }[] = userPixelData[userId] || [];
-      userPixels.forEach(({ xCoordinate, yCoordinate, color, timestamp }) => {
-        const currentPixel = combinedGrid[yCoordinate][xCoordinate];
+    Array.from(selectedUsers.entries()).map(([id, active]) => {
+      if (active) {
+        const userPixels: {
+          userId: number;
+          xCoordinate: number;
+          yCoordinate: number;
+          color: string;
+          timestamp: Date;
+        }[] = userPixelData[id] || [];
+        userPixels.forEach(({ xCoordinate, yCoordinate, color, timestamp }) => {
+          const currentPixel = combinedGrid[yCoordinate][xCoordinate];
 
-        // Update if this pixel is newer
-        if (
-          !currentPixel.timestamp ||
-          new Date(timestamp) > new Date(currentPixel.timestamp)
-        ) {
-          combinedGrid[yCoordinate][xCoordinate] = {
-            frontcolor: "transparent",
-            backcolor: color,
-            timestamp,
-          };
-        }
-      });
+          // Update if this pixel is newer
+          if (
+            !currentPixel.timestamp ||
+            new Date(timestamp) > new Date(currentPixel.timestamp)
+          ) {
+            combinedGrid[yCoordinate][xCoordinate] = {
+              frontcolor: "transparent",
+              backcolor: color,
+              timestamp,
+            };
+          }
+        });
+      }
     });
 
     return combinedGrid;
@@ -166,6 +236,7 @@ PixelWall(currentUserId: number) {
 
   return (
     <>
+      <>{currentUserID}</>
       <label>
         Wähle eine Farbe:{" "}
         <input
@@ -192,29 +263,46 @@ PixelWall(currentUserId: number) {
       </label>
       {/* User Selection */}
       <div>
-        {Object.keys(userPixelData).map((userIdStr) => {
-          const userId = Number(userIdStr); // Convert string key back to a number(
+        <label key={currentUserID}>
+          <input
+            type="checkbox"
+            value={currentUserID}
+            checked={selectedUsers.get(currentUserID) ?? true}
+            onChange={(e) => {
+              setSelectedUsers((prev) => {
+                const updatedMap = new Map(prev); // Create a copy of the map
+                updatedMap.set(currentUserID, e.target.checked); // Update the active status
+                return updatedMap;
+              });
+            }}
+          />
+          Eigene (User {currentUserID})
+        </label>
+
+        {/* User Selection */}
+
+        {Array.from(selectedUsers.entries()).map(([id, active]) => {
+          const userId = id; // Convert string key back to a number(
+          if (userId == currentUserID) return;
           return (
             <label key={userId}>
               <input
                 type="checkbox"
                 value={userId}
-                checked={selectedUsers.includes(userId)}
+                checked={active}
                 onChange={(e) => {
-                  const userId = Number(e.target.value);
-                  setSelectedUsers((prev) =>
-                    e.target.checked
-                      ? [...prev, userId]
-                      : prev.filter((id) => id !== userId)
-                  );
+                  setSelectedUsers((prev) => {
+                    const updatedMap = new Map(prev); // Create a copy of the map
+                    updatedMap.set(userId, e.target.checked); // Update the active status
+                    return updatedMap;
+                  });
                 }}
               />
-              User {userId}
+              {`User ${userId}`}
             </label>
           );
         })}
       </div>
-
       {/* Pixel Grid */}
       <div className="drawing-board">
         {grid.map((row, rowIndex) => (

@@ -74,7 +74,7 @@ function PageManager() {
       status={status}
     />
   ) : (
-    <PixelWall /> //userID={userID} displayName={displayName} onLogout={handleLogout} />
+    <PixelWall currentUserID={userID} /> //userID={userID} displayName={displayName} onLogout={handleLogout} />
   );
 }
 
