@@ -3,30 +3,50 @@ import { Pixel } from "./CustomPixel";
 import "./PixelWall.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEraser, faPen } from "@fortawesome/free-solid-svg-icons";
-async function fetchPixelData() {
+import { API_URL } from "../App";
+
+import axios from "axios";
+
+type PixelData = {
+  userId: number;
+  xCoordinate: number;
+  yCoordinate: number;
+  color: string;
+  timestamp: Date;
+};
+
+async function fetchPixelData(): Promise<{
+  [userID: number]: PixelData[];
+} | null> {
   try {
-    const response = await fetch("/api/pixels/get");
+    const response = await axios.get(`${API_URL}/pixels/get`);
 
-    // Check if response is JSON
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      return null; // Return null if there's an error
+    // Axios parses JSON responses automatically
+    const data: { [userID: number]: PixelData[] } = response.data;
+
+    // Validate the data structure if necessary
+    if (!data || typeof data !== "object") {
+      console.error("Invalid data structure received:", data);
+      return null;
     }
 
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      console.error("Response is not JSON");
-      return null; // Return null if there's an error
-    }
-
-    const data = await response.json(); // Parse JSON only if valid
-    console.log(data);
     return data;
   } catch (error) {
-    console.error("Error fetching pixel data:", error);
-    return null; // Return null if there's an error
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.error(`HTTP error! status: ${error.response.status}`);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+    } else {
+      console.error("An unexpected error occurred:", error);
+    }
+    return null;
   }
 }
+
 const rows = 35; // Number of rows
 const cols = 35; // Number of columns
 
@@ -34,7 +54,6 @@ const cols = 35; // Number of columns
 const createGrid = () => {
   return Array.from({ length: rows }, () =>
     Array.from({ length: cols }, () => ({
-      frontcolor: "transparent",
       backcolor: "white",
       timestamp: new Date(0),
     }))
@@ -71,7 +90,7 @@ PixelWall({ currentUserID }: PixelWallProps) {
 
   // get own drawing into the backend and wall
   const [drawing, setDrawing] = useState(true);
-  function pushDrawing() {
+  async function pushDrawing() {
     const changes: {
       userId: number;
       xCoordinate: number;
@@ -114,13 +133,17 @@ PixelWall({ currentUserID }: PixelWallProps) {
     });
 
     // Send pixels to the backend
-    fetch("/api/pixels/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(changes),
-    }).then(() => {
-      setFrontendPixels(createFrontendGrid()); // Reset lokale Pixel
-    });
+    try {
+      // Use axios to make the POST request
+      await axios.post(`${API_URL}/pixels/submit`, changes, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      // Reset local pixels after successful submission
+      setFrontendPixels(createFrontendGrid());
+    } catch (error) {
+      console.error("Error submitting pixel changes:", error);
+    }
   }
 
   useEffect(() => {
@@ -191,6 +214,7 @@ PixelWall({ currentUserID }: PixelWallProps) {
           color: string;
           timestamp: Date;
         }[] = userPixelData[id] || [];
+        console.log(userPixels);
         userPixels.forEach(({ xCoordinate, yCoordinate, color, timestamp }) => {
           const currentPixel = combinedGrid[yCoordinate][xCoordinate];
 
@@ -200,7 +224,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
             new Date(timestamp) > new Date(currentPixel.timestamp)
           ) {
             combinedGrid[yCoordinate][xCoordinate] = {
-              frontcolor: "transparent",
               backcolor: color,
               timestamp,
             };
