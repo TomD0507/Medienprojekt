@@ -4,7 +4,7 @@ import axios from "axios";
 
 /** Fonts */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 /** Helper functions */
 import {
@@ -33,6 +33,7 @@ import "./styles/BurgerMenu.css";
 import AvatarCustomization from "./taskville-components/AvatarCustomization";
 import "./styles/TaskVille/AvatarCustomization.css";
 import "./styles/TaskVille/TaskvilleAvatars.css";
+import MailModal from "./components/MailModal";
 
 export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom Backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
@@ -169,8 +170,15 @@ function App({ userID, onLogout }: AppProps) {
 
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const [mailModal, setMailModal] = useState(false);
+
+  const toggleMailModal = () => {
+    setMailModal((mailModal) => !mailModal);
+    setIsMenuOpen(!isMenuOpen)
+  }
+
   useEffect(() => {
-    if (isOpen || isMenuOpen || isSearchOpenOpen || isSearchClosedOpen) {
+    if (isOpen || isMenuOpen || isSearchOpenOpen || isSearchClosedOpen || mailModal) {
       // Scrollen verhindern
       document.body.style.overflow = "hidden";
     } else {
@@ -182,7 +190,7 @@ function App({ userID, onLogout }: AppProps) {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen, isMenuOpen, isSearchOpenOpen, isSearchClosedOpen]);
+  }, [isOpen, isMenuOpen, isSearchOpenOpen, isSearchClosedOpen, mailModal]);
   // This is a hook to close components when you click outside of them
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -303,12 +311,7 @@ function App({ userID, onLogout }: AppProps) {
 
   const isTesting = false;
 
-  // const [mailModal, setMailModal] = useState(false);
 
-  // const toggleMailModal = () => {
-  //   setMailModal(!mailModal);
-  //   setIsMenuOpen(!isMenuOpen);
-  // }
 
   return (
     <div className="app">
@@ -411,6 +414,10 @@ function App({ userID, onLogout }: AppProps) {
           <TaskvilleAvatars userID={1}></TaskvilleAvatars>
         </div>
       )}
+      {/** Mail Modal */}
+      { mailModal && (
+        <MailModal thisMailModal={mailModal} toggleMailModal={toggleMailModal}></MailModal>
+      )}
       {/* burgerMenu */}
       {isMenuOpen && (
         <div className="overlay">
@@ -421,7 +428,7 @@ function App({ userID, onLogout }: AppProps) {
           <div ref={menuRef} className="menu-overlay">
             <div className="app-options">
               {/* E-Mail Modal Button*/}
-              {/* <button
+              <button
                 className="button-menu"
                 onClick={toggleMailModal}
               >
@@ -430,7 +437,7 @@ function App({ userID, onLogout }: AppProps) {
                 </div>
                 <p className="button-text">E-Mail hinzufügen/ändern</p>
               </button>
-               */}
+              
               <div>
                 {/* Trennlinie */}
                 <hr className="divider" />
@@ -450,12 +457,7 @@ function App({ userID, onLogout }: AppProps) {
           </div>
         </div>
       )}
-
-      {/** Mail Modal */}
-      {/* { mailModal && (
-        <MailModal></MailModal>
-      )}
-       */}
+      
       {/* Searchmenus */}
       <FilterMenu
         filter={openFilter}

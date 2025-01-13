@@ -3,6 +3,7 @@
 }
 
 .modal, .mail-overlay {
+    display: flex;
     width: 100vw;
     height: 100vh;
     top: 0;
@@ -10,6 +11,48 @@
     right: 0;
     bottom: 0;
     position: fixed;
+}
+
+.mail-overlay{
+    background: rgba(0, 0, 0, 0.5); 
+}
+
+/* Close button */
+.overlay-close {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the X inside the circle */
+    position: fixed; /* Positioned relative to .overlay-content */
+    width: 10vw; /* Scales with viewport width */
+    height: 10vw; /* Match height to width for a perfect circle */
+    max-width: 2em; /* Optional: limit size for smaller screens */
+    max-height: 2em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7); /* Subtle shadow for depth */
+    border-radius: 50%; /* Makes the button circular */
+    cursor: pointer;
+    background-color: #304674; /* Button color */
+    top: 5%; /* Position the close button within the overlay */
+    right: 3%; /* Adjust as needed */
+    transition: opacity 0.3s, transform 0.3s; /* Smooth hover effects */
+  }
+
+/* Diagonal lines for the X */
+.x::before,
+.x::after {
+  content: ""; /* Creates the lines */
+  position: absolute; /* Positioned relative to the button container */
+  width: 0.2em; /* Thickness of the lines */
+  height: 60%; /* Length relative to the button */
+  border-radius: 4px; /* Slight rounding for better aesthetics */
+  background-color: white; /* Line color */
+  top: 50%; /* Center it vertically */
+  left: 50%; /* Center it horizontally */
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(45deg); /* First diagonal */
+}
+
+.x::after {
+  transform: translate(-50%, -50%) rotate(-45deg); /* Second diagonal */
 }
 
 .email-content{
@@ -23,4 +66,10 @@
     border-radius: 3px;
     max-width: 600px;
     min-width: 300px;
+}
+
+.mail-header{
+    width: 95%;
+    font-size: 15pt;
+    font-weight: bold;
 }
