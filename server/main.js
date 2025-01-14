@@ -5,9 +5,11 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cron = require("node-cron");
 // const bcrypt = require("bcrypt");
+const argon2 = require("argon2");
 const nodemailer = require("nodemailer");
 
 const { format } = require("date-fns");
+const { errorMonitor } = require("nodemailer/lib/xoauth2");
 
 const app = express();
 
@@ -374,18 +376,43 @@ app.get("/read-subtasks", (req, res) => {
 
 // Checks if the username and password exist and returns id + name if it does
 app.get("/login-user", (req, res) => {
-  const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
-  connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
+  const sql = "SELECT * FROM users_init WHERE name = ?";
+  connection.query(sql, [req.query.name, req.query.pw], async function (err, result) {
     if (err) {
       console.log("Login call attempt failed!");
+      res.json({ id: -1, name: "" });
     } else if (result.length === 0) {
-      // Kein Benutzer mit passendem Namen und Passwort gefunden
+      console.log("Did not find a user with this name.")
       res.json({ id: -1, name: "" });
     } else {
-      res.json({ id: result[0].id, name: result[0].displayName });
+      const user = result[0];
+      const password = req.query.pw;
+      const hashedPassword = user.password;
+      const match = authenticate(password, hashedPassword);
+      if (match) {
+        console.log("Login successful.");
+        res.json({ id: user.id, name: user.displayName });
+      } else {
+        console.log("Invalid password");
+        res.json({ id: -1, name: "" });
+      }
     }
   });
 });
+
+  // const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
+  // connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
+  //   if (err) {
+  //     console.log("Login call attempt failed!");
+  //   } else if (result.length === 0) {
+  //     // Kein Benutzer mit passendem Namen und Passwort gefunden
+  //     res.json({ id: -1, name: "" });
+  //   } else {
+  //     res.json({ id: result[0].id, name: result[0].displayName });
+  //   }
+  // });
+// });
+
 // Beneath is the part if it needs to work with hashes (currently not working on uberspace)
 //   const sql = "SELECT * FROM users_init WHERE name = ?";
 //   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
@@ -547,9 +574,35 @@ function getMaxTodoId(callback) {
 }
 
 // Helper function to get hash a password
-function hashPassword(password) {
-  const saltRounds = 10; // Value between 10 and 12 is considered safe
-  return password//bcrypt.hashSync(password, saltRounds);
+async function hashPassword(password) {
+  try {
+    const hash = await argon2.hash(password, {
+      type: argon2.argon2id,
+      memoryCost: 2 ** 16,
+      timeCost: 3,
+      parallelism: 1
+    });
+    return hash;
+  } catch (err) {
+    console.error("Something went wrong hashing a password:", err);
+    throw err;
+  }
+}
+
+// Helper function to authenticate with password and stored hash
+async function authenticate(password, hashedPassword) {
+  try {
+    const match = await argon2.verify(hashedPassword, password);
+    if (match) {
+      console.log("Authentication successful!");
+    } else {
+      console.log("Authentication failed!")
+    }
+    return match;
+  } catch (err) {
+    console.error("Error while authentification process:", err);
+    throw err;
+  }
 }
 
 // Helper function to delete user
@@ -566,11 +619,11 @@ function deleteUser(username) {
 }
 
 // Helper function to register a new user
-function registerUser(userName, password) {
+async function registerUser(userName, password) {
   const sql =
     "INSERT INTO users_init (name, password, displayName) VALUES (?, ?, ?)";
-  // const passwordHash = hashPassword(password);
-  connection.query(sql, [userName, password, userName], (err, result) => {
+  const passwordHash = await hashPassword(password);
+  connection.query(sql, [userName, passwordHash, userName], (err, result) => {
     if (err) throw err;
     console.log("User succesfully registered.");
   });
@@ -751,7 +804,6 @@ function handleReminder() {
       const reminderTasks = result;
       for (const task of reminderTasks) {
         const needsReminder = needRemind(task.deadline, task.todoReminder);
-        console.log(needsReminder);
         switch(needsReminder) {
           case 1: {
             transporter.sendMail({
