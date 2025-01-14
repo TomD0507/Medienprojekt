@@ -8,7 +8,6 @@ import { API_URL } from "../App";
 import axios from "axios";
 
 type PixelData = {
-  userId: number;
   xCoordinate: number;
   yCoordinate: number;
   color: string;
@@ -19,7 +18,7 @@ async function fetchPixelData(): Promise<{
   [userID: number]: PixelData[];
 } | null> {
   try {
-    const response = await axios.get(`${API_URL}/pixels/get`);
+    const response = await axios.get(`${API_URL}/pixels`);
 
     // Axios parses JSON responses automatically
     const data: { [userID: number]: PixelData[] } = response.data;
@@ -74,7 +73,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
   const [userPixelData, setUserPixelData] = useState<{
     [userID: number]: {
-      userId: number;
       xCoordinate: number;
       yCoordinate: number;
       color: string;
@@ -92,7 +90,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
   const [drawing, setDrawing] = useState(true);
   async function pushDrawing() {
     const changes: {
-      userId: number;
       xCoordinate: number;
       yCoordinate: number;
       color: string;
@@ -103,7 +100,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
       row.forEach((cell, x) => {
         if (cell !== "transparent") {
           changes.push({
-            userId: currentUserID,
             xCoordinate: x,
             yCoordinate: y,
             color: cell,
@@ -122,7 +118,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
       updatedData[currentUserID] = [
         ...updatedData[currentUserID],
         ...changes.map((pixel) => ({
-          userId: pixel.userId,
           xCoordinate: pixel.xCoordinate,
           yCoordinate: pixel.yCoordinate,
           color: pixel.color,
@@ -135,9 +130,13 @@ PixelWall({ currentUserID }: PixelWallProps) {
     // Send pixels to the backend
     try {
       // Use axios to make the POST request
-      await axios.post(`${API_URL}/pixels/submit`, changes, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.post(
+        `${API_URL}/pixels/submit`,
+        { currentUserID, changes },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       // Reset local pixels after successful submission
       setFrontendPixels(createFrontendGrid());
@@ -208,7 +207,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
     Array.from(selectedUsers.entries()).map(([id, active]) => {
       if (active) {
         const userPixels: {
-          userId: number;
           xCoordinate: number;
           yCoordinate: number;
           color: string;
