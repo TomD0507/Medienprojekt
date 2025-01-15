@@ -1,10 +1,6 @@
 /** Frameworks */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-
-/** Fonts */
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAt, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 /** Helper functions */
 import {
@@ -15,12 +11,11 @@ import {
 
 /** Components */
 import { TaskProps } from "./components/Task";
-import { Header } from "./components/Header";
 import AddTask from "./components/AddTask";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
 import Dialogue from "./taskville-components/Dialogue";
-import FilterMenu, { filterOptions } from "./components/FilterMenu";
+import { filterOptions } from "./components/FilterMenu";
 // import MailModal from "./components/MailModal";
 import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
 
@@ -33,7 +28,6 @@ import "./styles/BurgerMenu.css";
 import AvatarCustomization from "./taskville-components/AvatarCustomization";
 import "./styles/TaskVille/AvatarCustomization.css";
 import "./styles/TaskVille/TaskvilleAvatars.css";
-import MailModal from "./components/MailModal";
 
 export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom Backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
