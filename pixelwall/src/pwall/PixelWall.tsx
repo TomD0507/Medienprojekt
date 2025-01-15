@@ -257,33 +257,36 @@ PixelWall({ currentUserID }: PixelWallProps) {
 
   return (
     <>
-      <>{currentUserID}</>
-      <label>
-        Wähle eine Farbe:{" "}
-        <input
-          type="color"
-          value={selectedColor}
-          onChange={(e) => setSelectedColor(e.target.value)}
-        />
-      </label>
-      <label>
-        {" "}
-        <button onClick={pushDrawing}>Push change:</button>
-      </label>
-      <label>
-        {" "}
-        <button onClick={() => setDrawing(true)}>
-          <FontAwesomeIcon icon={faPen} className="icon" />
-        </button>
-      </label>
-      <label>
-        {" "}
-        <button onClick={() => setDrawing(false)}>
-          <FontAwesomeIcon icon={faEraser} className="icon" />
-        </button>
-      </label>
+      <div className="options_container">
+        <>{currentUserID}</>
+        <label>
+          Wähle eine Farbe:{" "}
+          <input
+            type="color"
+            value={selectedColor}
+            onChange={(e) => setSelectedColor(e.target.value)}
+          />
+        </label>
+        <label>
+          {" "}
+          <button onClick={pushDrawing}>Push change:</button>
+        </label>
+        <label>
+          {" "}
+          <button onClick={() => setDrawing(true)}>
+            <FontAwesomeIcon icon={faPen} className="icon" />
+          </button>
+        </label>
+        <label>
+          {" "}
+          <button onClick={() => setDrawing(false)}>
+            <FontAwesomeIcon icon={faEraser} className="icon" />
+          </button>
+        </label>
+      </div>
       {/* User Selection */}
-      <div>
+      <div className="user_selection_container">
+        {/* Eigener User */}
         <label key={currentUserID}>
           <input
             type="checkbox"
@@ -300,7 +303,7 @@ PixelWall({ currentUserID }: PixelWallProps) {
           Eigene (User {currentUserID})
         </label>
 
-        {/* User Selection */}
+        {/* User Selection andere user */}
 
         {Array.from(selectedUsers.entries()).map(([id, active]) => {
           const userId = id; // Convert string key back to a number(
