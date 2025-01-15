@@ -22,18 +22,19 @@ function PageManager() {
     // Clear login info from localStorage
     localStorage.removeItem("userID");
     localStorage.removeItem("displayName");
+    localStorage.removeItem("TodoApppassword");
+    localStorage.removeItem("TodoApploginName");
     console.log("Logged out.");
     setUserID(null);
     setDisplayName("");
   };
   //loads id an dpname from storage
   useEffect(() => {
-    const storedUserID = localStorage.getItem("userID");
-    const storedDisplayName = localStorage.getItem("displayName");
+    const storedLoginName = localStorage.getItem("TodoApploginName");
+    const storedPW = localStorage.getItem("TodoApppassword");
 
-    if (storedUserID && storedDisplayName) {
-      setUserID(Number(storedUserID));
-      setDisplayName(storedDisplayName);
+    if (storedLoginName && storedPW) {
+      handleSubmit();
     }
   }, []);
 
@@ -60,6 +61,8 @@ function PageManager() {
       // Save login info to localStorage
       localStorage.setItem("userID", id.toString());
       localStorage.setItem("displayName", name);
+      localStorage.setItem("TodoApppassword", password);
+      localStorage.setItem("TodoApploginName", loginName);
     } else {
       console.log("Login failed: incorrect username or password.");
       setStatus("error");
