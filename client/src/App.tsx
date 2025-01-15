@@ -41,7 +41,17 @@ export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom
 type AppProps = {
   userID: number;
   displayName: string;
-  onLogout: () => void;
+  isMenuOpen: boolean;
+  isSearchOpenOpen: boolean;
+  isSearchClosedOpen: boolean;
+  mailModal: boolean;
+  selectedTaskTab: string;
+  setSelectedTaskTab: (arg: string) => void;
+  sortArg: string;
+  closedFilter: string;
+  searchClosedQuery: string;
+  openFilter: string;
+  searchOpenQuery: string;
 };
 function sortTasks(
   tasks: TaskProps[],
@@ -63,7 +73,20 @@ function sortTasks(
   return reverse ? sortedTasks.reverse() : sortedTasks;
 }
 
-function App({ userID, onLogout }: AppProps) {
+function App({
+  userID,
+  isMenuOpen,
+  isSearchOpenOpen,
+  isSearchClosedOpen,
+  mailModal,
+  openFilter,
+  searchOpenQuery,
+  closedFilter,
+  searchClosedQuery,
+  selectedTaskTab,
+  sortArg,
+  setSelectedTaskTab,
+}: AppProps) {
   /** State Hooks */
   const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
   const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
@@ -148,37 +171,14 @@ function App({ userID, onLogout }: AppProps) {
   const [isOpen, setOverlay] = useState(false);
   const closeOverlay = () => setOverlay(false);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // filter für closed task
-  const [closedFilter, setClosedFilter] = useState("all");
-
-  const [isSearchClosedOpen, setIsSearchClosedOpen] = useState(false);
-  function closeClosedOptions() {
-    setIsSearchClosedOpen(false);
-  }
-  const [searchClosedQuery, setSearchClosedQuery] = useState("");
-
-  // filter für open task
-  const [openFilter, setOpenFilter] = useState("all");
-
-  const [isSearchOpenOpen, setIsSearchOpenOpen] = useState(false);
-  function closeOpenOptions() {
-    setIsSearchOpenOpen(false);
-  }
-  const [searchOpenQuery, setSearchOpenQuery] = useState("");
-
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const [mailModal, setMailModal] = useState(false);
-
-  const toggleMailModal = () => {
-    setMailModal((mailModal) => !mailModal);
-    setIsMenuOpen(!isMenuOpen)
-  }
-
   useEffect(() => {
-    if (isOpen || isMenuOpen || isSearchOpenOpen || isSearchClosedOpen || mailModal) {
+    if (
+      isOpen ||
+      isMenuOpen ||
+      isSearchOpenOpen ||
+      isSearchClosedOpen ||
+      mailModal
+    ) {
       // Scrollen verhindern
       document.body.style.overflow = "hidden";
     } else {
@@ -192,22 +192,6 @@ function App({ userID, onLogout }: AppProps) {
     };
   }, [isOpen, isMenuOpen, isSearchOpenOpen, isSearchClosedOpen, mailModal]);
   // This is a hook to close components when you click outside of them
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        isMenuOpen
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isMenuOpen]);
 
   function handleFilterOpen(task: TaskProps) {
     return filterByPredicates(
@@ -259,9 +243,7 @@ function App({ userID, onLogout }: AppProps) {
     // Cleanup on component unmount
     return () => clearInterval(intervalId);
   }, []);
-  const [selectedTaskTab, setSelectedTaskTab] = useState("open");
 
-  const [sortArg, setSortArg] = useState("deadline");
   function handleSortTasks(tasks: TaskProps[]): TaskProps[] {
     if (sortArg === "added") {
       return sortTasks(tasks, "added", true); // Umgekehrte Reihenfolge für "added"
@@ -311,36 +293,8 @@ function App({ userID, onLogout }: AppProps) {
 
   const isTesting = false;
 
-
-
   return (
-    <div className="app">
-      {/* Header */}
-      <Header
-        onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
-        onSearchToggle={
-          "open" === selectedTaskTab
-            ? () => setIsSearchOpenOpen(true)
-            : () => setIsSearchClosedOpen(true)
-        }
-        deleteSearchQuery={
-          "done" === selectedTaskTab
-            ? () => setSearchClosedQuery("")
-            : () => setSearchOpenQuery("")
-        }
-        delteFilter={
-          "done" === selectedTaskTab
-            ? () => setClosedFilter("all")
-            : () => setOpenFilter("all")
-        }
-        filter={"done" === selectedTaskTab ? closedFilter : openFilter}
-        searchQuery={
-          "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
-        }
-        title={
-          "done" === selectedTaskTab ? "Erledigte Aufgaben" : "Offene Aufgaben"
-        }
-      />
+    <>
       {/*<div>{currentTime.toString()}</div>*/}
       {/* Home Screen */}
       <main>
@@ -414,74 +368,7 @@ function App({ userID, onLogout }: AppProps) {
           <TaskvilleAvatars userID={1}></TaskvilleAvatars>
         </div>
       )}
-      {/** Mail Modal */}
-      { mailModal && (
-        <MailModal thisMailModal={mailModal} toggleMailModal={toggleMailModal}></MailModal>
-      )}
-      {/* burgerMenu */}
-      {isMenuOpen && (
-        <div className="overlay">
-          <div
-            className="overlay-backdrop"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          ></div>
-          <div ref={menuRef} className="menu-overlay">
-            <div className="app-options">
-              {/* E-Mail Modal Button*/}
-              <button
-                className="button-menu"
-                onClick={toggleMailModal}
-              >
-                <div className="button-icon">
-                  <FontAwesomeIcon icon={faAt} />
-                </div>
-                <p className="button-text">E-Mail hinzufügen/ändern</p>
-              </button>
-              
-              <div>
-                {/* Trennlinie */}
-                <hr className="divider" />
-
-                {/* Logout-Button */}
-                <button
-                  className="logout"
-                  onClick={() => {
-                    onLogout();
-                  }}
-                >
-                  <FontAwesomeIcon icon={faRightFromBracket} className="icon" />
-                  Abmelden
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Searchmenus */}
-      <FilterMenu
-        filter={openFilter}
-        setFilter={setOpenFilter}
-        sortArg={sortArg}
-        setSortArg={setSortArg}
-        searchQuery={searchOpenQuery}
-        setSearchQuery={setSearchOpenQuery}
-        isMenuOpen={isSearchOpenOpen}
-        closeMenu={closeOpenOptions}
-        placeholder={"Durchsuche deine offenen Aufgaben:"}
-      />
-      <FilterMenu
-        filter={closedFilter}
-        setFilter={setClosedFilter}
-        sortArg={sortArg}
-        setSortArg={setSortArg}
-        searchQuery={searchClosedQuery}
-        setSearchQuery={setSearchClosedQuery}
-        isMenuOpen={isSearchClosedOpen}
-        closeMenu={closeClosedOptions}
-        placeholder={"Durchsuche deine erledigten Aufgaben:"}
-      />
-    </div>
+    </>
   );
 }
 

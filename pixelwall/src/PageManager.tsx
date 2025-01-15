@@ -10,7 +10,7 @@ import BurgerMenu from "../../client/src/components/BurgerMenu";
 import App from "../../client/src/App";
 function PageManager() {
   //userID wird bei login gesetzt
-  const [userID, setUserID] = useState<number | null>(1);
+  const [userID, setUserID] = useState<number | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
 
@@ -33,10 +33,38 @@ function PageManager() {
     const storedLoginName = localStorage.getItem("TodoApploginName");
     const storedPW = localStorage.getItem("TodoApppassword");
 
+    setUserID(null);
     if (storedLoginName && storedPW) {
-      handleSubmit();
+      loginFromReload(storedLoginName, storedPW);
     }
   }, []);
+  const loginFromReload = async (loginname: string, pw: string) => {
+    setStatus("loading");
+
+    const { name, id } = await checkLogin(loginname, pw);
+    //id is -1 when the login failed
+    const isAuthenticated = id != -1;
+
+    if (isAuthenticated) {
+      console.log("Login successful!");
+      setStatus("idle");
+      setUserID(id);
+      setDisplayName(name);
+      // Save login info to localStorage
+      localStorage.setItem("TodoApppassword", password);
+      localStorage.setItem("TodoApploginName", loginName);
+    } else {
+      console.log("Login failed: incorrect username or password.");
+      setStatus("error");
+      // Remove login info to localStorage
+      setUserID(null);
+      localStorage.removeItem("TodoApppassword");
+      localStorage.removeItem("TodoApploginName");
+    }
+    //input reset after login was checked
+    handleNameChange("");
+    handlePwChange("");
+  };
 
   const handleNameChange = (e: string) => {
     setName(e);
@@ -59,8 +87,6 @@ function PageManager() {
       setUserID(id);
       setDisplayName(name);
       // Save login info to localStorage
-      localStorage.setItem("userID", id.toString());
-      localStorage.setItem("displayName", name);
       localStorage.setItem("TodoApppassword", password);
       localStorage.setItem("TodoApploginName", loginName);
     } else {
@@ -102,6 +128,7 @@ function PageManager() {
   }
   const [searchOpenQuery, setSearchOpenQuery] = useState("");
 
+  const mode = 1; // testing mode functionality
   return userID === null ? (
     <Login
       name={loginName}
@@ -111,7 +138,7 @@ function PageManager() {
       onSubmit={handleSubmit}
       status={status}
     />
-  ) : (
+  ) : mode === null ? (
     <div className="app">
       <Header
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
@@ -188,6 +215,70 @@ function PageManager() {
         setSelectedTaskTab={setSelectedTaskTab}
         sortArg={sortArg}
       />
+    </div>
+  ) : (
+    <div className="app">
+      <Header
+        onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+        onSearchToggle={
+          "open" === selectedTaskTab
+            ? () => setIsSearchOpenOpen(true)
+            : () => setIsSearchClosedOpen(true)
+        }
+        deleteSearchQuery={
+          "done" === selectedTaskTab
+            ? () => setSearchClosedQuery("")
+            : () => setSearchOpenQuery("")
+        }
+        delteFilter={
+          "done" === selectedTaskTab
+            ? () => setClosedFilter("all")
+            : () => setOpenFilter("all")
+        }
+        filter={"done" === selectedTaskTab ? closedFilter : openFilter}
+        searchQuery={
+          "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
+        }
+        title={
+          "done" === selectedTaskTab ? "Erledigte Aufgaben" : "Offene Aufgaben"
+        }
+      />
+      <FilterMenu
+        filter={openFilter}
+        setFilter={setOpenFilter}
+        sortArg={sortArg}
+        setSortArg={setSortArg}
+        searchQuery={searchOpenQuery}
+        setSearchQuery={setSearchOpenQuery}
+        isMenuOpen={isSearchOpenOpen}
+        closeMenu={closeOpenOptions}
+        placeholder={"Durchsuche deine offenen Aufgaben:"}
+      />
+      <FilterMenu
+        filter={closedFilter}
+        setFilter={setClosedFilter}
+        sortArg={sortArg}
+        setSortArg={setSortArg}
+        searchQuery={searchClosedQuery}
+        setSearchQuery={setSearchClosedQuery}
+        isMenuOpen={isSearchClosedOpen}
+        closeMenu={closeClosedOptions}
+        placeholder={"Durchsuche deine erledigten Aufgaben:"}
+      />
+      <BurgerMenu
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+        onLogout={handleLogout}
+        toggleMailModal={toggleMailModal}
+      ></BurgerMenu>
+      {/** Mail Modal */}
+      {mailModal && (
+        <MailModal
+          thisMailModal={mailModal}
+          toggleMailModal={toggleMailModal}
+        ></MailModal>
+      )}
+      <PixelWall currentUserID={userID} />
     </div>
   );
 }
