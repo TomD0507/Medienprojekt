@@ -118,6 +118,7 @@ function initTodoDB() {
       password VARCHAR(255) NOT NULL,
       tasksCreated int NOT NULL DEFAULT 0,
       tasksDone int NOT NULL DEFAULT 0,
+      email VARCHAR(255),
       PRIMARY KEY (id)
     )
     `;
@@ -125,8 +126,8 @@ function initTodoDB() {
     if (err) throw err;
     console.log("User Table successfully created");
   });
-  // deleteUser("testUser");
-  // registerUser("testPascal", "testPascal");
+  // deleteUser("testSteven");
+  // registerUser("testSteven", "testSteven");
   // console.log(process.env.EMAIL_USER);
   // console.log(process.env.EMAIL_PASS);
   // transporter.verify().then(console.log).catch(console.error)
@@ -461,6 +462,47 @@ app.get("/get-user-list", (req, res)=>{
   });
 });
 
+// Sets the e-mail adress for an user
+app.post("/update-email", (req, res) => {
+  try {
+    res.sendStatus(200);
+    const sql = "UPDATE users_init SET email=? WHERE id = ?";
+    const email = req.body.email;
+    const userID = req.body.userID;
+    connection.query(sql, [email, userID], function (err, _) {
+      if (err) {
+        console.log("Error setting the E-Mail:", err);
+        throw err;
+      } else {
+        console.log("E-Mail has been set successfully!");
+      }
+    })
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+})
+
+// Deletes the e-mail adress for an user
+app.post("/delete-email", (req, res) => {
+  try {
+    res.sendStatus(200);
+    const sql = "UPDATE users_init SET email= NULL WHERE id = ?";
+    const userID = req.body.userID;
+    connection.query(sql, [userID], function (err, _) {
+      if (err) {
+        console.log("Error deleting the E-Mail:", err);
+        throw err;
+      } else {
+        console.log("E-Mail has been deleted successfully!");
+      }
+    })
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+})
+
 // Logic for handling repeatable tasks
 function handleRepeatingTasks() {
   const sql_getTasks = `
@@ -792,8 +834,9 @@ function needRemind(deadline, todoRepeat) {
 // Logic for handling reminder
 function handleReminder() {
   const sql_getTasks = `
-    SELECT userId, title, deadline, todoReminder
-    FROM todos_init
+    SELECT t.userId, t.title, t.deadline, t.todoReminder, u.email AS userEmail
+    FROM todos_init t
+    INNER JOIN users_init u ON t.userId = u.id
     WHERE isDone = FALSE AND todoReminder != 'Nie' AND todoDeleted = FALSE
   `;
   // Query for getting all the relevant tasks
@@ -803,105 +846,39 @@ function handleReminder() {
     } else {
       const reminderTasks = result;
       for (const task of reminderTasks) {
+        if(!task.userEmail) {
+          console.log(`No email saved for this user with id: ${task.userId}, task "${task.title}" was skipped.`);
+          continue;
+        }
         const needsReminder = needRemind(task.deadline, task.todoReminder);
-        switch(needsReminder) {
-          case 1: {
-            transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: process.env.EMAIL_RECIPENT,
-              subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task "${task.title}" fällt in 1 Stunde an!`
-            }, (err, info) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(info);
+        if (needsReminder > 0) {
+          const reminderHours = {
+            1: "in 1 Stunde",
+            6: "in 6 Stunden",
+            12: "in 12 Stunden",
+            24: "in 1 Tag",
+            72: "in 3 Tagen",
+            168: "in 1 Woche",
+          }[needsReminder];
+
+          if (reminderHours) {
+            transporter.sendMail(
+              {
+                from: process.env.EMAIL_USER,
+                to: task.userEmail, // Use the user's email from the database
+                subject: "Reminder für einen deiner Tasks!",
+                text: `Dein Task "${task.title}" fällt ${reminderHours} an!`,
+              },
+              (err, info) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  console.log(info);
+                }
               }
-            });
-            break;
-          }
-          case 6: {
-            transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: process.env.EMAIL_RECIPENT,
-              subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task "${task.title}" fällt in 6 Stunden an!`
-            }, (err, info) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(info);
-              }
-            });
-            break;
-          }
-          case 12: {
-            transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: process.env.EMAIL_RECIPENT,
-              subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task "${task.title}" fällt in 12 Stunden an!`
-            }, (err, info) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(info);
-              }
-            });
-            break;
-          }
-          case 24: {
-            transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: process.env.EMAIL_RECIPENT,
-              subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task "${task.title}" fällt in 1 Tag an!`
-            }, (err, info) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(info);
-              }
-            });
-            break;
-          }
-          case 72: {
-            transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: process.env.EMAIL_RECIPENT,
-              subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task "${task.title}" fällt in 3 Tagen an!`
-            }, (err, info) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(info);
-              }
-            });
-            break;
-          }
-          case 168: {
-            transporter.sendMail({
-              from: process.env.EMAIL_USER,
-              to: process.env.EMAIL_RECIPENT,
-              subject: 'Reminder für einen deiner Tasks!',
-              text: `Dein Task "${task.title}" fällt in 1 Woche an!`
-            }, (err, info) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log(info);
-              }
-            });
-            break;
-          }
-          case -1: {
-            console.log("-1 was returned");
-            break;
-          }
-          default: {
-            console.log("Weird values...");
-            break;
+            );
+          } else {
+            console.log("-1 was returned or invalid reminder case.");
           }
         };
       };

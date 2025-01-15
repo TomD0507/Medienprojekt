@@ -73,3 +73,38 @@
     font-size: 15pt;
     font-weight: bold;
 }
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-container button {
+  padding: 10px 20px;
+  width: 50%;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-button {
+  background-color: #304674;
+  color: white;
+}
+
+.delete-button {
+  background-color: red;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #1d2c4a;
+}
+
+.delete-button:hover {
+  background-color: darkred;
+}
