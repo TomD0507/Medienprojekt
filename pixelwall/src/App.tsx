@@ -1,8 +1,9 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
-export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
+//export const API_URL = "http://localhost:5000";  // wenn local (auf Computer)
 
+export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom Backend dann ist
 function App() {
   const [count, setCount] = useState(0);
 

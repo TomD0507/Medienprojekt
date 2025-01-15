@@ -51,8 +51,8 @@ function PageManager() {
       setUserID(id);
       setDisplayName(name);
       // Save login info to localStorage
-      localStorage.setItem("TodoApppassword", password);
-      localStorage.setItem("TodoApploginName", loginName);
+      localStorage.setItem("TodoApppassword", pw);
+      localStorage.setItem("TodoApploginName", loginname);
     } else {
       console.log("Login failed: incorrect username or password.");
       setStatus("error");
