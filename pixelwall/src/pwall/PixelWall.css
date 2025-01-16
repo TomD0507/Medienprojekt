@@ -1,7 +1,15 @@
+
 .drawing-board {
-  box-sizing: border-box;
-  border: 1px solid;
+  display: grid;
+  grid-template-columns: repeat(35, 1fr); /* 35 columns of equal width */
+  grid-template-rows: repeat(35, 1fr);   /* 35 rows of equal height */
+  width: 100%; /* Example width of the entire grid container */
+  height: 100%; /* Example height of the entire grid container */
+
+  row-gap: 0px;    /* Gap between rows */
+  column-gap: 0px; /* Gap between columns */
 }
+
 .zoom-container {
   display: flex;
   overflow: auto; /* Enable scrolling if content overflows */
@@ -9,7 +17,6 @@
   max-width: 100vw; /* Begrenze die Breite auf die Bildschirmbreite */
   max-height: 100vh; /* Begrenze die Höhe auf die Bildschirmhöhe */
   width: 100%; /* Full width of the parent */
-  border: 1px solid;
   white-space: nowrap; /* Prevent row wrapping */
   box-sizing: border-box;
   margin: 0px;

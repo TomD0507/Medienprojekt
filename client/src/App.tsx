@@ -14,20 +14,13 @@ import { TaskProps } from "./components/Task";
 import AddTask from "./components/AddTask";
 import { CollList } from "./components/CollList";
 import TaskList from "./components/TaskList";
-import Dialogue from "./taskville-components/Dialogue";
 import { filterOptions } from "./components/FilterMenu";
-// import MailModal from "./components/MailModal";
-import TaskvilleAvatars from "./taskville-components/TaskvilleAvatars";
 
 /** Styles */
 import "./index.css";
 import "./styles/Overlay.css";
 import "./styles/FilterMenu.css";
 import "./styles/BurgerMenu.css";
-
-import AvatarCustomization from "./taskville-components/AvatarCustomization";
-import "./styles/TaskVille/AvatarCustomization.css";
-import "./styles/TaskVille/TaskvilleAvatars.css";
 
 export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom Backend dann ist
 // export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
@@ -245,48 +238,6 @@ function App({
       return sortTasks(tasks, "deadline", false); // Normale Reihenfolge für "deadline"
     }
   }
-
-  const headAssets = [
-    {
-      path: "/src/assets/Taskville/head-testZagreus.png",
-      title: "headZagreus",
-    },
-    {
-      path: "/src/assets/Taskville/head-testMelinoe.png",
-      title: "headMelinoe",
-    },
-    {
-      path: "/src/assets/Taskville/head-testPrometheus.png",
-      title: "headPrometheus",
-    },
-    { path: "/src/assets/Taskville/head-testHades.png", title: "headHades" },
-  ];
-
-  const bodyAssets = [
-    {
-      path: "/src/assets/Taskville/body-testSpongebob.png",
-      title: "bodySpongebob",
-    },
-    {
-      path: "/src/assets/Taskville/body-testSquidward.png",
-      title: "bodySquidward",
-    },
-    { path: "/src/assets/Taskville/body-testKrabs.png", title: "bodyKrabs" },
-    {
-      path: "/src/assets/Taskville/body-testPlankton.png",
-      title: "bodyPlankton",
-    },
-  ];
-
-  const legAssets = [
-    { path: "/src/assets/Taskville/leg-testAragorn.png", title: "legAragorn" },
-    { path: "/src/assets/Taskville/leg-testLegolas.png", title: "legLegolas" },
-    { path: "/src/assets/Taskville/leg-testGimmli.png", title: "legGimmli" },
-    { path: "/src/assets/Taskville/leg-testGandalf.png", title: "legGandalf" },
-  ];
-
-  const isTesting = false;
-
   return (
     <>
       {/*<div>{currentTime.toString()}</div>*/}
