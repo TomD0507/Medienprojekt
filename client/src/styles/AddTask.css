@@ -53,10 +53,7 @@
 .deleteSubTaskButton {
   color: red;
 }
-.deleteSubTaskButton:hover {
-  opacity: 0.8;
-}
-.taskMenuButton:hover {
+.deleteSubTaskButton:hover,.taskMenuButton:hover {
   opacity: 0.8;
 }
 /* Shared styles for form elements */

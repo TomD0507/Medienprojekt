@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { Pixel } from "./CustomPixel";
 import "./PixelWall.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEraser, faPen } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEraser,
+  faMagnifyingGlassMinus,
+  faMagnifyingGlassPlus,
+  faPen,
+} from "@fortawesome/free-solid-svg-icons";
 import { API_URL } from "../App";
 
 import axios from "axios";
@@ -262,7 +267,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
   return (
     <>
       <div className="options_container">
-        <>{currentUserID}</>
         <label>
           Wähle eine Farbe:{" "}
           <input
@@ -273,25 +277,36 @@ PixelWall({ currentUserID }: PixelWallProps) {
         </label>
         <label>
           {" "}
-          <button onClick={pushDrawing}>Push change:</button>
+          <button className="pwbuttons" onClick={pushDrawing}>
+            Push change:
+          </button>
         </label>
         <label>
           {" "}
-          <button onClick={() => setDrawing(true)}>
+          <button className="pwbuttons" onClick={() => setDrawing(true)}>
             <FontAwesomeIcon icon={faPen} className="icon" />
           </button>
         </label>
         <label>
           {" "}
-          <button onClick={() => setDrawing(false)}>
+          <button className="pwbuttons" onClick={() => setDrawing(false)}>
             <FontAwesomeIcon icon={faEraser} className="icon" />
           </button>
         </label>
+        <div className="zoom-buttons-container">
+          <button className="pwbuttons" onClick={handleZoomIn}>
+            <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
+          </button>
+          <button className="pwbuttons" onClick={handleZoomOut}>
+            <FontAwesomeIcon icon={faMagnifyingGlassMinus} />
+          </button>
+        </div>
       </div>
+
       {/* User Selection */}
       <div className="user_selection_container">
         {/* Eigener User */}
-        <label key={currentUserID}>
+        <label className="pwbuttons" key={currentUserID}>
           <input
             type="checkbox"
             value={currentUserID}
@@ -304,7 +319,7 @@ PixelWall({ currentUserID }: PixelWallProps) {
               });
             }}
           />
-          Eigene (User {currentUserID})
+          {` Eigene (User ${currentUserID})`}
         </label>
 
         {/* User Selection andere user */}
@@ -313,7 +328,7 @@ PixelWall({ currentUserID }: PixelWallProps) {
           const userId = id; // Convert string key back to a number(
           if (userId == currentUserID) return;
           return (
-            <label key={userId}>
+            <label className="pwbuttons" key={userId}>
               <input
                 type="checkbox"
                 value={userId}
@@ -326,13 +341,11 @@ PixelWall({ currentUserID }: PixelWallProps) {
                   });
                 }}
               />
-              {`User ${userId}`}
+              {` User ${userId}`}
             </label>
           );
         })}
       </div>
-      <button onClick={handleZoomIn}>Zoom In</button>
-      <button onClick={handleZoomOut}>Zoom Out</button>
       {/* Pixel Grid */}
 
       <div className="zoom-container">

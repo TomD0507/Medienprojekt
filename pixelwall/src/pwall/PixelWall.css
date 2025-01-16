@@ -1,4 +1,67 @@
-
+.pwbuttons {
+  align-self: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  background-color: #304674;
+  justify-content: center;
+  align-items: center; /* Zentriert den Text vertikal */
+  cursor: pointer;
+  font-size: 0.8em;
+  font-weight: 500;
+  padding: 10px 9% 10px;
+  transition: border-color 0.25s;
+  color: white;
+}
+.pwbuttons:hover
+{
+ opacity: 0.8;
+}
+/* Options Container */
+.options_container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  gap: 0.5rem;
+  justify-content: space-evenly; /* Distribute items evenly */
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #f9f9f9; /* Light background for separation */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+/* User Selection Container */
+.user_selection_container{
+  display: grid;
+  grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* Single column by default */
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1em;
+  box-sizing: border-box;
+  background-color: #f9f9f9; /* Light background for separation */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+.zoom-buttons-container{
+  display: flex;
+  gap: 5px;
+}
+.zoom-container {
+  display: flex;
+  overflow: auto; /* Enable scrolling if content overflows */
+  max-width: 100vw; /* Begrenze die Breite auf die Bildschirmbreite */
+  max-height: 100vh; /* Begrenze die Höhe auf die Bildschirmhöhe */
+  width: 100%; /* Full width of the parent */
+  white-space: nowrap; /* Prevent row wrapping */
+  box-sizing: border-box;
+  margin: 0px;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #f9f9f9; /* Light background for separation */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
 .drawing-board {
   display: grid;
   grid-template-columns: repeat(35, 20px); /* 35 columns of equal width */
@@ -10,18 +73,6 @@
   column-gap: 0px; /* Gap between columns */
 }
 
-.zoom-container {
-  display: flex;
-  overflow: auto; /* Enable scrolling if content overflows */
-
-  max-width: 100vw; /* Begrenze die Breite auf die Bildschirmbreite */
-  max-height: 100vh; /* Begrenze die Höhe auf die Bildschirmhöhe */
-  width: 100%; /* Full width of the parent */
-  white-space: nowrap; /* Prevent row wrapping */
-  box-sizing: border-box;
-  margin: 0px;
-  align-items: center;
-}
 
 .row {
   display: flex; /* Align pixels horizontally */
