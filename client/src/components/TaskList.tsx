@@ -13,7 +13,7 @@ function TaskList({ tasks, currentTime, onUpdateTask }: TaskListProps) {
   if (tasks.length == 0)
     return <div className="no_task"> Keine Aufgaben gefunden.</div>;
   return (
-    <div>
+    <div className="taskList ">
       {tasks.map((task) => (
         <Task
           currentTime={currentTime}

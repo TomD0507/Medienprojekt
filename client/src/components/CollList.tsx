@@ -7,13 +7,5 @@ type CollListProps = {
 };
 
 export const CollList: React.FC<CollListProps> = ({ visible, children }) => {
-  return (
-    <>
-      {visible && (
-        <div className="collapsible-list">
-          <div className="collapsible-content">{children}</div>
-        </div>
-      )}
-    </>
-  );
+  return <>{visible && <div className="">{children}</div>}</>;
 };

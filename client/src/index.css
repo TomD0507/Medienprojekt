@@ -18,30 +18,32 @@ header {
   font-size: large;
   padding-bottom: 10px;
 }
-/*darin ist der aufgaben container*/
-main {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  padding: 2px;
-  margin-top: 20px;
-  width: 100%;
+* {
+  box-sizing: border-box; /* Padding und Border in die Breite und Höhe einbeziehen */
 }
-
 body {
   background-color: #98bad5;
-  max-width: 100vw;
-  min-height: 100vh; 
+  width: 100vw; /* Volle Breite des Viewports */
+  height: 100vh; /* Volle Höhe des Viewports */
+  overflow: hidden; /* Verhindert, dass der Viewport scrollt */
 }
 
+/* Haupt-App-Container */
 .app {
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 1vh;
-  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  border: 1px solid;
+  overflow: hidden; /* Keine Scrollleisten */
+  background-color: lightblue;
 }
 
-
+/* Add Task Button */
 .add-task-button {
+  box-sizing: border-box;
   width: 100%;
   border-radius: 8px;
   border: 1px solid transparent;
@@ -50,15 +52,66 @@ body {
   font-weight: 500;
   font-family: inherit;
   background-color: #304674;
-  position: sticky;
-  bottom: 0; /* Fixiert den Button unten */
-  display: flex; /* Stellt sicher, dass Flexbox-Eigenschaften funktionieren */
+  display: flex;
   align-items: center;
-  justify-content: center; /* Zentriert den Inhalt horizontal */
+  justify-content: center;
   cursor: pointer;
   transition: border-color 0.25s;
   z-index: 4;
 }
+
+/* Main Content */
+main {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 2px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  max-width: 100%;
+  box-sizing: border-box; /* Padding und Border in der Größe berücksichtigen */
+  flex-grow: 1; /* Nimmt den verbleibenden Platz ein */
+  overflow: hidden; /* Kein Scrollen für den Main-Bereich */
+}
+
+.scrollable-container {
+  width: 100%;
+  height: 100%;
+  overflow: scroll; /* Ermöglicht das Scrollen */
+}
+
+/* Scrollbar ausblenden, Scrollen bleibt aktiv */
+.scrollable-container {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.scrollable-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari und Edge */
+}
+
+/* Erledigte und offene ToDos*/
+.collapsible-content {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background: #f4f4f4;
+  font-size: 14px;
+  transition: max-height 0.3s ease-out;
+  height: 100%;
+}
+.no_task{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  font-size: auto;
+}
+
+
 
 
 .add-task-button:hover {
@@ -66,13 +119,7 @@ body {
 }
 
 
-/* Erledigte und offene ToDos*/
-.collapsible-list {
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  overflow: hidden;
-}
+
 .taskbutton_holder {
   display: flex; /* Stellt sicher, dass die Buttons nebeneinander angezeigt werden */
   border-top-left-radius: 8px;
@@ -111,21 +158,6 @@ body {
   opacity: 0.8;
 }
 
-.collapsible-content {
-  padding: 10px;
-  background: #f4f4f4;
-  font-size: 14px;
-  transition: max-height 0.3s ease-out;
-  overflow: hidden;
-}
-.no_task{
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-  color: gray;
-  font-size: auto;
-}
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

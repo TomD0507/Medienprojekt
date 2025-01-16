@@ -309,7 +309,7 @@ function App({
             {"Erledigte Aufgaben"}
           </button>
         </div>
-        <div>
+        <div className="collapsible-content  scrollable-container">
           <CollList visible={"done" === selectedTaskTab}>
             <TaskList
               currentTime={currentTime}
@@ -335,33 +335,16 @@ function App({
             />
           </CollList>
         </div>
-        <AddTask
-          id={id}
-          onClose={closeOverlay}
-          isOpen={isOpen}
-          onSave={handleSaveTask}
-        ></AddTask>
       </main>
       <button className="add-task-button" onClick={() => setOverlay(true)}>
         Aufgabe hinzufügen
       </button>
-      {isTesting && (
-        <div>
-          <Dialogue></Dialogue>
-        </div>
-      )}
-      {isTesting && (
-        <div className="sliderContainer">
-          <AvatarCustomization assets={headAssets}></AvatarCustomization>
-          <AvatarCustomization assets={bodyAssets}></AvatarCustomization>
-          <AvatarCustomization assets={legAssets}></AvatarCustomization>
-        </div>
-      )}
-      {isTesting && (
-        <div className="taskville-container">
-          <TaskvilleAvatars userID={1}></TaskvilleAvatars>
-        </div>
-      )}
+      <AddTask
+        id={id}
+        onClose={closeOverlay}
+        isOpen={isOpen}
+        onSave={handleSaveTask}
+      ></AddTask>
     </>
   );
 }

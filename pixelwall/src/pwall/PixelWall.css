@@ -1,44 +1,70 @@
 .drawing-board {
-  width: 100%;
-  height: 100%;
+  box-sizing: border-box;
+  border: 1px solid;
+}
+.zoom-container {
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  overflow: auto;
+  overflow: auto; /* Enable scrolling if content overflows */
+
+  max-width: 100vw; /* Begrenze die Breite auf die Bildschirmbreite */
+  max-height: 100vh; /* Begrenze die Höhe auf die Bildschirmhöhe */
+  width: 100%; /* Full width of the parent */
+  border: 1px solid;
+  white-space: nowrap; /* Prevent row wrapping */
+  box-sizing: border-box;
+  margin: 0px;
+  align-items: center;
 }
 
 .row {
-  display: flex;
+  display: flex; /* Align pixels horizontally */
+  flex-wrap: nowrap; /* Prevent rows from wrapping */
+  box-sizing: border-box;
 }
+
+
 .pixelcontainer {
   position: relative;
   width: 20px;
   height: 20px;
+  
+  box-sizing: border-box;
+  flex-shrink: 0; /* Prevents shrinking when screen size is small */
 }
+
 .bgcell {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
+  
+  box-sizing: border-box;
   border: 1px solid #ccc;
   background-color: white;
   z-index: 0;
 }
+
 .fgcell {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
+  
+  box-sizing: border-box;
   border: 1px solid #ccc;
-  background-color: white;
-  opacity: 80%;
+  background-color: rgba(255, 255, 255, 0.8); /* Use rgba for opacity */
   z-index: 1;
-}
+ }
+
 
 .fgcell.active {
   border: 1px solid #ffb41e;
+}
+
+.transparent {
+  background-color: transparent;
+}
+
+.active {
+  background-color: var(--active-color, black); /* Replace with your color */
 }
 .color_picker {
   width: 20px;

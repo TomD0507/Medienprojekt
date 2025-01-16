@@ -254,6 +254,10 @@ PixelWall({ currentUserID }: PixelWallProps) {
       ];
     });
   };
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 3)); // Max zoom level 3x
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min zoom level 0.5x
 
   return (
     <>
@@ -327,27 +331,34 @@ PixelWall({ currentUserID }: PixelWallProps) {
           );
         })}
       </div>
+      <button onClick={handleZoomIn}>Zoom In</button>
+      <button onClick={handleZoomOut}>Zoom Out</button>
       {/* Pixel Grid */}
-      <div className="drawing-board">
-        {grid.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-              <Pixel
-                key={colIndex}
-                colIndex={colIndex}
-                rowIndex={rowIndex}
-                className={
-                  frontendPixels[rowIndex][colIndex] === "transparent"
-                    ? "transparent"
-                    : "active"
-                }
-                frontcolor={frontendPixels[rowIndex][colIndex]}
-                backcolor={cell.backcolor}
-                handleCellClick={() => handleCellClick(rowIndex, colIndex)}
-              />
-            ))}
-          </div>
-        ))}
+      <div className="zoom-container">
+        <div
+          className="drawing-board"
+          style={{ transform: `scale(${zoomLevel})`, transformOrigin: "0 0" }}
+        >
+          {grid.map((row, rowIndex) => (
+            <div key={rowIndex} className="row">
+              {row.map((cell, colIndex) => (
+                <Pixel
+                  key={colIndex}
+                  colIndex={colIndex}
+                  rowIndex={rowIndex}
+                  className={
+                    frontendPixels[rowIndex][colIndex] === "transparent"
+                      ? "transparent"
+                      : "active"
+                  }
+                  frontcolor={frontendPixels[rowIndex][colIndex]}
+                  backcolor={cell.backcolor}
+                  handleCellClick={() => handleCellClick(rowIndex, colIndex)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

@@ -198,6 +198,7 @@ function PageManager() {
         <MailModal
           thisMailModal={mailModal}
           toggleMailModal={toggleMailModal}
+          userID={userID}
         ></MailModal>
       )}
       <App
@@ -276,6 +277,7 @@ function PageManager() {
         <MailModal
           thisMailModal={mailModal}
           toggleMailModal={toggleMailModal}
+          userID={userID}
         ></MailModal>
       )}
       <PixelWall currentUserID={userID} />
