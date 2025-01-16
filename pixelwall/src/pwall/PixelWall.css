@@ -18,7 +18,8 @@
 }
 .usersel {
   height: 3em;
-  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
   display: flex;
   flex-grow: unset;
   justify-content: flex-start;
