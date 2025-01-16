@@ -256,8 +256,8 @@ PixelWall({ currentUserID }: PixelWallProps) {
   };
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 3)); // Max zoom level 3x
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.6)); // Min zoom level 0.5x
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 3.4)); // Max zoom level 3x
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min zoom level 0.5x
 
   return (
     <>

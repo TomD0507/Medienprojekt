@@ -1,8 +1,8 @@
 
 .drawing-board {
   display: grid;
-  grid-template-columns: repeat(35, 1fr); /* 35 columns of equal width */
-  grid-template-rows: repeat(35, 1fr);   /* 35 rows of equal height */
+  grid-template-columns: repeat(35, 20px); /* 35 columns of equal width */
+  grid-template-rows: repeat(35, 20px);   /* 35 rows of equal height */
   width: 100%; /* Example width of the entire grid container */
   height: 100%; /* Example height of the entire grid container */
 
