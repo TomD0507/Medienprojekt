@@ -1,5 +1,7 @@
 .pwbuttons {
   align-self: center;
+
+  font-size: 12px;
   border-radius: 8px;
   border: 1px solid transparent;
   font-family: inherit;
@@ -7,15 +9,29 @@
   justify-content: center;
   align-items: center; /* Zentriert den Text vertikal */
   cursor: pointer;
-  font-size: 0.8em;
-  font-weight: 500;
   padding: 10px 9% 10px;
   transition: border-color 0.25s;
   color: white;
 }
-.pwbuttons:hover
-{
- opacity: 0.8;
+.pwbuttons:hover {
+  opacity: 0.8;
+}
+.usersel {
+  height: 3em;
+  width: 100px;
+  display: flex;
+  flex-grow: unset;
+  justify-content: flex-start;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #304674;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Ensure items start from the same position */
+  padding: 5px; /* Offsets the content to the right */
+}
+.usersel input {
+  margin-right: 5px;
 }
 /* Options Container */
 .options_container {
@@ -31,9 +47,9 @@
   border-radius: 8px;
 }
 /* User Selection Container */
-.user_selection_container{
+.user_selection_container {
   display: grid;
-  grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* Single column by default */
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* Single column by default */
   gap: 0.5rem;
   width: 100%;
   padding: 0.5rem;
@@ -43,7 +59,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
 }
-.zoom-buttons-container{
+.zoom-buttons-container {
   display: flex;
   gap: 5px;
 }
@@ -65,14 +81,13 @@
 .drawing-board {
   display: grid;
   grid-template-columns: repeat(35, 20px); /* 35 columns of equal width */
-  grid-template-rows: repeat(35, 20px);   /* 35 rows of equal height */
+  grid-template-rows: repeat(35, 20px); /* 35 rows of equal height */
   width: 100%; /* Example width of the entire grid container */
   height: 100%; /* Example height of the entire grid container */
 
-  row-gap: 0px;    /* Gap between rows */
+  row-gap: 0px; /* Gap between rows */
   column-gap: 0px; /* Gap between columns */
 }
-
 
 .row {
   display: flex; /* Align pixels horizontally */
@@ -80,12 +95,11 @@
   box-sizing: border-box;
 }
 
-
 .pixelcontainer {
   position: relative;
   width: 20px;
   height: 20px;
-  
+
   box-sizing: border-box;
   flex-shrink: 0; /* Prevents shrinking when screen size is small */
 }
@@ -94,7 +108,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  
+
   box-sizing: border-box;
   border: 1px solid #ccc;
   background-color: white;
@@ -105,13 +119,12 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  
+
   box-sizing: border-box;
   border: 1px solid #ccc;
   background-color: rgba(255, 255, 255, 0.8); /* Use rgba for opacity */
   z-index: 1;
- }
-
+}
 
 .fgcell.active {
   border: 1px solid #ffb41e;
