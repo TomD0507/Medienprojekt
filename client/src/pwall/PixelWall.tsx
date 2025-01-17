@@ -278,7 +278,7 @@ PixelWall({ currentUserID }: PixelWallProps) {
         <label>
           {" "}
           <button className="pwbuttons" onClick={pushDrawing}>
-            Push change:
+            Push:
           </button>
         </label>
         <label>
@@ -303,49 +303,6 @@ PixelWall({ currentUserID }: PixelWallProps) {
         </div>
       </div>
 
-      {/* User Selection */}
-      <div className="user_selection_container">
-        {/* Eigener User */}
-        <label className="pwbuttons" key={currentUserID}>
-          <input
-            type="checkbox"
-            value={currentUserID}
-            checked={selectedUsers.get(currentUserID) ?? true}
-            onChange={(e) => {
-              setSelectedUsers((prev) => {
-                const updatedMap = new Map(prev); // Create a copy of the map
-                updatedMap.set(currentUserID, e.target.checked); // Update the active status
-                return updatedMap;
-              });
-            }}
-          />
-          {` Eigene (User ${currentUserID})`}
-        </label>
-
-        {/* User Selection andere user */}
-
-        {Array.from(selectedUsers.entries()).map(([id, active]) => {
-          const userId = id; // Convert string key back to a number(
-          if (userId == currentUserID) return;
-          return (
-            <label className="pwbuttons" key={userId}>
-              <input
-                type="checkbox"
-                value={userId}
-                checked={active}
-                onChange={(e) => {
-                  setSelectedUsers((prev) => {
-                    const updatedMap = new Map(prev); // Create a copy of the map
-                    updatedMap.set(userId, e.target.checked); // Update the active status
-                    return updatedMap;
-                  });
-                }}
-              />
-              {` User ${userId}`}
-            </label>
-          );
-        })}
-      </div>
       {/* Pixel Grid */}
 
       <div className="zoom-container">
@@ -371,6 +328,49 @@ PixelWall({ currentUserID }: PixelWallProps) {
             ))
           )}
         </div>
+      </div>
+      {/* User Selection */}
+      <div className="user_selection_container">
+        {/* Eigener User */}
+        <label className="pwbuttons usersel" key={currentUserID}>
+          <input
+            type="checkbox"
+            value={currentUserID}
+            checked={selectedUsers.get(currentUserID) ?? true}
+            onChange={(e) => {
+              setSelectedUsers((prev) => {
+                const updatedMap = new Map(prev); // Create a copy of the map
+                updatedMap.set(currentUserID, e.target.checked); // Update the active status
+                return updatedMap;
+              });
+            }}
+          />
+          {` Eigene (${currentUserID})`}
+        </label>
+
+        {/* User Selection andere user */}
+
+        {Array.from(selectedUsers.entries()).map(([id, active]) => {
+          const userId = id; // Convert string key back to a number(
+          if (userId == currentUserID) return;
+          return (
+            <label className="pwbuttons usersel" key={userId}>
+              <input
+                type="checkbox"
+                value={userId}
+                checked={active}
+                onChange={(e) => {
+                  setSelectedUsers((prev) => {
+                    const updatedMap = new Map(prev); // Create a copy of the map
+                    updatedMap.set(userId, e.target.checked); // Update the active status
+                    return updatedMap;
+                  });
+                }}
+              />
+              {` User ${userId}`}
+            </label>
+          );
+        })}
       </div>
     </>
   );
