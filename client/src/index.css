@@ -33,7 +33,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1vh;
+  padding: 0.5vh;
   width: 100vw;
   height: 100vh;
   border: 1px solid;
@@ -102,7 +102,7 @@ main {
   transition: max-height 0.3s ease-out;
   height: 100%;
 }
-.no_task{
+.no_task {
   display: flex;
   width: 100%;
   align-items: center;
@@ -111,14 +111,9 @@ main {
   font-size: auto;
 }
 
-
-
-
 .add-task-button:hover {
   opacity: 0.8;
 }
-
-
 
 .taskbutton_holder {
   display: flex; /* Stellt sicher, dass die Buttons nebeneinander angezeigt werden */
@@ -129,7 +124,8 @@ main {
   border-color: #304674;
 }
 
-.taskbutton_left,.taskbutton_right {
+.taskbutton_left,
+.taskbutton_right {
   flex: 1;
   padding: 10px;
   color: #242424;
@@ -141,7 +137,6 @@ main {
 }
 
 .taskbutton_right {
-  
   border-left: 1px solid white; /* Weißer Trennstrich */
 }
 .taskbutton_left:disabled,
