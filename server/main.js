@@ -43,31 +43,7 @@ const connection = mysql.createPool({
 
 
 function initTodoDB() {
-  // SQL query to create the database only if it does not exist
-  /*const sql_createDb = "CREATE DATABASE IF NOT EXISTS medienprojektdb";
-  connection.query(sql_createDb, (err, result) => {
-    if (err) {
-      console.error("Error creating database:", err.message);
-      return;
-    }
-    console.log("Database created or already exists");
-  });*/
-
-  // SQL query to drop previous init table
-  /*
-  const sql_dropTaskTable = "DROP TABLE IF EXISTS todos_init";
-  connection.query(sql_dropTaskTable, (err, result) => {
-    if (err) throw err;
-    console.log("Previous todo table deleted.");
-  });
-
-  // SQL query to drop previous subtask table
-  const sql_dropSubtaskTable = "DROP TABLE IF EXISTS subtasks_init";
-  connection.query(sql_dropSubtaskTable, (err, result) => {
-    if (err) throw err;
-    console.log("Previous subtasks table deleted.");
-  });
-  */
+  
   // SQL query to create a dummy table for testing purposes
   const sql_createTaskTable = `
     CREATE TABLE IF NOT EXISTS todos_init (
@@ -126,23 +102,49 @@ function initTodoDB() {
     if (err) throw err;
     console.log("User Table successfully created");
   });
-  // deleteUser("testSteven");
-  // registerUser("testSteven", "testSteven");
-  // console.log(process.env.EMAIL_USER);
-  // console.log(process.env.EMAIL_PASS);
-  // transporter.verify().then(console.log).catch(console.error)
-  // transporter.sendMail({
-  //   from: process.env.EMAIL_USER,
-  //   to: process.env.EMAIL_RECIPENT,
-  //   subject: 'Message',
-  //   text: 'I hope this message gets delivered!'
-  // }, (err, info) => {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log(info);
-  //   }
-  // });
+  // Create users_pixels table
+const sql_createUsersPixelsTable = `
+CREATE TABLE IF NOT EXISTS users_pixels (
+  id INT NOT NULL AUTO_INCREMENT,
+  userId INT NOT NULL,
+  pixels INT DEFAULT 0,
+  PRIMARY KEY (id),
+  FOREIGN KEY (userId) REFERENCES users_init(id) ON DELETE CASCADE
+)
+`;
+connection.query(sql_createUsersPixelsTable, (err, result) => {
+if (err) throw err;
+console.log("Users Pixels Table successfully created");
+});
+
+// Create stats table
+const sql_createStatsTable = `
+CREATE TABLE IF NOT EXISTS stats (
+  id INT NOT NULL AUTO_INCREMENT,
+  userId INT NOT NULL,
+  interactions INT DEFAULT 0,
+  lastLogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (userId) REFERENCES users_init(id) ON DELETE CASCADE
+)
+`;
+connection.query(sql_createStatsTable, (err, result) => {
+if (err) throw err;
+console.log("Stats Table successfully created");
+});
+const sql_createSettingsTable = `
+  CREATE TABLE IF NOT EXISTS settings (
+    id INT NOT NULL AUTO_INCREMENT,
+    mode INT DEFAULT 0,
+    PRIMARY KEY (id)
+  )
+`;
+
+connection.query(sql_createSettingsTable, (err, result) => {
+  if (err) throw err;
+  console.log("Settings Table successfully created.");
+});
+
 }
 
 initTodoDB();
@@ -179,7 +181,7 @@ app.get("/", (req, res) => {
 
 // Function to create a NEW Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
-function createTodo(reqBody) {
+function createTodo(reqBody,userId) {
   let date;
   let dateNow = format(Date.now(), "yyyy-MM-dd HH:mm:ss");
   if (reqBody.newTask.deadline != null) {
@@ -189,7 +191,7 @@ function createTodo(reqBody) {
   }
   const value = [
     [
-      reqBody.userID,
+      userId,
       reqBody.newTask.id,
       reqBody.newTask.title,
       reqBody.newTask.description,
@@ -205,28 +207,67 @@ function createTodo(reqBody) {
 
 // Function to extract a NEW Subtaskarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
-function extractNewSubtasks(reqBody) {
+function extractNewSubtasks(reqBody,userId) {
   const subtasks = reqBody.newTask.subtasks;
   let subtasksArray = [];
   for (let subtask of subtasks) {
-    subtasksArray.push([reqBody.userID, reqBody.newTask.id, subtask.name]);
+    subtasksArray.push([userId, reqBody.newTask.id, subtask.name]);
   }
   return subtasksArray;
 }
 
+async function getUserId(body) {
+  return new Promise((resolve, reject) => {
+    const { name, password } = body;
+
+    if (!name || !password) {
+      return resolve(-1); // Missing credentials
+    }
+
+    // Query to fetch user by name
+    const sql = "SELECT * FROM users_init WHERE name = ?";
+    connection.query(sql, [name], (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return reject(err); // Internal error
+      }
+
+      if (results.length === 0) {
+        console.log("User not found.");
+        return resolve(-1); // User not found
+      }
+
+      const user = results[0];
+      const hashedPassword = user.password;
+
+      // Compare the provided password with the hashed password
+      const isMatch = bcrypt.compareSync(password, hashedPassword);
+      if (!isMatch) {
+        console.log("Invalid password.");
+        return resolve(-1); // Invalid password
+      }
+
+      console.log("Authentication successful.");
+      resolve(user.id); // Return the userId
+    });
+  });}
 // Creates a new entry for new task
-app.post("/new-task", (req, res) => {
-  res.sendStatus(200);
+app.post("/new-task", async (req, res) => {
+  const userId = await getUserId(req.body);
+
+  if (userId === -1) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
   const sql =
     "INSERT INTO todos_init (userId, todoId, title, description, deadline, priority, todoReminder, todoRepeat, dateCreated) VALUES ?";
-  const value = createTodo(req.body);
+  const value = createTodo(req.body,userId);
   connection.query(sql, [value], (err, result) => {
     if (err) {
       console.log("Failed to store new task.");
     } else {
       console.log("New Todo with id:", req.body.newTask.id, "saved.");
       // This is for adding the subtasks with its respective maintaskId to another table
-      const subtasks = extractNewSubtasks(req.body);
+      const subtasks = extractNewSubtasks(req.body,userId);
       if (subtasks.length != 0) {
         const sql_subtask =
           "INSERT INTO subtasks_init (userId, mainTaskId, name) VALUES ?";
@@ -247,7 +288,7 @@ app.post("/new-task", (req, res) => {
 
 // Function to UPDATE an ALREADY EXISTING Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
-function extractTodo(reqBody) {
+function extractTodo(reqBody,userId) {
   let date;
   if (reqBody.updatedTask.deadline != null) {
     date = format(reqBody.updatedTask.deadline, "yyyy-MM-dd HH:mm:ss");
@@ -269,7 +310,7 @@ function extractTodo(reqBody) {
       reqBody.updatedTask.repeat,
       reqBody.updatedTask.deleted,
       dateDeleted,
-      reqBody.userID,
+      userId,
       reqBody.updatedTask.id
   ];
   return value;
@@ -277,75 +318,123 @@ function extractTodo(reqBody) {
 
 // Function to extract a Subtaskarray from a request body of an updatedTask for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
-function extractSubtasks(reqBody) {
+function extractSubtasks(reqBody,userId) {
   const subtasks = reqBody.updatedTask.subtasks;
   let subtasksArray = [];
   for (let subtask of subtasks) {
-    subtasksArray.push([reqBody.userID, reqBody.updatedTask.id, subtask.name, subtask.done]);
+    subtasksArray.push([userId, reqBody.updatedTask.id, subtask.name, subtask.done]);
   }
   return subtasksArray;
 }
 
-
-// Updates a already existing task
 app.post("/update-task", async (req, res) => {
-  try {
-    res.sendStatus(200);
-    
-    const subtasks = extractSubtasks(req.body);
-    const task = extractTodo(req.body);
+  try {const userId = await getUserId(req.body);
 
-    // Deleting all the subtasks (they either get added back, extended or deleted after all), task[9] is userId and task[10] is taskId
-    const sql_delete = "DELETE FROM subtasks_init WHERE userId = ? AND mainTaskId = ?";
-    await helperQuery(sql_delete, [task[9], task[10]]);
-    // connection.query(sql_delete, [task[9], task[10]], function(err, result) {
-    //   if (err) throw err;
-    //   else console.log("Updating subtasks...");
-    // });
+    if (userId === -1) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const subtasks = extractSubtasks(req.body,userId);
+    const task = extractTodo(req.body,userId);
 
-    
-    // Updating the main task nevertheless
-    const sql_update =
-      "UPDATE todos_init SET title = ?, description = ?, deadline = ?, priority = ?, isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND todoId = ?";
-    await helperQuery(sql_update, task);
-    // connection.query(sql, task, function(err, result) {
-    //   if (err) {
-    //     throw err;
-    //     console.log("Failed to update task.");
-    //   } else {
-    //     // task[8] is the maintaskID
-    //     console.log("Task with id:", task[10], "successfully updated.");
-    //   }
-    // });
-    
+    // Ensure task has all required fields
+    if (!task || task.length < 11) {
+      return res.status(400).json({ error: "Invalid task data" });
+    }
 
-    // Updating the subtasks
-    if (subtasks.length != 0) {
-      const sql_newSubtasks = "INSERT INTO subtasks_init (userId, mainTaskId, name, isDone) VALUES ?";
-      await helperQuery(sql_newSubtasks, [subtasks]);
-      // connection.query(sql_newSubtasks, [subtasks], function(err, result) {
-      //   if (err) throw err;
-      //   else console.log("Subtasks were successfully updated!");
-      // });
-    } 
+    // Fetch user by name
+    const sqlUser = "SELECT * FROM users_init WHERE name = ?";
+    connection.query(sqlUser, [name], async (err, users) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+
+      if (users.length === 0) {
+        console.log("User not found.");
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const user = users[0];
+      const hashedPassword = user.password;
+
+      // Authenticate the password
+      const match = authenticate(password, hashedPassword); // Ensure `authenticate` is implemented securely
+      if (!match) {
+        console.log("Invalid password.");
+        return res.status(401).json({ message: "Invalid password" });
+      }
+
+      // Delete existing subtasks for the task
+      const sqlDeleteSubtasks = `
+        DELETE FROM subtasks_init 
+        WHERE userId = ? AND mainTaskId = ?`;
+      await helperQuery(sqlDeleteSubtasks, [user.id, task.id]);
+
+      // Update the main task
+      const sqlUpdateTask = `
+        UPDATE todos_init 
+        SET title = ?, description = ?, deadline = ?, priority = ?, 
+            isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? 
+        WHERE userId = ? AND todoId = ?`;
+      const taskData = [
+        task.title,
+        task.description,
+        task.deadline,
+        task.priority,
+        task.isDone,
+        task.todoReminder,
+        task.todoRepeat,
+        task.todoDeleted,
+        task.dateDeleted,
+        user.id,
+        task.id,
+      ];
+      await helperQuery(sqlUpdateTask, taskData);
+
+      // Insert new subtasks if they exist
+      if (subtasks.length > 0) {
+        const sqlInsertSubtasks = `
+          INSERT INTO subtasks_init (userId, mainTaskId, name, isDone) 
+          VALUES ?`;
+        const subtaskData = subtasks.map((subtask) => [
+          user.id,
+          task.id,
+          subtask.name,
+          subtask.isDone,
+        ]);
+        await helperQuery(sqlInsertSubtasks, [subtaskData]);
+      }
+
+      console.log("Task updated successfully.");
+      res.status(200).json({ message: "Task updated successfully", taskId: task.id });
+    });
   } catch (err) {
-    console.log(err);
+    console.error("Unexpected error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-
 // Deletes an existing todo
-app.post("/delete-task", (req, res) => {
+app.post("/delete-task", async(req, res) => {
+  const userId = await getUserId(req.body);
+
+  if (userId === -1) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
   const sql = "UPDATE todos_init SET todoDeleted = ?, dateDeleted = ? WHERE userId = ? AND mainTaskId = ?";
-  connection.query(sql, [true, Date.now(), req.body.userID, req.body.deletedTask.id], function(err, result) {
+  connection.query(sql, [true, Date.now(), userId, req.body.deletedTask.id], function(err, result) {
     if (err) throw err;
     else console.log("Task with id:", req.body.deletedTask.id, "was successfuly deleted!");
   })
 })
 
 // Gets all the todos in the database
-app.get("/read-tasks", (req, res) => {
-  const userId = req.query.id;
+app.get("/read-tasks", async (req, res) => {
+  const userId = await getUserId(req.query);
+
+  if (userId === -1) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
   const sql = "SELECT * FROM todos_init WHERE userId = ?";
   connection.query(sql, [userId], function (err, result) {
     if (err) {
@@ -358,8 +447,12 @@ app.get("/read-tasks", (req, res) => {
 });
 
 // Gets all the subtasks in the database
-app.get("/read-subtasks", (req, res) => {
-  const userId = req.query.id;
+app.get("/read-subtasks", async (req, res) => {
+  const userId = await getUserId(req.query);
+
+  if (userId === -1) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
   const sql = "SELECT * FROM subtasks_init WHERE userId = ?";
   connection.query(sql, [userId],function (err, result) {
     if (err) {
@@ -374,68 +467,64 @@ app.get("/read-subtasks", (req, res) => {
     }
   });
 });
-
 // Checks if the username and password exist and returns id + name if it does
-app.get("/login-user", (req, res) => {
-  const sql = "SELECT * FROM users_init WHERE name = ?";
-  connection.query(sql, [req.query.name, req.query.pw], async function (err, result) {
-    if (err) {
-      console.log("Login call attempt failed!");
-      res.json({ id: -1, name: "" });
-    } else if (result.length === 0) {
-      console.log("Did not find a user with this name.")
-      res.json({ id: -1, name: "" });
-    } else {
-      const user = result[0];
-      const password = req.query.pw;
-      const hashedPassword = user.password;
-      const match = authenticate(password, hashedPassword);
-      if (match) {
-        console.log("Login successful.");
-        res.json({ id: user.id, name: user.displayName });
-      } else {
-        console.log("Invalid password");
-        res.json({ id: -1, name: "" });
-      }
+app.get("/login-user", async (req, res) => {
+  try {
+    const { name, pw } = req.query;
+
+    if (!name || !pw) {
+      return res.status(400).json({ id: -1, mode: 0, pixels: 0, message: "Missing name or password" });
     }
-  });
+
+    // Fetch user by name
+    const sqlUser = "SELECT * FROM users_init WHERE name = ?";
+    connection.query(sqlUser, [name], async (err, users) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ id: -1, mode: 0, pixels: 0, message: "Internal server error" });
+      }
+
+      if (users.length === 0) {
+        console.log("User not found.");
+        return res.status(404).json({ id: -1, mode: 0, pixels: 0, message: "User not found" });
+      }
+
+      const user = users[0];
+      const hashedPassword = user.password;
+
+      // Authenticate the password
+      const match = authenticate(pw, hashedPassword); // Ensure `authenticate` is implemented correctly
+      if (!match) {
+        console.log("Invalid password.");
+        return res.status(401).json({ id: -1, mode: 0, pixels: 0, message: "Invalid password" });
+      }
+
+      // Fetch user's pixels and mode
+      const sqlPixels = "SELECT * FROM users_pixels WHERE userid = ?";
+      connection.query(sqlPixels, [user.id], (err, pixelsResult) => {
+        if (err) {
+          console.error("Error fetching user pixels:", err);
+          return res.status(500).json({ id: -1, mode: 0, pixels: 0, message: "Internal server error" });
+        }
+
+        const pixelsData = pixelsResult[0] || { pixels: 0, mode: 0 };
+        console.log("Login successful.");
+        res.status(200).json({
+          id: user.id,
+          mode: currentMode ,
+          pixels: pixelsData.pixels || 0,
+          message: "Login successful",
+        });
+      });
+    });
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    res.status(500).json({ id: -1, mode: 0, pixels: 0, message: "Internal server error" });
+  }
 });
 
-  // const sql = "SELECT * FROM users_init WHERE name = ? AND password = ?";
-  // connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
-  //   if (err) {
-  //     console.log("Login call attempt failed!");
-  //   } else if (result.length === 0) {
-  //     // Kein Benutzer mit passendem Namen und Passwort gefunden
-  //     res.json({ id: -1, name: "" });
-  //   } else {
-  //     res.json({ id: result[0].id, name: result[0].displayName });
-  //   }
-  // });
-// });
 
-// Beneath is the part if it needs to work with hashes (currently not working on uberspace)
-//   const sql = "SELECT * FROM users_init WHERE name = ?";
-//   connection.query(sql, [req.query.name, req.query.pw], function (err, result) {
-//     if (err) {
-//       console.log("Login call attempt failed!");
-//       res.json({ id: -1, name: "" });
-//     } else if (result.length === 0) {
-//       console.log("Did not find a user with this name.")
-//       res.json({ id: -1, name: "" });
-//     } else {
-//       const user = result[0];
-//       const match = bcrypt.compareSync(req.query.pw, user.password);
-//       if (match) {
-//         console.log("Login successful.");
-//         res.json({ id: user.id, name: user.displayName });
-//       } else {
-//         console.log("Invalid password");
-//         res.json({ id: -1, name: "" });
-//       }
-//     }
-//   });
-// });
+ 
 
 // Checks if the username and password exist and returns id + name if it does
 app.get("/exists-user", (req, res) => {
@@ -463,13 +552,18 @@ app.get("/get-user-list", (req, res)=>{
 });
 
 // Sets the e-mail adress for an user
-app.post("/update-email", (req, res) => {
+app.post("/update-email", async(req, res) => {
   try {
+    const userId = await getUserId(req.body);
+
+  if (userId === -1) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
     res.sendStatus(200);
     const sql = "UPDATE users_init SET email=? WHERE id = ?";
     const email = req.body.email;
-    const userID = req.body.userID;
-    connection.query(sql, [email, userID], function (err, _) {
+    
+    connection.query(sql, [email, userId], function (err, _) {
       if (err) {
         console.log("Error setting the E-Mail:", err);
         throw err;
@@ -484,12 +578,16 @@ app.post("/update-email", (req, res) => {
 })
 
 // Deletes the e-mail adress for an user
-app.post("/delete-email", (req, res) => {
-  try {
+app.post("/delete-email", async(req, res) => {
+  try {const userId = await getUserId(req.body);
+
+    if (userId === -1) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
     res.sendStatus(200);
     const sql = "UPDATE users_init SET email= NULL WHERE id = ?";
-    const userID = req.body.userID;
-    connection.query(sql, [userID], function (err, _) {
+    
+    connection.query(sql, [userId], function (err, _) {
       if (err) {
         console.log("Error deleting the E-Mail:", err);
         throw err;
@@ -662,14 +760,43 @@ function deleteUser(username) {
 
 // Helper function to register a new user
 async function registerUser(userName, password) {
-  const sql =
-    "INSERT INTO users_init (name, password, displayName) VALUES (?, ?, ?)";
+  // SQL to insert the new user into the users_init table
+  const sql_insertUser = "INSERT INTO users_init (name, password, displayName) VALUES (?, ?, ?)";
   const passwordHash = await hashPassword(password);
-  connection.query(sql, [userName, passwordHash, userName], (err, result) => {
-    if (err) throw err;
-    console.log("User succesfully registered.");
+
+  connection.query(sql_insertUser, [userName, passwordHash, userName], (err, result) => {
+    if (err) {
+      console.error("Error registering user:", err);
+      throw err;
+    }
+
+    // Get the generated userId from the inserted user
+    const userId = result.insertId; // This is the auto-generated user ID
+
+    console.log("User successfully registered with ID:", userId);
+
+    // Insert into users_pixels table
+    const sql_insertPixels = "INSERT INTO users_pixels (userId, mode, pixels) VALUES (?, ?, ?)";
+    connection.query(sql_insertPixels, [userId, 0, 0], (err, result) => {
+      if (err) {
+        console.error("Error inserting into users_pixels:", err);
+        throw err;
+      }
+      console.log("User pixels entry successfully created.");
+    });
+
+    // Insert into stats table
+    const sql_insertStats = "INSERT INTO stats (userId, interactions) VALUES (?, ?)";
+    connection.query(sql_insertStats, [userId, 0], (err, result) => {
+      if (err) {
+        console.error("Error inserting into stats:", err);
+        throw err;
+      }
+      console.log("User stats entry successfully created.");
+    });
   });
 }
+
 
 // Helper function for queries
 async function helperQuery(sql, params) {
@@ -894,7 +1021,48 @@ cron.schedule('* * * * *', () => {
 
 module.exports = sendMail;
 
+// mode 
+let currentMode = 0; // Default mode value
 
+const readModeFromDatabase = () => {
+  const sql = "SELECT mode FROM settings WHERE id = 1"; // Assuming only one row in settings table
+  connection.query(sql, (err, result) => {
+    if (err) {
+      console.error("Error fetching mode from database:", err);
+    } else if (result.length > 0) {
+      currentMode = result[0].mode;
+      console.log("Current mode loaded from database:", currentMode);
+    } else {
+      console.log("No mode found in database, using default mode.");
+    }
+  });
+};
+
+// Call the function on server startup
+readModeFromDatabase();
+
+app.post("/update-mode", (req, res) => {
+  const { mode } = req.body; // Assuming mode is passed in the request body
+
+  if (typeof mode !== "number") {
+    return res.status(400).json({ error: "Mode must be a number" });
+  }
+
+  // Update the mode in the database
+  const sql_updateMode = "UPDATE settings SET mode = ? WHERE id = 1";
+  connection.query(sql_updateMode, [mode], (err, result) => {
+    if (err) {
+      console.error("Error updating mode in database:", err);
+      return res.status(500).json({ error: "Failed to update mode" });
+    }
+
+    // Update the mode in memory
+    currentMode = mode;
+    console.log("Mode updated to:", currentMode);
+
+    res.status(200).json({ message: "Mode updated successfully", mode: currentMode });
+  });
+});
 
 //pwall
 const pixelstates = {};

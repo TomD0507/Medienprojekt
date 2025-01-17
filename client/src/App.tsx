@@ -27,13 +27,15 @@ export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom
 
 type AppProps = {
   userID: number;
-  displayName: string;
+  name: string;
+  password: string;
   isMenuOpen: boolean;
   isSearchOpenOpen: boolean;
   isSearchClosedOpen: boolean;
   mailModal: boolean;
   selectedTaskTab: string;
   setSelectedTaskTab: (arg: string) => void;
+  returnHook: (arg: number) => void;
   sortArg: string;
   closedFilter: string;
   searchClosedQuery: string;
@@ -62,6 +64,8 @@ function sortTasks(
 
 function App({
   userID,
+  name,
+  password,
   isMenuOpen,
   isSearchOpenOpen,
   isSearchClosedOpen,
@@ -73,37 +77,44 @@ function App({
   selectedTaskTab,
   sortArg,
   setSelectedTaskTab,
+  returnHook,
 }: AppProps) {
   /** State Hooks */
-  const [openTasks, setOpenTasks] = useState<TaskProps[]>([]);
-  const [doneTasks, setDoneTasks] = useState<TaskProps[]>([]);
+  // Derived states for openTasks and doneTasks
+  const [tasks, setTasks] = useState<TaskProps[]>([]);
+
+  const openTasks = tasks.filter((task) => !task.deleted && !task.done);
+  const doneTasks = tasks.filter((task) => !task.deleted && task.done);
+
   const [id, updateID] = useState(1);
 
-  // Function: Backend-call to update tasks (either check them as "done/undone" or to alter them)
+  // Function: Backend call to update tasks
   const handleUpdateTask = (updatedTask: TaskProps) => {
-    setOpenTasks((prevTasks) =>
+    setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
     );
-    setDoneTasks((prevTasks) =>
-      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-    );
-    //backendcall: update(user,updatedTask) maybe zeit eintrag in datenbank für erstellen und löschen
+
     axios
-      .post(`${API_URL}/update-task`, { updatedTask, userID })
-      .then((r) => {
-        console.log(r);
+      .post(`${API_URL}/update-task`, {
+        params: { updatedTask, name, password },
+      })
+      .then((response) => {
+        const updatedValue = response.data; // Assuming backend returns a number
+        console.log(response.data);
+        returnHook(updatedValue); // Feed the returned number into your returnHook function
+        console.log(response);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
   // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
-    setOpenTasks((prevTasks) => [...prevTasks, newTask]);
+    setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     axios
-      .post(`${API_URL}/new-task`, { newTask, userID })
+      .post(`${API_URL}/new-task`, { newTask, name, password })
       .then((r) => {
         console.log(r);
       })
@@ -117,41 +128,29 @@ function App({
     const fetchData = async () => {
       try {
         const [tasksResponse, subtasksResponse] = await Promise.all([
-          axios.get(`${API_URL}/read-tasks`, { params: { id: userID } }),
-          axios.get(`${API_URL}/read-subtasks`, { params: { id: userID } }),
+          axios.get(`${API_URL}/read-tasks`, { params: { name, password } }),
+          axios.get(`${API_URL}/read-subtasks`, { params: { name, password } }),
         ]);
 
         const tasksArray: TaskInput[] = tasksResponse.data;
         const subtasksArray: SubtaskInput[] = subtasksResponse.data;
 
-        const initalizedTasks = getTasksFromArray(tasksArray, subtasksArray);
+        const initializedTasks = getTasksFromArray(tasksArray, subtasksArray);
+
         let maxId = 0;
-        for (const task of initalizedTasks) {
+        for (const task of initializedTasks) {
           if (task.id > maxId) maxId = task.id;
         }
         updateID(maxId + 1);
 
-        const [doneTasks, openTasks] = initalizedTasks.reduce<
-          [TaskProps[], TaskProps[]]
-        >(
-          ([done, open], task) => {
-            if (!task.deleted) {
-              task.done ? done.push(task) : open.push(task);
-            }
-            return [done, open];
-          },
-          [[], []]
-        );
-
-        setDoneTasks(doneTasks);
-        setOpenTasks(openTasks);
+        setTasks(initializedTasks);
       } catch (error) {
         console.error("Error fetching tasks or subtasks:", error);
       }
     };
 
     fetchData();
-  }, [userID]);
+  }, [name, password]);
 
   const incrementID = () => updateID((prevID) => (prevID += 1));
 
@@ -178,7 +177,6 @@ function App({
       document.body.style.overflow = "";
     };
   }, [isOpen, isMenuOpen, isSearchOpenOpen, isSearchClosedOpen, mailModal]);
-  // This is a hook to close components when you click outside of them
 
   function handleFilterOpen(task: TaskProps) {
     return filterByPredicates(
@@ -264,24 +262,14 @@ function App({
           <CollList visible={"done" === selectedTaskTab}>
             <TaskList
               currentTime={currentTime}
-              tasks={handleSortTasks(
-                doneTasks
-                  .filter((task) => !task.deleted)
-
-                  .filter(handleFilterClosed)
-              )}
+              tasks={handleSortTasks(doneTasks.filter(handleFilterClosed))}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
           <CollList visible={"open" === selectedTaskTab}>
             <TaskList
               currentTime={currentTime}
-              tasks={handleSortTasks(
-                openTasks
-                  .filter((task) => !task.deleted)
-
-                  .filter(handleFilterOpen)
-              )}
+              tasks={handleSortTasks(openTasks.filter(handleFilterOpen))}
               onUpdateTask={handleUpdateTask}
             />
           </CollList>
