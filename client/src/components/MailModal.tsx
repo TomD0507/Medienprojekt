@@ -9,13 +9,15 @@ import axios from "axios";
 type MailModalProps = {
   thisMailModal: boolean;
   toggleMailModal: () => void;
-  userID: number;
+  name: string;
+  password: string;
 };
 
 export default function MailModal({
   thisMailModal,
   toggleMailModal,
-  userID
+  name,
+  password,
 }: MailModalProps) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -32,26 +34,25 @@ export default function MailModal({
     }
   };
 
-
   const handleSubmit = () => {
     if (emailError || !email) {
       alert("Bitte gib eine gültige E-Mail-Adresse ein.");
     } else {
       alert(`E-Mail ${email} wurde erfolgreich eingereicht.`);
       axios
-      .post(`${API_URL}/update-email`, { email, userID })
-      .then((r) => {
-        console.log(r);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        .post(`${API_URL}/update-email`, { email, name, password })
+        .then((r) => {
+          console.log(r);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 
   const handleDelete = () => {
     axios
-      .post(`${API_URL}/delete-email`, { userID })
+      .post(`${API_URL}/delete-email`, { name, password })
       .then((r) => {
         console.log(r);
       })
@@ -65,7 +66,6 @@ export default function MailModal({
   } else {
     document.body.classList.remove("active-modal");
   }
-
 
   return (
     <div>
@@ -87,8 +87,12 @@ export default function MailModal({
               <span className="x"></span>
             </button>
             <div className="button-container">
-              <button className="save-button" onClick={handleSubmit}>Speichern</button>
-              <button className="delete-button" onClick={handleDelete}>Löschen</button>
+              <button className="save-button" onClick={handleSubmit}>
+                Speichern
+              </button>
+              <button className="delete-button" onClick={handleDelete}>
+                Löschen
+              </button>
             </div>
           </div>
         </div>

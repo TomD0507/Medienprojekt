@@ -200,7 +200,8 @@ function PageManager() {
         <MailModal
           thisMailModal={mailModal}
           toggleMailModal={toggleMailModal}
-          userID={userID}
+          name={loginName}
+          password={password}
         ></MailModal>
       )}
       <App
@@ -281,7 +282,8 @@ function PageManager() {
         <MailModal
           thisMailModal={mailModal}
           toggleMailModal={toggleMailModal}
-          userID={userID}
+          name={loginName}
+          password={password}
         ></MailModal>
       )}
       {!motStrat && (
