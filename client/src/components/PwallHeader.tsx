@@ -1,9 +1,6 @@
 import React from "react";
-import "../styles/PwallHeader.css";
-import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getFilterTextByKey } from "./FilterMenu";
-import { PixelWall } from "../pwall/PixelWall";
 type PwallHeaderProps = {};
 
 export const PwallHeader: React.FC<PwallHeaderProps> = ({}) => {

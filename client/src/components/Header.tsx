@@ -11,6 +11,7 @@ type HeaderProps = {
   filter: string;
   title: string;
   searchQuery: string;
+  showBurger: boolean;
 };
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,13 +22,16 @@ export const Header: React.FC<HeaderProps> = ({
   searchQuery,
   filter,
   title,
+  showBurger,
 }) => {
   return (
     <header className="app_header">
       <div className="headerrow">
-        <button className="menu-button" onClick={onMenuToggle}>
-          ☰
-        </button>
+        {showBurger && (
+          <button className="menu-button" onClick={onMenuToggle}>
+            ☰
+          </button>
+        )}
         <h1 className="header-title">{title}</h1>
         <button className="search-button" onClick={onSearchToggle}>
           <FontAwesomeIcon icon={faFilter} className="icon" />

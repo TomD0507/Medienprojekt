@@ -26,10 +26,10 @@ export const SwapHeader: React.FC<SwapHeaderProps> = ({
       <div className="child-container">
         {showSecondChild ? (
           <button
-            className="swap-button"
+            className="menu-button"
             onClick={() => setShowSecondChild(false)}
           >
-            Show First Child
+            Show
           </button>
         ) : (
           firstChild
@@ -40,10 +40,10 @@ export const SwapHeader: React.FC<SwapHeaderProps> = ({
           secondChild
         ) : (
           <button
-            className="swap-button"
+            className="menu-button"
             onClick={() => setShowSecondChild(true)}
           >
-            Show Second Child
+            ☰
           </button>
         )}
       </div>

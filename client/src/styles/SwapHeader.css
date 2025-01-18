@@ -1,12 +1,25 @@
 .swap-header {
   display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #f0f0f0;
+  gap: 7px;
+  width: 100%;
+  padding: 10px 20px;
+  flex-direction: row;
+  border-radius: 10px;
+  background-color: #304674;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  z-index: 10;
+  box-sizing: border-box; /* Padding und Border in der Größe berücksichtigen */
 }
-
 .child-container {
-  flex-grow: 1;
-  cursor: pointer;
-  text-align: center;
+  background-color: #bdbdbd;
+}
+.child-container {
+  display: contents;
+}
+.child-container .app_header,
+.child-container .app_header {
+  padding: 0px;
+  box-shadow: none;
+  margin: 0px;
 }

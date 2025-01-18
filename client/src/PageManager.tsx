@@ -169,6 +169,7 @@ function PageManager() {
         title={
           "done" === selectedTaskTab ? "Erledigte Aufgaben" : "Offene Aufgaben"
         }
+        showBurger={true}
       />
       <FilterMenu
         filter={openFilter}
@@ -256,6 +257,7 @@ function PageManager() {
                 ? "Erledigte Aufgaben"
                 : "Offene Aufgaben"
             }
+            showBurger={true}
           />
         }
         secondChild={<PwallHeader />}
