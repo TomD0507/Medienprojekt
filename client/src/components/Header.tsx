@@ -1,4 +1,3 @@
-import React from "react";
 import "../styles/Header.css";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +13,7 @@ type HeaderProps = {
   showBurger: boolean;
 };
 
-export const Header: React.FC<HeaderProps> = ({
+export function Header({
   onMenuToggle,
   onSearchToggle,
   deleteSearchQuery,
@@ -23,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
   filter,
   title,
   showBurger,
-}) => {
+}: HeaderProps) {
   return (
     <header className="app_header">
       <div className="headerrow">
@@ -77,4 +76,4 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
     </header>
   );
-};
+}

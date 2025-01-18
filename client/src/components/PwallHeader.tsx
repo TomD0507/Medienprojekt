@@ -1,9 +1,8 @@
-import React from "react";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-type PwallHeaderProps = {};
+type PwallHeaderProps = { remainingPixel: number };
 
-export const PwallHeader: React.FC<PwallHeaderProps> = ({}) => {
+export function PwallHeader({ remainingPixel }: PwallHeaderProps) {
   return (
     <header className="app_header">
       <div className="headerrow">
@@ -15,4 +14,4 @@ export const PwallHeader: React.FC<PwallHeaderProps> = ({}) => {
       <div className="currentfilterview"></div>
     </header>
   );
-};
+}

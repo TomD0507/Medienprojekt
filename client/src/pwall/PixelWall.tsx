@@ -70,9 +70,9 @@ const createFrontendGrid = () => {
 };
 type PixelWallProps = {
   currentUserID: number;
+  remainingPixel: number;
 };
-export function // PixelWall(userID:number) {
-PixelWall({ currentUserID }: PixelWallProps) {
+export function PixelWall({ currentUserID, remainingPixel }: PixelWallProps) {
   //todo: pixel count
 
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe

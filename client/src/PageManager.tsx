@@ -260,7 +260,7 @@ function PageManager() {
             showBurger={true}
           />
         }
-        secondChild={<PwallHeader />}
+        secondChild={<PwallHeader remainingPixel={pixelCount} />}
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         showSecondChild={motStrat}
         setShowSecondChild={setMotStrat}
@@ -321,7 +321,9 @@ function PageManager() {
           returnHook={addPixels}
         />
       )}
-      {motStrat && <PixelWall currentUserID={userID} />}
+      {motStrat && (
+        <PixelWall currentUserID={userID} remainingPixel={pixelCount} />
+      )}
     </div>
   );
 }
