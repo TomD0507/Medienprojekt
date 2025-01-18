@@ -95,9 +95,7 @@ function App({
     );
 
     axios
-      .post(`${API_URL}/update-task`, {
-        params: { updatedTask, name, password },
-      })
+      .post(`${API_URL}/update-task`, { updatedTask, name, password })
       .then((response) => {
         const updatedValue = response.data; // Assuming backend returns a number
         console.log(response.data);

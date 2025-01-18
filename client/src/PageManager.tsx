@@ -34,6 +34,8 @@ function PageManager() {
     const storedPW = localStorage.getItem("TodoApppassword");
 
     if (storedLoginName && storedPW) {
+      setName(storedLoginName);
+      setPw(storedPW);
       login(storedLoginName, storedPW);
     }
   }, []);
@@ -73,13 +75,13 @@ function PageManager() {
       console.log("Login failed: incorrect username or password.");
       setStatus("error");
       setUserID(null);
+      handleNameChange("");
+      handlePwChange("");
       // Remove login info to localStorage
       localStorage.removeItem("TodoApppassword");
       localStorage.removeItem("TodoApploginName");
     }
     //input reset after login was checked
-    handleNameChange("");
-    handlePwChange("");
   };
   const handleNameChange = (e: string) => {
     setName(e);

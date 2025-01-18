@@ -1,6 +1,5 @@
 /* Styles für Task-Komponente */
 
-
 .task-element {
   position: relative;
   background: #fff; /* Weißer Hintergrund */
@@ -14,7 +13,8 @@
   display: flex; /* Aktiviert Flexbox */
 
   flex-wrap: nowrap; /* Elemente nicht umbrechen bei kleiner Breite */
-  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
 }
 /* Item-Container  wenn kompletter bereich eingenommen werden soll*/
 .itemmiddle {
@@ -22,12 +22,10 @@
   flex-direction: column;
   flex-grow: 1;
   padding: 0.2em 1em;
-}
-.item {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 0;
-  padding-top: 2%;
+  /* Allow long words to wrap */
+  overflow-wrap: break-word; /* For modern browsers */
+  word-wrap: break-word; /* For older browsers */
+  word-break: break-word; /* Break long words */
 }
 .itemleft {
   display: flex;
@@ -41,6 +39,13 @@
   flex-grow: 0;
   min-height: 100%;
   padding-top: 2px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  padding-top: 2%;
 }
 /* Checkbox-Design */
 .checkbox {
@@ -141,16 +146,17 @@ li {
   z-index: 1;
 }
 
-.deadlinebox {/* Shrink to fit content */
+.deadlinebox {
+  /* Shrink to fit content */
   display: flex;
   flex-grow: 0;
   padding: 5px 10px;
   align-items: center; /* Vertically center content */
   justify-content: center; /* Horizontally center content */
   border-radius: 1em; /* Rounded corners */
-  z-index: 1; 
+  z-index: 1;
   background-color: #f0f0f0; /* background */
- max-width: max-content;
+  max-width: max-content;
 }
 .overtime {
   background-color: rgb(255, 47, 47); /* schwarz, 0,5 alpha */
@@ -184,8 +190,9 @@ li {
   z-index: 2;
   justify-content: center;
   align-items: center;
-  display:flex;
-  z-index: 4; margin-top: auto;
+  display: flex;
+  z-index: 4;
+  margin-top: auto;
 }
 
 .task_edit_symbol span {
@@ -194,5 +201,4 @@ li {
 }
 .task_edit_symbol:hover {
   transform: scale(1.1); /* Vergrößerung beim Hover */
-} 
-
+}
