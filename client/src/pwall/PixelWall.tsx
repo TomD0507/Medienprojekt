@@ -71,8 +71,15 @@ const createFrontendGrid = () => {
 type PixelWallProps = {
   currentUserID: number;
   remainingPixel: number;
+  username: string;
+  password: string;
 };
-export function PixelWall({ currentUserID, remainingPixel }: PixelWallProps) {
+export function PixelWall({
+  currentUserID,
+  remainingPixel,
+  username,
+  password,
+}: PixelWallProps) {
   //todo: pixel count
 
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
@@ -115,36 +122,41 @@ export function PixelWall({ currentUserID, remainingPixel }: PixelWallProps) {
     });
 
     // Update local userPixelData immediately
-    setUserPixelData((prev) => {
-      const updatedData = { ...prev };
-      if (!updatedData[currentUserID]) {
-        updatedData[currentUserID] = [];
-      }
-      updatedData[currentUserID] = [
-        ...updatedData[currentUserID],
-        ...changes.map((pixel) => ({
-          xCoordinate: pixel.xCoordinate,
-          yCoordinate: pixel.yCoordinate,
-          color: pixel.color,
-          timestamp: pixel.timestamp,
-        })),
-      ];
-      return updatedData;
-    });
+    if (changes.length == 0) return;
 
     // Send pixels to the backend
     try {
       // Use axios to make the POST request
-      await axios.post(
-        `${API_URL}/pixels/submit`,
-        { currentUserID, changes },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      await axios
+        .post(
+          `${API_URL}/pixels/submit`,
+          { username, password, changes },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => {
+          setFrontendPixels(createFrontendGrid());
+
+          setUserPixelData((prev) => {
+            const updatedData = { ...prev };
+            if (!updatedData[currentUserID]) {
+              updatedData[currentUserID] = [];
+            }
+            updatedData[currentUserID] = [
+              ...updatedData[currentUserID],
+              ...changes.map((pixel) => ({
+                xCoordinate: pixel.xCoordinate,
+                yCoordinate: pixel.yCoordinate,
+                color: pixel.color,
+                timestamp: pixel.timestamp,
+              })),
+            ];
+            return updatedData;
+          });
+        });
 
       // Reset local pixels after successful submission
-      setFrontendPixels(createFrontendGrid());
     } catch (error) {
       console.error("Error submitting pixel changes:", error);
     }

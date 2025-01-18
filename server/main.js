@@ -375,12 +375,12 @@ app.post("/update-task", async (req, res) => {
     }
 
     console.log("Task updated successfully.");
-    res
+    return res
       .status(200)
-      .json({ message: "Task updated successfully", taskId: task.id });
+      .json({ message: "Task updated successfully.", taskId: 2 });
   } catch (err) {
     console.error("Unexpected error:", err);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 

@@ -322,7 +322,12 @@ function PageManager() {
         />
       )}
       {motStrat && (
-        <PixelWall currentUserID={userID} remainingPixel={pixelCount} />
+        <PixelWall
+          currentUserID={userID}
+          remainingPixel={pixelCount}
+          username={loginName}
+          password={password}
+        />
       )}
     </div>
   );
