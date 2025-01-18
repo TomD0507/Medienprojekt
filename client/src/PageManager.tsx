@@ -9,6 +9,8 @@ import BurgerMenu from "./components/BurgerMenu";
 import MailModal from "./components/MailModal";
 
 import { PixelWall } from "./pwall/PixelWall";
+import { SwapHeader } from "./components/SwapHeader";
+import { PwallHeader } from "./components/PwallHeader";
 function PageManager() {
   //userID wird bei login gesetzt
   const [userID, setUserID] = useState<number | null>(null);
@@ -141,7 +143,7 @@ function PageManager() {
       onSubmit={handleSubmit}
       status={status}
     />
-  ) : mode === 0 ? (
+  ) : mode === 1 ? (
     <div className="app">
       <Header
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
@@ -226,31 +228,41 @@ function PageManager() {
     </div>
   ) : (
     <div className="app">
-      <Header
+      <SwapHeader
+        firstChild={
+          <Header
+            onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+            onSearchToggle={
+              "open" === selectedTaskTab
+                ? () => setIsSearchOpenOpen(true)
+                : () => setIsSearchClosedOpen(true)
+            }
+            deleteSearchQuery={
+              "done" === selectedTaskTab
+                ? () => setSearchClosedQuery("")
+                : () => setSearchOpenQuery("")
+            }
+            delteFilter={
+              "done" === selectedTaskTab
+                ? () => setClosedFilter("all")
+                : () => setOpenFilter("all")
+            }
+            filter={"done" === selectedTaskTab ? closedFilter : openFilter}
+            searchQuery={
+              "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
+            }
+            title={
+              "done" === selectedTaskTab
+                ? "Erledigte Aufgaben"
+                : "Offene Aufgaben"
+            }
+          />
+        }
+        secondChild={<PwallHeader />}
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
-        onSearchToggle={
-          "open" === selectedTaskTab
-            ? () => setIsSearchOpenOpen(true)
-            : () => setIsSearchClosedOpen(true)
-        }
-        deleteSearchQuery={
-          "done" === selectedTaskTab
-            ? () => setSearchClosedQuery("")
-            : () => setSearchOpenQuery("")
-        }
-        delteFilter={
-          "done" === selectedTaskTab
-            ? () => setClosedFilter("all")
-            : () => setOpenFilter("all")
-        }
-        filter={"done" === selectedTaskTab ? closedFilter : openFilter}
-        searchQuery={
-          "done" === selectedTaskTab ? searchClosedQuery : searchOpenQuery
-        }
-        title={
-          "done" === selectedTaskTab ? "Erledigte Aufgaben" : "Offene Aufgaben"
-        }
-      />
+        showSecondChild={motStrat}
+        setShowSecondChild={setMotStrat}
+      ></SwapHeader>
       <FilterMenu
         filter={openFilter}
         setFilter={setOpenFilter}

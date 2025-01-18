@@ -1,0 +1,12 @@
+.swap-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+
+.child-container {
+  flex-grow: 1;
+  cursor: pointer;
+  text-align: center;
+}
