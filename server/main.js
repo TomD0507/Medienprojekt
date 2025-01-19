@@ -56,6 +56,7 @@ function initTodoDB() {
         dateCreated DATETIME NOT NULL,
         dateDeleted DATETIME,
         isRepeated BOOL DEFAULT false,
+        firstDone DATETIME,
         PRIMARY KEY (userId, todoId)
     )
     `;
@@ -102,7 +103,8 @@ function initTodoDB() {
 CREATE TABLE IF NOT EXISTS users_pixels (
   id INT NOT NULL AUTO_INCREMENT,
   userId INT NOT NULL,
-  pixels INT DEFAULT 0,
+  leftPixels INT DEFAULT 0,
+  placedPixels INT DEFAULT 0,
   PRIMARY KEY (id),
   FOREIGN KEY (userId) REFERENCES users_init(id) ON DELETE CASCADE
 )
@@ -118,7 +120,7 @@ CREATE TABLE IF NOT EXISTS stats (
   id INT NOT NULL AUTO_INCREMENT,
   userId INT NOT NULL,
   interactions INT DEFAULT 0,
-  lastLogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  lastLogin TIMESTAMP ,
   PRIMARY KEY (id),
   FOREIGN KEY (userId) REFERENCES users_init(id) ON DELETE CASCADE
 )
@@ -129,15 +131,30 @@ CREATE TABLE IF NOT EXISTS stats (
   });
   const sql_createSettingsTable = `
   CREATE TABLE IF NOT EXISTS settings (
-    id INT NOT NULL AUTO_INCREMENT,
-    mode INT DEFAULT 0,
-    PRIMARY KEY (id)
+    settingID INT NOT NULL AUTO_INCREMENT,
+    settingValue INT DEFAULT 0,
+    PRIMARY KEY (settingID)
   )
 `;
 
   connection.query(sql_createSettingsTable, (err, result) => {
     if (err) throw err;
     console.log("Settings Table successfully created.");
+  });
+  const sql_createPixelsTable = `
+  CREATE TABLE IF NOT EXISTS pixels (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userID INT NOT NULL,
+  xCoordinate INT NOT NULL,
+  yCoordinate INT NOT NULL,
+  color VARCHAR(20) NOT NULL,
+  timestamp DATETIME NOT NULL
+)
+`;
+
+  connection.query(sql_createPixelsTable, (err, result) => {
+    if (err) throw err;
+    console.log("Pixelwall Table successfully created.");
   });
 }
 
@@ -265,6 +282,7 @@ app.post("/new-task", async (req, res) => {
   connection.query(sql, [value], (err, result) => {
     if (err) {
       console.log("Failed to store new task.");
+      return res.status(401).json({ message: "Failed to save task" });
     } else {
       console.log("New Todo with id:", req.body.newTask.id, "saved.");
       // This is for adding the subtasks with its respective maintaskId to another table
@@ -284,11 +302,12 @@ app.post("/new-task", async (req, res) => {
       }
     }
   });
+  return res.status(20).json({ message: "Saved task" });
 });
 
 // Function to UPDATE an ALREADY EXISTING Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
-function extractTodo(reqBody, userId) {
+function extractTodo(reqBody, userId, firstDone) {
   console.log("Request body:", reqBody);
 
   let date = null;
@@ -314,6 +333,7 @@ function extractTodo(reqBody, userId) {
     reqBody.updatedTask.repeat,
     reqBody.updatedTask.deleted,
     dateDeleted,
+    firstDone,
     userId,
     reqBody.updatedTask.id,
   ];
@@ -340,11 +360,29 @@ function extractSubtasks(reqBody, userId) {
 app.post("/update-task", async (req, res) => {
   try {
     const userId = await getUserId(req.body);
+    const mainTaskId = req.body.updatedTask.id;
+
     if (userId === -1) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    if (!mainTaskId) {
+      return res.status(401).json({ message: "Invalid taskID" });
+    }
+    //get wether this todo was done before
+    const sqlGetTask = `
+    SELECT isDone, firstDone 
+    FROM todos_init 
+    WHERE userId = ? AND todoId = ?`;
+    const [currentTask] = await helperQuery(sqlGetTask, [userId, todoId]);
+    let newPixels = 0;
+    let firstDone = currentTask.firstDone; // Keep existing value if already set
+    if (!firstDone && req.body.updatedTask.done) {
+      // Task is being marked as done for the first time
+      firstDone = new Date(); // Current date
+      newPixels = calcNewPixels(userID);
+    }
     const subtasks = extractSubtasks(req.body, userId);
-    const task = extractTodo(req.body, userId);
+    const task = extractTodo(req.body, userId, firstDone);
 
     // Ensure task has all required fields
     if (!task || task.length < 11) {
@@ -355,13 +393,14 @@ app.post("/update-task", async (req, res) => {
     const sqlDeleteSubtasks = `
         DELETE FROM subtasks_init 
         WHERE userId = ? AND mainTaskId = ?`;
-    await helperQuery(sqlDeleteSubtasks, [userId, req.body.updatedTask.id]);
+    await helperQuery(sqlDeleteSubtasks, [userId]);
 
     // Update the main task
     const sqlUpdateTask = `
         UPDATE todos_init 
         SET title = ?, description = ?, deadline = ?, priority = ?, 
-            isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? 
+            isDone = ?, todoReminder = ?, todoRepeat = ?, todoDeleted = ?, dateDeleted = ? ,
+        firstDone = ? 
         WHERE userId = ? AND todoId = ?`;
     await helperQuery(sqlUpdateTask, task);
 
@@ -377,7 +416,7 @@ app.post("/update-task", async (req, res) => {
     console.log("Task updated successfully.");
     return res
       .status(200)
-      .json({ message: "Task updated successfully.", taskId: 2 });
+      .json({ message: "Task updated successfully.", newPixels: newPixels });
   } catch (err) {
     console.error("Unexpected error:", err);
     return res.status(500).json({ message: "Internal server error" });
@@ -492,28 +531,55 @@ app.get("/login-user", async (req, res) => {
           .status(401)
           .json({ id: -1, mode: 0, pixels: 0, message: "Invalid password" });
       }
-
-      // Fetch user's pixels and mode
-      const sqlPixels = "SELECT * FROM users_pixels WHERE userid = ?";
+      //fetch pixels in database
+      const sqlPixels = "SELECT * FROM users_pixels WHERE userId = ?";
       connection.query(sqlPixels, [user.id], (err, pixelsResult) => {
         if (err) {
           console.error("Error fetching user pixels:", err);
           return res.status(500).json({
             id: -1,
             mode: 0,
-            pixels: 0,
+            leftPixels: 0,
+            placedPixels: 0,
             message: "Internal server error",
           });
         }
 
-        const pixelsData = pixelsResult[0] || { pixels: 0, mode: 0 };
-        console.log("Login successful.");
-        res.status(200).json({
-          id: user.id,
-          mode: currentMode,
-          pixels: pixelsData.pixels || 0,
-          message: "Login successful",
-        });
+        if (pixelsResult.length === 0) {
+          //catch if registered before pixelsupdate(not in pixeldatabase)
+          const insertSql = "INSERT INTO users_pixels (userId) VALUES (?)";
+          connection.query(insertSql, [user.id], (insertErr) => {
+            if (insertErr) {
+              console.error("Error inserting new user record:", insertErr);
+              return res.status(500).json({
+                id: -1,
+                mode: 0,
+                leftPixels: 0,
+                placedPixels: 0,
+                message: "Internal server error",
+              });
+            }
+
+            console.log(`Inserted new record for user ${user.id}.`);
+            res.status(200).json({
+              id: user.id,
+              mode: currentMode,
+              leftPixels: 0,
+              placedPixels: 0,
+              message: "Login successful",
+            });
+          });
+        } else {
+          const pixelsData = pixelsResult[0];
+          console.log("Login successful.");
+          res.status(200).json({
+            id: user.id,
+            mode: currentMode,
+            leftPixels: pixelsData.leftPixels || 0,
+            placedPixels: pixelsData.placedPixels || 0,
+            message: "Login successful",
+          });
+        }
       });
     });
   } catch (err) {
@@ -826,9 +892,8 @@ async function registerUser(userName, password) {
       console.log("User successfully registered with ID:", userId);
 
       // Insert into users_pixels table
-      const sql_insertPixels =
-        "INSERT INTO users_pixels (userId, mode, pixels) VALUES (?, ?, ?)";
-      connection.query(sql_insertPixels, [userId, 0, 0], (err, result) => {
+      const sql_insertPixels = "INSERT INTO users_pixels (userId) VALUES (?)";
+      connection.query(sql_insertPixels, [userId], (err, result) => {
         if (err) {
           console.error("Error inserting into users_pixels:", err);
           throw err;
@@ -837,9 +902,8 @@ async function registerUser(userName, password) {
       });
 
       // Insert into stats table
-      const sql_insertStats =
-        "INSERT INTO stats (userId, interactions) VALUES (?, ?)";
-      connection.query(sql_insertStats, [userId, 0], (err, result) => {
+      const sql_insertStats = "INSERT INTO stats (userId) VALUES (?)";
+      connection.query(sql_insertStats, [userId], (err, result) => {
         if (err) {
           console.error("Error inserting into stats:", err);
           throw err;
@@ -881,6 +945,7 @@ app.listen(5000, "0.0.0.0", () => {
 cron.schedule("0 0 * * *", () => {
   console.log("Checking for repeating tasks...");
   handleRepeatingTasks();
+  resetDayCount();
 });
 
 /**
@@ -1093,23 +1158,6 @@ module.exports = sendMail;
 // mode
 let currentMode = 0; // Default mode value
 
-const readModeFromDatabase = () => {
-  const sql = "SELECT mode FROM settings WHERE id = 1"; // Assuming only one row in settings table
-  connection.query(sql, (err, result) => {
-    if (err) {
-      console.error("Error fetching mode from database:", err);
-    } else if (result.length > 0) {
-      currentMode = result[0].mode;
-      console.log("Current mode loaded from database:", currentMode);
-    } else {
-      console.log("No mode found in database, using default mode.");
-    }
-  });
-};
-
-// Call the function on server startup
-readModeFromDatabase();
-
 app.post("/update-mode", (req, res) => {
   const { mode } = req.body; // Assuming mode is passed in the request body
 
@@ -1118,7 +1166,8 @@ app.post("/update-mode", (req, res) => {
   }
 
   // Update the mode in the database
-  const sql_updateMode = "UPDATE settings SET mode = ? WHERE id = 1";
+  const sql_updateMode =
+    "UPDATE settings SET settingValue = ? WHERE settingID = 0";
   connection.query(sql_updateMode, [mode], (err, result) => {
     if (err) {
       console.error("Error updating mode in database:", err);
@@ -1138,34 +1187,261 @@ app.post("/update-mode", (req, res) => {
 //pwall
 const pixelstates = {};
 // Endpoint to handle pixel submission
-app.post("/pixels/submit", (req, res) => {
-  const { currentUserID, changes } = req.body;
+app.post("/pixels/submit", async (req, res) => {
+  const { username, password, changes } = req.body;
 
   // Validate input
-  if (!currentUserID || !Array.isArray(changes)) {
+  if (!username || !password || !Array.isArray(changes)) {
     return res.status(400).json({ error: "Invalid input data" });
   }
 
-  // Ensure the userID exists in pixelstates
-  if (!pixelstates[currentUserID]) {
-    pixelstates[currentUserID] = [];
-  }
+  // Get user ID
+  try {
+    const currentUserID = await getUserId({ name: username, password });
 
-  // Add the changes to the user's pixel data
-  changes.forEach((change) => {
-    pixelstates[currentUserID].push({
-      xCoordinate: change.xCoordinate,
-      yCoordinate: change.yCoordinate,
-      color: change.color,
-      timestamp: new Date(change.timestamp), // Ensure timestamp is a Date object
+    if (currentUserID === -1) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+    // Insert pixel changes into the database
+    const sql = `
+ INSERT INTO pixels (userID, xCoordinate, yCoordinate, color, timestamp)
+ VALUES (?, ?, ?, ?, ?)
+`;
+    const values = changes.map((change) => [
+      currentUserID,
+      change.xCoordinate,
+      change.yCoordinate,
+      change.color,
+      new Date(change.timestamp),
+    ]);
+
+    connection.query(sql, [values], (err) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Failed to save pixel data" });
+      }
     });
-  });
+    // Ensure the userID exists in pixelstates
+    if (!pixelstates[currentUserID]) {
+      pixelstates[currentUserID] = [];
+    }
 
-  // Respond with a success message
-  res.status(200).json({ message: "Pixels submitted successfully!" });
+    // Add the changes to the user's pixel data
+    changes.forEach((change) => {
+      pixelstates[currentUserID].push({
+        xCoordinate: change.xCoordinate,
+        yCoordinate: change.yCoordinate,
+        color: change.color,
+        timestamp: new Date(change.timestamp), // Ensure timestamp is a Date object
+      });
+    });
+
+    increasePlacedPixels(currentUserID, changes.length);
+    decreaseLeftPixels(currentUserID, changes.length);
+
+    // Respond with a success message
+    res.status(200).json({ message: "Pixels submitted successfully!" });
+  } catch (error) {
+    console.error("Error during pixel submission:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Endpoint to get pixel data for debugging or visualization
 app.get("/pixels", (req, res) => {
+  const userID = req.query.id;
   res.status(200).json(pixelstates);
 });
+const doneToday = {};
+let rewards = {};
+
+// Function to reset daily counts
+function resetDayCount() {
+  for (const userID in doneToday) {
+    if (doneToday.hasOwnProperty(userID)) {
+      doneToday[userID] = 0;
+    }
+  }
+  console.log("Daily counts reset.");
+}
+
+// Function to calculate new pixels for a user
+function calcNewPixels(userID) {
+  /*
+  if(currentMode==0){
+    return 0;
+  }
+    */
+  if (!doneToday[userID]) {
+    doneToday[userID] = 0;
+  }
+  doneToday[userID] += 1;
+
+  const taskCount = doneToday[userID];
+  const pixelsReward = rewards[taskCount] || 0; // Default to 0 if no reward is defined
+
+  console.log(
+    `User ${userID} completed task #${taskCount}, earned ${pixelsReward} pixels.`
+  );
+  if (pixelsReward != 0) {
+    increaseLeftPixels(userID, pixelsReward);
+  }
+  return pixelsReward;
+}
+
+// Function to load the mode and rewards from the database
+const readModeFromDatabase = () => {
+  const sqlMode = "SELECT settingValue FROM settings WHERE settingID = 0";
+  connection.query(sqlMode, (err, result) => {
+    if (err) {
+      console.error("Error fetching mode from database:", err);
+    } else if (result.length > 0) {
+      currentMode = result[0].mode;
+      console.log("Current mode loaded from database:", currentMode);
+    } else {
+      console.log("No mode found in database, using default mode.");
+    }
+  });
+
+  const sqlRewards =
+    "SELECT settingValue,seetingID FROM settings WHERE settingID > 0";
+  connection.query(sqlRewards, (err, results) => {
+    if (err) {
+      console.error("Error fetching rewards from database:", err);
+    } else {
+      rewards = {};
+      results.forEach((row) => {
+        rewards[row.settingID] = row.settingValue;
+      });
+      console.log("Rewards loaded from database:", rewards);
+    }
+  });
+  loadPixelData().catch((err) => {
+    console.error("Error loading pixel data on startup:", err);
+  });
+};
+
+// Function to increase leftPixels for a user
+function increaseLeftPixels(userID, amount) {
+  const sql =
+    "UPDATE users_pixels SET leftPixels = leftPixels + ? WHERE userId = ?";
+  connection.query(sql, [amount, userID], (err, result) => {
+    if (err) {
+      console.error("Error increasing leftPixels:", err);
+    } else if (result.affectedRows === 0) {
+      const insertSql =
+        "INSERT INTO users_pixels (userId, leftPixels) VALUES (?, ?)";
+      connection.query(insertSql, [userID, amount], (insertErr) => {
+        if (insertErr) {
+          console.error(
+            "Error inserting new user record for leftPixels:",
+            insertErr
+          );
+        } else {
+          console.log(
+            `Inserted new record for user ${userID} with ${amount} leftPixels.`
+          );
+        }
+      });
+    } else {
+      console.log(`Increased leftPixels for user ${userID} by ${amount}.`);
+    }
+  });
+}
+
+// Function to increase placedPixels for a user
+function increasePlacedPixels(userID, amount) {
+  const sql =
+    "UPDATE users_pixels SET placedPixels = placedPixels + ? WHERE userId = ?";
+  connection.query(sql, [amount, userID], (err, result) => {
+    if (err) {
+      console.error("Error increasing placedPixels:", err);
+    } else if (result.affectedRows === 0) {
+      const insertSql =
+        "INSERT INTO users_pixels (userId, placedPixels) VALUES (?, ?)";
+      connection.query(insertSql, [userID, amount], (insertErr) => {
+        if (insertErr) {
+          console.error(
+            "Error inserting new user record for placedPixels:",
+            insertErr
+          );
+        } else {
+          console.log(
+            `Inserted new record for user ${userID} with ${amount} placedPixels.`
+          );
+        }
+      });
+    } else {
+      console.log(`Increased placedPixels for user ${userID} by ${amount}.`);
+    }
+  });
+}
+
+// Function to decrease leftPixels for a user
+function decreaseLeftPixels(userID, amount) {
+  const sql =
+    "UPDATE users_pixels SET leftPixels = GREATEST(leftPixels - ?, 0) WHERE userId = ?";
+  connection.query(sql, [amount, userID], (err, result) => {
+    if (err) {
+      console.error("Error decreasing leftPixels:", err);
+    } else if (result.affectedRows === 0) {
+      const insertSql =
+        "INSERT INTO users_pixels (userId, leftPixels) VALUES (?, 0)";
+      connection.query(insertSql, [userID], (insertErr) => {
+        if (insertErr) {
+          console.error(
+            "Error inserting new user record for leftPixels:",
+            insertErr
+          );
+        } else {
+          console.log(
+            `Inserted new record for user ${userID} with 0 leftPixels.`
+          );
+        }
+      });
+    } else {
+      console.log(`Decreased leftPixels for user ${userID} by ${amount}.`);
+    }
+  });
+}
+
+// Function to reset the rewards in the database
+const resetRewardsInDatabase = () => {
+  const sql = "DELETE FROM settings WHERE settingID > 0";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      console.error("Error resetting rewards in database:", err);
+    } else {
+      console.log("Rewards reset in database.");
+    }
+  });
+};
+function loadPixelData() {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM pixels";
+
+    connection.query(sql, (err, results) => {
+      if (err) {
+        console.error("Failed to load pixel data:", err);
+        return reject(err);
+      }
+
+      results.forEach((row) => {
+        if (!pixelstates[row.userID]) {
+          pixelstates[row.userID] = [];
+        }
+        pixelstates[row.userID].push({
+          xCoordinate: row.xCoordinate,
+          yCoordinate: row.yCoordinate,
+          color: row.color,
+          timestamp: new Date(row.timestamp),
+        });
+      });
+
+      console.log("Pixel data loaded successfully.");
+      resolve();
+    });
+  });
+}
+// Call the function on server startup
+readModeFromDatabase();
