@@ -1254,7 +1254,18 @@ app.get("/pixels", (req, res) => {
 });
 const doneToday = {};
 let rewards = {};
-
+// Function to reset the rewards in the database
+const resetRewards = () => {
+  const sql = "DELETE FROM settings WHERE settingID > 0";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      console.error("Error resetting rewards in database:", err);
+    } else {
+      rewards = {};
+      console.log("Rewards reset in database.");
+    }
+  });
+};
 // Function to reset daily counts
 function resetDayCount() {
   for (const userID in doneToday) {
@@ -1405,17 +1416,6 @@ function decreaseLeftPixels(userID, amount) {
   });
 }
 
-// Function to reset the rewards in the database
-const resetRewardsInDatabase = () => {
-  const sql = "DELETE FROM settings WHERE settingID > 0";
-  connection.query(sql, (err, result) => {
-    if (err) {
-      console.error("Error resetting rewards in database:", err);
-    } else {
-      console.log("Rewards reset in database.");
-    }
-  });
-};
 function loadPixelData() {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM pixels";
