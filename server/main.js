@@ -1318,11 +1318,10 @@ function resetDayCount() {
 
 // Function to calculate new pixels for a user
 function calcNewPixels(userID) {
-  /*
-  if(currentMode==0){
+  if (currentMode == 0) {
     return 0;
   }
-    */
+
   if (!doneToday[userID]) {
     doneToday[userID] = 0;
   }
