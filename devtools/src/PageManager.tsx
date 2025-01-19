@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Register from "./components/Register";
 import ShowUsers from "./components/ShowUsers";
+import ManageRewards from "./components/ManageRewards"; // Import the new component
 import "./styles/PageManager.css"; // Import the CSS file
 
 function PageManager() {
@@ -11,7 +12,6 @@ function PageManager() {
     <>
       {/* Header with buttons for navigation */}
       <header className="header">
-        {" "}
         <button
           className={currentView === "register" ? "active" : ""}
           onClick={() => setCurrentView("register")}
@@ -26,9 +26,17 @@ function PageManager() {
         >
           Show Users
         </button>
+        <button
+          className={currentView === "manageRewards" ? "active" : ""}
+          onClick={() => setCurrentView("manageRewards")}
+          disabled={currentView === "manageRewards"}
+        >
+          Manage Rewards
+        </button>
       </header>
       {currentView === "register" && <Register />}
       {currentView === "showUsers" && <ShowUsers />}
+      {currentView === "manageRewards" && <ManageRewards />}
     </>
   );
 }

@@ -1,0 +1,25 @@
+.manage-rewards {
+  padding: 20px;
+}
+
+.actions button {
+  margin-bottom: 20px;
+}
+
+.update-form {
+  margin-top: 20px;
+}
+
+.update-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.update-form input {
+  margin-left: 10px;
+}
+
+.message {
+  margin-top: 20px;
+  color: green;
+}

@@ -1266,6 +1266,46 @@ const resetRewards = () => {
     }
   });
 };
+app.get("/reset-rewards", (req, res) => {
+  resetRewards();
+  res.status(200).json({ message: "Rewards have been reset." });
+});
+app.post("/update-reward", (req, res) => {
+  const { settingID, settingValue } = req.body;
+
+  // Validate input
+  if (!settingID || settingID <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Invalid settingID. It must be greater than 0." });
+  }
+
+  // Update database
+  const sql =
+    "INSERT INTO settings (settingID, settingValue) VALUES (?, ?) ON DUPLICATE KEY UPDATE settingValue = ?";
+  connection.query(
+    sql,
+    [settingID, settingValue, settingValue],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating reward in database:", err);
+        return res
+          .status(500)
+          .json({ error: "Failed to update reward in database." });
+      }
+
+      // Update in-memory rewards
+      rewards[settingID] = settingValue;
+      console.log(
+        `Reward updated: settingID=${settingID}, settingValue=${settingValue}`
+      );
+
+      res
+        .status(200)
+        .json({ message: "Reward updated successfully.", rewards });
+    }
+  );
+});
 // Function to reset daily counts
 function resetDayCount() {
   for (const userID in doneToday) {
