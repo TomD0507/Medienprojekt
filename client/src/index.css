@@ -23,8 +23,8 @@ header {
 }
 body {
   background-color: #98bad5;
-  width: 100vw; /* Volle Breite des Viewports */
-  height: 100vh; /* Volle Höhe des Viewports */
+  width: 100dvw; /* Volle Breite des Viewports */
+  height: 100dvh; /* Volle Höhe des Viewports */
   overflow: hidden; /* Verhindert, dass der Viewport scrollt */
 }
 
@@ -34,8 +34,8 @@ body {
   flex-direction: column;
   justify-content: space-between;
   padding: 0.5vh;
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
   border: 1px solid;
   overflow: hidden; /* Keine Scrollleisten */
   background-color: lightblue;
