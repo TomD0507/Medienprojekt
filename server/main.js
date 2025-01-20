@@ -302,7 +302,7 @@ app.post("/new-task", async (req, res) => {
       }
     }
   });
-  return res.status(20).json({ message: "Saved task" });
+  return res.status(200).json({ message: "Saved task" });
 });
 
 // Function to UPDATE an ALREADY EXISTING Todoarray from a request body for SQL INSERT
