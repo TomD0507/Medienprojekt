@@ -1,6 +1,10 @@
 import React from "react";
 import "../styles/SwapHeader.css";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBorderNone,
+  faRectangleList,
+} from "@fortawesome/free-solid-svg-icons";
 type SwapHeaderProps = {
   firstChild: React.ReactNode; // First child component
   secondChild: React.ReactNode; // Second child component
@@ -29,7 +33,7 @@ export const SwapHeader: React.FC<SwapHeaderProps> = ({
             className="menu-button"
             onClick={() => setShowSecondChild(false)}
           >
-            Show
+            <FontAwesomeIcon icon={faRectangleList} />
           </button>
         ) : (
           firstChild
@@ -43,7 +47,7 @@ export const SwapHeader: React.FC<SwapHeaderProps> = ({
             className="menu-button"
             onClick={() => setShowSecondChild(true)}
           >
-            ☰
+            <FontAwesomeIcon icon={faBorderNone} />
           </button>
         )}
       </div>

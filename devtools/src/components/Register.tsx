@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { registerUser } from "../helpers/loginHelper";
 import "../styles/LoginSignup.css";
-type LoginProps = {
-  status: "idle" | "loading" | "error";
-};
+
 function Login() {
   const [loginName, setName] = useState("");
   const [password, setPw] = useState("");
