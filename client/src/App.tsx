@@ -26,7 +26,6 @@ export const API_URL = "https://devstate.uber.space/api"; // auf was die URL vom
 // export const API_URL = "http://localhost:5000"; // wenn local (auf Computer)
 
 type AppProps = {
-  userID: number;
   name: string;
   password: string;
   isMenuOpen: boolean;
@@ -63,7 +62,6 @@ function sortTasks(
 }
 
 function App({
-  userID,
   name,
   password,
   isMenuOpen,

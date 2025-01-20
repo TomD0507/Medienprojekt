@@ -137,7 +137,7 @@ export function PixelWall({
             headers: { "Content-Type": "application/json" },
           }
         )
-        .then((response) => {
+        .then((_response) => {
           setFrontendPixels(createFrontendGrid());
 
           setUserPixelData((prev) => {

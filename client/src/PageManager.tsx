@@ -216,7 +216,6 @@ function PageManager() {
         ></MailModal>
       )}
       <App
-        userID={userID}
         name={loginName}
         password={password}
         isMenuOpen={isMenuOpen}
@@ -310,7 +309,6 @@ function PageManager() {
       )}
       {!motStrat && (
         <App
-          userID={userID}
           name={loginName}
           password={password}
           isMenuOpen={isMenuOpen}
