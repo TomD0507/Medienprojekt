@@ -1,5 +1,3 @@
-import { faFilter } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 type PwallHeaderProps = { remainingPixel: number };
 
 export function PwallHeader({ remainingPixel }: PwallHeaderProps) {
@@ -7,8 +5,8 @@ export function PwallHeader({ remainingPixel }: PwallHeaderProps) {
     <header className="app_header">
       <div className="headerrow">
         <h1 className="header-title">PixelWall</h1>
-        <button className="search-button" onClick={() => {}}>
-          <FontAwesomeIcon icon={faFilter} className="icon" />
+        <button className="search-button" onClick={() => {}} disabled={true}>
+          {remainingPixel}
         </button>
       </div>
       <div className="currentfilterview"></div>

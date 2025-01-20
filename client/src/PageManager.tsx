@@ -125,9 +125,15 @@ function PageManager() {
   //pixelwall vars
   const [pixelCount, setPixelCount] = useState(0);
   function addPixels(p: number): void {
-    if ((p = 0)) return;
+    if (p == 0) return;
     setPixelCount((prev) => {
       return prev + p;
+    });
+  }
+  function removePixels(p: number): void {
+    if (p == 0) return;
+    setPixelCount((prev) => {
+      return prev - p;
     });
   }
   //wheter or not the strategie page(true) should be visible or the app(false)
@@ -327,6 +333,7 @@ function PageManager() {
           remainingPixel={pixelCount}
           username={loginName}
           password={password}
+          removePixels={removePixels}
         />
       )}
     </div>

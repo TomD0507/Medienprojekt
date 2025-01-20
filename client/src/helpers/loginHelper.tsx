@@ -21,7 +21,7 @@ export const checkLogin = async (
     const loginData: loginData = {
       id: res.data.id,
       mode: res.data.mode,
-      pixels: res.data.pixels,
+      pixels: res.data.leftPixels,
     };
     return loginData;
   } catch (err) {

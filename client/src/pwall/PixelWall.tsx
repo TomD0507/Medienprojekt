@@ -73,12 +73,14 @@ type PixelWallProps = {
   remainingPixel: number;
   username: string;
   password: string;
+  removePixels: (arg: number) => void;
 };
 export function PixelWall({
   currentUserID,
   remainingPixel,
   username,
   password,
+  removePixels,
 }: PixelWallProps) {
   //todo: pixel count
 
@@ -154,6 +156,7 @@ export function PixelWall({
             ];
             return updatedData;
           });
+          removePixels(changes.length);
         });
 
       // Reset local pixels after successful submission
@@ -263,8 +266,13 @@ export function PixelWall({
         ...prev.slice(0, row),
         [
           ...prev[row].slice(0, col),
-
-          drawing ? selectedColor : "transparent",
+          //wenn gleche farbe dann wieder löschen?
+          drawing
+            ? prev.flat().filter((v) => v !== "transparent").length >=
+              remainingPixel
+              ? prev[row][col]
+              : selectedColor
+            : "transparent",
           ...prev[row].slice(col + 1),
         ],
         ...prev.slice(row + 1),

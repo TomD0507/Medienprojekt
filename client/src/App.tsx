@@ -97,9 +97,9 @@ function App({
     axios
       .post(`${API_URL}/update-task`, { updatedTask, name, password })
       .then((response) => {
-        const updatedValue = response.data; // Assuming backend returns a number
-        console.log(response.data.taskId);
-        returnHook(updatedValue); // Feed the returned number into your returnHook function
+        const { newPixels } = response.data; // Assuming backend returns a number
+        console.log(newPixels);
+        returnHook(newPixels); // Feed the returned number into your returnHook function
         console.log(response);
       })
       .catch((err) => {
