@@ -99,14 +99,14 @@ export default function MailModal({
                 onChange={handlePrivacyConsent}
               />
               <label htmlFor="privacyConsent">
-                Ich stimme zu, dass meine E-Mail bis zum Studienende, oder bis
-                ich sie expliziet lösche, gespeichert wird und ich E-Mails
+                Hiermit stimme ich zu, dass meine E-Mail bis zum Studienende, oder bis
+                ich sie explizit lösche, gespeichert wird und ich E-Mails
                 erhalten kann.
               </label>
               <p className="privacy-text">
                 Hinweis: Deine E-Mail-Adresse wird ausschließlich für die
-                Errinnerungsfunktion der Todoliste im Rahmen der Studie
-                verwendet und nach dem Studienende gelöscht.
+                Erinnerungsfunktion der ToDo-Liste im Rahmen der Studie
+                verwendet und nach Studienende gelöscht.
               </p>
             </div>
             <div className="button-container">
