@@ -27,7 +27,7 @@ function BurgerMenu({
               <div className="button-icon">
                 <FontAwesomeIcon icon={faAt} />
               </div>
-              <p className="button-text">E-Mail hinzufügen/ändern</p>
+              <p className="button-text">Erinnerungen einrichten</p>
             </button>
 
             <div>
