@@ -78,8 +78,8 @@ export default function MailModal({
         <div className="modal">
           <div className="mail-overlay" onClick={toggleMailModal}></div>
           <div className="email-content">
-            <h2 className="mail-header">E-Mail eingeben oder ändern</h2>
-            <p>Hier kannst du deine E-Mail ändern</p>
+            <h2 className="mail-header">E-Mailadresse eingeben oder ändern</h2>
+            <p>Hier kannst du deine E-Mailadresse ändern</p>
             <input
               type="text"
               value={email}
@@ -99,14 +99,14 @@ export default function MailModal({
                 onChange={handlePrivacyConsent}
               />
               <label htmlFor="privacyConsent">
-                Ich stimme zu, dass meine E-Mail bis zum Studienende, oder bis
-                ich sie expliziet lösche, gespeichert wird und ich E-Mails
+                Hiermit stimme ich zu, dass meine E-Mailadresse bis zum Studienende, oder bis
+                ich sie explizit lösche, gespeichert wird und ich E-Mails
                 erhalten kann.
               </label>
               <p className="privacy-text">
-                Hinweis: Deine E-Mail-Adresse wird ausschließlich für die
-                Errinnerungsfunktion der Todoliste im Rahmen der Studie
-                verwendet und nach dem Studienende gelöscht.
+                Hinweis: Deine E-Mailadresse wird ausschließlich für die
+                Erinnerungsfunktion der ToDo-Liste im Rahmen der Studie
+                verwendet und nach Studienende gelöscht.
               </p>
             </div>
             <div className="button-container">
@@ -118,7 +118,7 @@ export default function MailModal({
                 Speichern
               </button>
               <button className="delete-button" onClick={handleDelete}>
-                Gespeicherte Mail Löschen
+                Gespeicherte E-Mailadresse Löschen
               </button>
             </div>
           </div>
