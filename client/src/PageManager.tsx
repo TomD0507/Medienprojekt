@@ -143,7 +143,7 @@ function PageManager() {
       onSubmit={handleSubmit}
       status={status}
     />
-  ) : mode === 1 ? (
+  ) : mode === 0 ? (
     <div className="app">
       <Header
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}

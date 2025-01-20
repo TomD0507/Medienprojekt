@@ -6,6 +6,7 @@ import "../styles/Task.css";
 import EditTask from "./EditTask"; //prioritäten
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons/faGear";
+import { faRepeat } from "@fortawesome/free-solid-svg-icons/faRepeat";
 const getPrioritySymbol = (priority: Priority) => {
   switch (priority) {
     case "none":
@@ -195,18 +196,21 @@ function Task({ props, currentTime, onUpdateTask }: TaskElProps) {
               ))}
             </ul>
             {isValidDate(props.deadline) && (
-              <div className={"deadlinebox " + taskStatus}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  className="bi bi-calendar"
-                  viewBox="-0.05 0 16 16"
-                >
-                  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
-                </svg>
-                {" " + formatDate(props.deadline)}
+              <div className="side-by-side">
+                <div className={"deadlinebox " + taskStatus}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="bi bi-calendar"
+                    viewBox="-0.05 0 16 16"
+                  >
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+                  </svg>
+                  {" " + formatDate(props.deadline)}
+                </div>
+                {props.repeat != "Nie" && <FontAwesomeIcon icon={faRepeat} />}
               </div>
             )}
           </div>

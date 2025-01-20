@@ -21,7 +21,12 @@ export default function MailModal({
 }: MailModalProps) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-
+  const [privacyConsent, setPrivacyConsent] = useState(false); // Zustand für Checkbox
+  const handlePrivacyConsent = (event: {
+    target: { checked: boolean | ((prevState: boolean) => boolean) };
+  }) => {
+    setPrivacyConsent(event.target.checked);
+  };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(e.target.value);
@@ -83,15 +88,37 @@ export default function MailModal({
               className={`email-input ${emailError ? "input-error" : ""}`}
             ></input>
             {emailError && <p className="error-text">{emailError}</p>}
-            <button className="overlay-close" onClick={toggleMailModal}>
+            <button className="overlay-close-mail" onClick={toggleMailModal}>
               <span className="x"></span>
             </button>
+            <div className="privacy-info">
+              <input
+                type="checkbox"
+                id="privacyConsent"
+                checked={privacyConsent}
+                onChange={handlePrivacyConsent}
+              />
+              <label htmlFor="privacyConsent">
+                Ich stimme zu, dass meine E-Mail bis zum Studienende, oder bis
+                ich sie expliziet lösche, gespeichert wird und ich E-Mails
+                erhalten kann.
+              </label>
+              <p className="privacy-text">
+                Hinweis: Deine E-Mail-Adresse wird ausschließlich für die
+                Errinnerungsfunktion der Todoliste im Rahmen der Studie
+                verwendet und nach dem Studienende gelöscht.
+              </p>
+            </div>
             <div className="button-container">
-              <button className="save-button" onClick={handleSubmit}>
+              <button
+                className="save-button"
+                onClick={handleSubmit}
+                disabled={!privacyConsent}
+              >
                 Speichern
               </button>
               <button className="delete-button" onClick={handleDelete}>
-                Löschen
+                Gespeicherte Mail Löschen
               </button>
             </div>
           </div>

@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS stats (
   });
   const sql_createSettingsTable = `
   CREATE TABLE IF NOT EXISTS settings (
-    settingID INT NOT NULL AUTO_INCREMENT,
+    settingID INT NOT NULL ,
     settingValue INT DEFAULT 0,
     PRIMARY KEY (settingID)
   )
@@ -373,13 +373,13 @@ app.post("/update-task", async (req, res) => {
     SELECT isDone, firstDone 
     FROM todos_init 
     WHERE userId = ? AND todoId = ?`;
-    const [currentTask] = await helperQuery(sqlGetTask, [userId, todoId]);
+    const [currentTask] = await helperQuery(sqlGetTask, [userId, mainTaskId]);
     let newPixels = 0;
     let firstDone = currentTask.firstDone; // Keep existing value if already set
     if (!firstDone && req.body.updatedTask.done) {
       // Task is being marked as done for the first time
       firstDone = new Date(); // Current date
-      newPixels = calcNewPixels(userID);
+      newPixels = calcNewPixels(userId);
     }
     const subtasks = extractSubtasks(req.body, userId);
     const task = extractTodo(req.body, userId, firstDone);
@@ -393,7 +393,7 @@ app.post("/update-task", async (req, res) => {
     const sqlDeleteSubtasks = `
         DELETE FROM subtasks_init 
         WHERE userId = ? AND mainTaskId = ?`;
-    await helperQuery(sqlDeleteSubtasks, [userId]);
+    await helperQuery(sqlDeleteSubtasks, [userId, mainTaskId]);
 
     // Update the main task
     const sqlUpdateTask = `
@@ -1167,8 +1167,8 @@ app.post("/update-mode", (req, res) => {
 
   // Update the mode in the database
   const sql_updateMode =
-    "UPDATE settings SET settingValue = ? WHERE settingID = 0";
-  connection.query(sql_updateMode, [mode], (err, result) => {
+    "INSERT INTO settings (settingID, settingValue) VALUES (0, ?) ON DUPLICATE KEY UPDATE settingValue = ?";
+  connection.query(sql_updateMode, [mode, mode], (err, result) => {
     if (err) {
       console.error("Error updating mode in database:", err);
       return res.status(500).json({ error: "Failed to update mode" });
@@ -1203,9 +1203,8 @@ app.post("/pixels/submit", async (req, res) => {
       return res.status(401).json({ error: "Invalid username or password" });
     }
     // Insert pixel changes into the database
-    const sql = `
- INSERT INTO pixels (userID, xCoordinate, yCoordinate, color, timestamp)
- VALUES (?, ?, ?, ?, ?)
+    const sql = `INSERT INTO pixels (userID, xCoordinate, yCoordinate, color, timestamp)
+ VALUES ?
 `;
     const values = changes.map((change) => [
       currentUserID,
@@ -1354,7 +1353,7 @@ const readModeFromDatabase = () => {
   });
 
   const sqlRewards =
-    "SELECT settingValue,seetingID FROM settings WHERE settingID > 0";
+    "SELECT settingValue,settingID FROM settings WHERE settingID > 0";
   connection.query(sqlRewards, (err, results) => {
     if (err) {
       console.error("Error fetching rewards from database:", err);
