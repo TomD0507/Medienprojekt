@@ -11,6 +11,7 @@ type SwapHeaderProps = {
   onMenuToggle: () => void; // Callback for menu toggle button
   showSecondChild: boolean;
   setShowSecondChild: (arg: boolean) => void;
+  remainingPixel: number;
 };
 
 export const SwapHeader: React.FC<SwapHeaderProps> = ({
@@ -19,6 +20,7 @@ export const SwapHeader: React.FC<SwapHeaderProps> = ({
   onMenuToggle,
   showSecondChild,
   setShowSecondChild,
+  remainingPixel,
 }) => {
   return (
     <div className="swap-header">
@@ -47,7 +49,13 @@ export const SwapHeader: React.FC<SwapHeaderProps> = ({
             className="menu-button"
             onClick={() => setShowSecondChild(true)}
           >
-            <FontAwesomeIcon icon={faBorderNone} />
+            <div className="icon-container">
+              {" "}
+              <FontAwesomeIcon className="icon" icon={faBorderNone} />
+              <span className="badge">
+                {remainingPixel > 0 ? remainingPixel : ""}
+              </span>
+            </div>
           </button>
         )}
       </div>

@@ -11,6 +11,7 @@ import MailModal from "./components/MailModal";
 import { PixelWall } from "./pwall/PixelWall";
 import { SwapHeader } from "./components/SwapHeader";
 import { PwallHeader } from "./components/PwallHeader";
+import { Snackbar } from "./components/Snackbar";
 function PageManager() {
   //userID wird bei login gesetzt
   const [userID, setUserID] = useState<number | null>(null);
@@ -126,6 +127,11 @@ function PageManager() {
   const [pixelCount, setPixelCount] = useState(0);
   function addPixels(p: number): void {
     if (p == 0) return;
+    showSnackbar(
+      "Du hast eine Aufgabe erledigt und kannst nun " +
+        p +
+        " neue Pixel setzen!"
+    );
     setPixelCount((prev) => {
       return prev + p;
     });
@@ -140,6 +146,18 @@ function PageManager() {
   const [motStrat, setMotStrat] = useState(false);
   //mode
   const [mode, setMode] = useState(0);
+
+  //snackbar
+  const [snackbar, setSnackbar] = useState({ visible: false, message: "" });
+
+  const showSnackbar = (message: string) => {
+    setSnackbar({ visible: true, message });
+
+    // Nach 3 Sekunden automatisch schließen
+    setTimeout(() => {
+      setSnackbar({ visible: false, message: "" });
+    }, 3000);
+  };
   return userID === null ? (
     <Login
       name={loginName}
@@ -269,6 +287,7 @@ function PageManager() {
         onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         showSecondChild={motStrat}
         setShowSecondChild={setMotStrat}
+        remainingPixel={pixelCount}
       ></SwapHeader>
       <FilterMenu
         filter={openFilter}
@@ -332,6 +351,12 @@ function PageManager() {
           username={loginName}
           password={password}
           removePixels={removePixels}
+        />
+      )}
+      {snackbar.visible && (
+        <Snackbar
+          message={snackbar.message}
+          onClose={() => setSnackbar({ visible: false, message: "" })}
         />
       )}
     </div>
