@@ -192,7 +192,7 @@ app.get("/", (req, res) => {
 
 // Function to create a NEW Todoarray from a request body for SQL INSERT
 // @PARAM: reqBody is the body of the request sent
-function createTodo(reqBody, userId) {
+function createTodo(reqBody, userId,maxid) {
   let date;
   let dateNow = format(Date.now(), "yyyy-MM-dd HH:mm:ss");
   if (reqBody.newTask.deadline != null) {
@@ -203,7 +203,7 @@ function createTodo(reqBody, userId) {
   const value = [
     [
       userId,
-      reqBody.newTask.id,
+      maxid,
       reqBody.newTask.title,
       reqBody.newTask.description,
       date,
@@ -243,7 +243,7 @@ async function getUserId(body) {
 
     // Query to fetch user by name
     const sql = "SELECT * FROM users_init WHERE name = ?";
-    connection.query(sql, [name], (err, results) => {
+    connection.query(sql, [name], async (err, results) => {
       if (err) {
         console.error("Database error:", err);
         return reject(err); // Internal error
@@ -258,9 +258,9 @@ async function getUserId(body) {
       const hashedPassword = user.password;
 
       // Compare the provided password with the hashed password
-      const isMatch = authenticate(password, hashedPassword);
+      const isMatch = await authenticate(password, hashedPassword);
       if (!isMatch) {
-        console.log("Invalid password.");
+        console.log("Invalid password. in userid");
         return resolve(-1); // Invalid password
       }
 
@@ -272,13 +272,26 @@ async function getUserId(body) {
 // Creates a new entry for new task
 app.post("/new-task", async (req, res) => {
   const userId = await getUserId(req.body);
-
   if (userId === -1) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
+  let nextTodoId=1;
+  // Query to get the maximum todoId for the user
+const getMaxIdSql = "SELECT MAX(todoId) AS maxTodoId FROM todos_init WHERE userId = ?";
+connection.query(getMaxIdSql, [userId], (err, results) => {
+  if (err) {
+    console.error("Error fetching max todoId:", err);
+    return res.status(500).json({ message: "Database error" });
+  }
+
+  // Determine the next todoId
+  const maxId = results[0]?.maxTodoId || 0; // If no todos exist, default to 0
+   nextTodoId = maxId + 1;
+   
+  console.log("userid: ", userId," next id: ",nextTodoId);
   const sql =
     "INSERT INTO todos_init (userId, todoId, title, description, deadline, priority, todoReminder, todoRepeat, dateCreated) VALUES ?";
-  const value = createTodo(req.body, userId);
+  const value = createTodo(req.body, userId,nextTodoId);
   connection.query(sql, [value], (err, result) => {
     if (err) {
       console.log("Failed to store new task.");
@@ -302,7 +315,8 @@ app.post("/new-task", async (req, res) => {
       }
     }
   });
-  return res.status(200).json({ message: "Saved task" });
+  return res.status(200).json({ message: "Saved task" ,nextTodoId:nextTodoId});
+});
 });
 
 // Function to UPDATE an ALREADY EXISTING Todoarray from a request body for SQL INSERT
@@ -524,9 +538,10 @@ app.get("/login-user", async (req, res) => {
       const hashedPassword = user.password;
 
       // Authenticate the password
-      const match = authenticate(pw, hashedPassword); // Ensure `authenticate` is implemented correctly
+      const match = await authenticate(pw, hashedPassword); // Ensure `authenticate` is implemented correctly
+      console.log(match);
       if (!match) {
-        console.log("Invalid password.");
+        console.log("Invalid password. in login");
         return res
           .status(401)
           .json({ id: -1, mode: 0, pixels: 0, message: "Invalid password" });
@@ -737,10 +752,11 @@ function handleRepeatingTasks() {
               SELECT userId, name
               FROM subtasks_init
               WHERE mainTaskId = ?
+              AND userId = ?
             `;
             connection.query(
               sql_getSubtasks,
-              [task.todoId],
+              [task.todoId,task.userId],
               function (err_sub, result_sub) {
                 if (err_sub) {
                   console.log(
@@ -849,7 +865,8 @@ async function authenticate(password, hashedPassword) {
     if (match) {
       console.log("Authentication successful!");
     } else {
-      console.log("Authentication failed!");
+      console.log("Authentication failed!",password,match);
+      return false;
     }
     return match;
   } catch (err) {
@@ -1345,7 +1362,7 @@ const readModeFromDatabase = () => {
     if (err) {
       console.error("Error fetching mode from database:", err);
     } else if (result.length > 0) {
-      currentMode = result[0].mode;
+      currentMode = result[0].settingValue;
       console.log("Current mode loaded from database:", currentMode);
     } else {
       console.log("No mode found in database, using default mode.");

@@ -107,11 +107,19 @@ function App({
 
   // Function: Backend-Call to save a task after creating it
   const handleSaveTask = (newTask: TaskProps) => {
-    setTasks((prevTasks) => [...prevTasks, newTask]);
     incrementID();
     axios
       .post(`${API_URL}/new-task`, { newTask, name, password })
       .then((r) => {
+        if (r.data?.nextTodoId) {
+          newTask.id = r.data.nextTodoId;
+          setTasks((prevTasks) => [...prevTasks, newTask]);
+        } else {
+          console.error("Unexpected response format:", r);
+          alert(
+            "Failed to save task. Please check your internetconnection or try again."
+          );
+        }
         console.log(r);
       })
       .catch((err) => {
