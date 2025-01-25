@@ -37,17 +37,12 @@
 
 .icon-container .badge {
   position: absolute;
-  top: -8px; /* Position über dem Icon */
-  right: -12px; /* Position rechts vom Icon */
-  background-color: rgba(
-    175,
-    175,
-    175,
-    0.363
-  ); /* Hintergrundfarbe des Badges */
-  color: rgb(199, 0, 0); /* Textfarbe */
-  font-size: 15px; /* Schriftgröße des Badges */
-  font-weight: bold;
+  top: -11px; /* Position über dem Icon */
+  right: -11px; /* Position rechts vom Icon */
+  background-color: rgba(255, 255, 255, 0); /* Hintergrundfarbe des Badges */
+  color: rgb(255, 0, 0); /* Textfarbe */
+  font-size: 17px; /* Schriftgröße des Badges */
+  font-weight:600;
   padding: 3px 3px; /* Innenabstand */
   border-radius: 50%; /* Rundes Badge */
   line-height: 1; /* Textausrichtung */

@@ -1,88 +1,89 @@
-.pwbuttons {
+.pwbuttons,
+.penbutton,
+.erasebutton,.colorSelection {
   align-self: center;
-
   font-size: 12px;
   border-radius: 8px;
   border: 1px solid transparent;
   font-family: inherit;
-  background-color: #304674;
   justify-content: center;
   align-items: center; /* Zentriert den Text vertikal */
   cursor: pointer;
-  padding: 10px 9px 10px;
+  padding: 10px 10px 10px;
   transition: border-color 0.25s;
   color: white;
+  background-color: #304674;
+}
+.overlay-backdropselection{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.05); /* schwarz, 0,5 alpha */
+  cursor: pointer;
+  z-index: 1001; /* über dem rest*/}
+.colorSelection{ 
+  position: absolute;
+  transform: translate(-50%); /* Adjust position to align the center */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* Enable wrapping of content */
+  width: 80dvw;
+   gap: 10px ;
+   z-index: 1002; /* über dem rest*/
+  }.dropdown {
+    position: relative; /* Create a positioning context for the menu */
+    align-self: center;
+  }
+  .coloroption{
+    min-width: 30px;
+    min-height: 30px;
+    border: none;
+    cursor: pointer;}
+.erasebutton,
+.penbutton {
+  background-color: #364871ac;
 }
 .pwbuttons:hover {
   opacity: 0.8;
 }
-.usersel {
-  height: 3em;
-  min-width: 100px;
-  max-width: 100px;
-  display: flex;
-  flex-grow: unset;
-  justify-content: flex-start;
-  font-size: 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.penbutton:disabled,
+.erasebutton:disabled {
   background-color: #304674;
-  cursor: pointer;
-  transition: all 0.3s ease; /* Ensure items start from the same position */
-  padding: 5px; /* Offsets the content to the right */
+  color: white;
 }
-.usersel input {
-  margin-right: 5px;
+.pw-buttons-container {
+  display: flex;
+  gap: 5px;
+}
+.options_container,
+.user_selection_container,
+.zoom-container{
+  background-color: #f9f9f9; /* Light background for separation */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  margin-top: 5px;
 }
 /* Options Container */
 .options_container {
-  margin-top: 5px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap; /* Allows wrapping on smaller screens */
   gap: 0.5rem;
   justify-content: space-evenly; /* Distribute items evenly */
   align-items: center;
-  box-sizing: border-box;
-  background-color: #f9f9f9; /* Light background for separation */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-/* User Selection Container */
-.user_selection_container {
-  margin-top: 5px;
-  display: flex;
-  overflow: hidden;
-  overflow-x: scroll;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1em;
-  padding: 10px;
-  box-sizing: border-box;
-  background-color: #f9f9f9; /* Light background for separation */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-.zoom-buttons-container {
-  display: flex;
-  gap: 5px;
+  padding: 2px;
 }
 .zoom-container {
   display: flex;
   overflow: auto; /* Enable scrolling if content overflows */
-  max-width: 100vw; /* Begrenze die Breite auf die Bildschirmbreite */
-  max-height: 100vh; /* Begrenze die Höhe auf die Bildschirmhöhe */
+  max-width: 100dvw; /* Begrenze die Breite auf die Bildschirmbreite */
+  max-height: 100dvh; /* Begrenze die Höhe auf die Bildschirmhöhe */
   width: 100%; /* Full width of the parent */
   white-space: nowrap; /* Prevent row wrapping */
-  box-sizing: border-box;
-  margin: 0px;
-  margin-top: 5px;
   align-items: center;
-  box-sizing: border-box;
-  background-color: #f9f9f9; /* Light background for separation */
-  border: 1px solid #ddd;
-  border-radius: 8px;
 }
 .drawing-board {
   display: grid;
@@ -140,14 +141,36 @@
   background-color: transparent;
 }
 
-.active {
-  background-color: var(--active-color, black); /* Replace with your color */
+
+/* User Selection Container */
+.user_selection_container {
+  display: flex;
+  overflow: hidden;
+  overflow-x: scroll;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1em;
+  padding: 10px;
 }
-.color_picker {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #000000;
+.usersel {
+  height: 3em;
+  min-width: 100px;
+  max-width: 100px;
+  display: flex;
+  flex-grow: unset;
+  justify-content: flex-start;
+  font-size: 12px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: rgb(201, 51, 51);
-  color: green;
+  background-color: #304674;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Ensure items start from the same position */
+  padding: 5px; /* Offsets the content to the right */
+}
+.usersel input {
+  margin-right: 5px;
+}
+.icon-invisible {
+  visibility: hidden;
 }

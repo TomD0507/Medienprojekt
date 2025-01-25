@@ -82,9 +82,47 @@ export function PixelWall({
   password,
   removePixels,
 }: PixelWallProps) {
-  //todo: pixel count
+  const predefinedColors = [
+    // Primary Colors
+    "#ff0000", // Red
+    "#00ff00", // Green
+    "#0000ff", // Blue
+
+    // Secondary Colors
+    "#ffff00", // Yellow
+    "#ff00ff", // Magenta
+    "#00ffff", // Cyan
+
+    // Neutral Colors
+    "#000000", // Black
+    "#ffffff", // White
+    "#808080", // Gray
+
+    // Warm Colors
+    "#ffa500", // Orange
+    "#ffdab9", // PeachPuff
+
+    // Pastel Colors
+    "#ffd700", // Gold
+
+    // Vivid Colors
+    "#dc143c", // Crimson
+    "#8a2be2", // BlueViolet
+    "#ff1493", // DeepPink
+    "#1e90ff", // DodgerBlue
+
+    // Earthy Tones
+    "#a0522d", // Sienna
+    "#deb887", // Burlywood
+
+    // Additional Colors
+    "#c71585", // MediumVioletRed
+    "#6a5acd", // SlateBlue
+    "#2e8b57", // SeaGreen
+  ];
 
   const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
+  const [selectionOpen, setSelectionOpen] = useState(false);
   const [userPixelData, setUserPixelData] = useState<{
     [userID: number]: {
       xCoordinate: number;
@@ -279,41 +317,65 @@ export function PixelWall({
       ];
     });
   };
-  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomLevel, setZoomLevel] = useState(0.5);
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 3.4)); // Max zoom level 3x
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min zoom level 0.5x
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.15, 2.8)); // Max zoom level 3x
+  const handleZoomOut = () =>
+    setZoomLevel((prev) => Math.max(prev - 0.15, 0.3)); // Min zoom level 0.5x
 
   return (
     <>
       <div className="options_container">
-        <label>
-          Wähle eine Farbe:{" "}
-          <input
-            type="color"
-            value={selectedColor}
-            onChange={(e) => setSelectedColor(e.target.value)}
-          />
-        </label>
         <label>
           {" "}
           <button className="pwbuttons" onClick={pushDrawing}>
             Push:
           </button>
         </label>
-        <label>
-          {" "}
-          <button className="pwbuttons" onClick={() => setDrawing(true)}>
-            <FontAwesomeIcon icon={faPen} className="icon" />
-          </button>
-        </label>
-        <label>
-          {" "}
-          <button className="pwbuttons" onClick={() => setDrawing(false)}>
-            <FontAwesomeIcon icon={faEraser} className="icon" />
-          </button>
-        </label>
-        <div className="zoom-buttons-container">
+        <div className="pw-buttons-container">
+          <label>
+            {" "}
+            <button
+              className="penbutton "
+              onClick={() => setDrawing(true)}
+              disabled={drawing}
+            >
+              <FontAwesomeIcon icon={faPen} className="icon" />
+            </button>
+            <label>
+              <div>
+                <button
+                  className="pwbuttons "
+                  key={"selected"}
+                  style={{
+                    backgroundColor: selectedColor,
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setSelectionOpen(true);
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={faPen}
+                    className="icon icon-invisible"
+                  />
+                </button>
+              </div>
+            </label>
+          </label>
+          <label>
+            {" "}
+            <button
+              className="erasebutton"
+              onClick={() => setDrawing(false)}
+              disabled={!drawing}
+            >
+              <FontAwesomeIcon icon={faEraser} className="icon" />
+            </button>
+          </label>
+        </div>
+        <div className="pw-buttons-container">
           <button className="pwbuttons" onClick={handleZoomIn}>
             <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
           </button>
@@ -322,7 +384,35 @@ export function PixelWall({
           </button>
         </div>
       </div>
-
+      {selectionOpen && (
+        <>
+          <div
+            className="overlay-backdropselection"
+            onClick={() => {
+              setSelectionOpen(false);
+            }}
+          ></div>
+          <div className="dropdown">
+            <div className="colorSelection">
+              {predefinedColors.map((color) => (
+                <button
+                  className="coloroption"
+                  key={color}
+                  style={{
+                    backgroundColor: color,
+                    outline:
+                      selectedColor === color ? "2px solid black" : "none",
+                  }}
+                  onClick={() => {
+                    setSelectionOpen(false);
+                    setSelectedColor(color);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
       {/* Pixel Grid */}
 
       <div className="zoom-container">
