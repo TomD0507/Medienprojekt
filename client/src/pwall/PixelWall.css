@@ -136,7 +136,9 @@
 .fgcell.active {
   border: 1px solid #ffb41e;
 }
-
+.pwbuttons span{
+  font-size: medium;
+}
 .transparent {
   background-color: transparent;
 }
@@ -173,4 +175,17 @@
 }
 .icon-invisible {
   visibility: hidden;
+}
+/*scrollbar design*/
+/* Scrollbar-Styling für Webkit-Browser (Chrome, Edge, Safari) */
+
+.user_selection_container::-webkit-scrollbar {
+  width: 10px; /* Breite der Scroll-Leiste */
+  height: 10px;;
+}
+
+.user_selection_container::-webkit-scrollbar-thumb,
+.user_selection_container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* Dunkler Daumen */
+  border-radius: 8px; /* Runde Ecken */
 }

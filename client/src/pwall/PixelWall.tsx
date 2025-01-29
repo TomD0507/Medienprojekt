@@ -236,9 +236,6 @@ export function PixelWall({
           } // Set to true for currentUserID if not already existing
         }
 
-        console.log(prev);
-        console.log(updatedUsers);
-
         console.log(updated);
         return updated ? updatedUsers : prev;
       });
@@ -298,7 +295,6 @@ export function PixelWall({
 
   // Handle cell click
   const handleCellClick = (row: number, col: number) => {
-    console.log("cell", row, col, drawing, selectedColor);
     setFrontendPixels((prev) => {
       return [
         ...prev.slice(0, row),
@@ -329,7 +325,11 @@ export function PixelWall({
         <label>
           {" "}
           <button className="pwbuttons" onClick={pushDrawing}>
-            Push:
+            Save:{" "}
+            <span style={{ color: "#ffb41e" }}>
+              {frontendPixels.flat().filter((v) => v !== "transparent").length}
+            </span>
+            {" / " + remainingPixel}
           </button>
         </label>
         <div className="pw-buttons-container">
@@ -441,6 +441,27 @@ export function PixelWall({
       </div>
       {/* User Selection */}
       <div className="user_selection_container">
+        {/* nur Eigener User */}
+        <label
+          className="pwbuttons usersel"
+          key={"only" + currentUserID}
+          onClick={() => {
+            setSelectedUsers((prev) => {
+              const updatedMap = new Map(prev); // Create a copy of the map
+              updatedMap.forEach((_value: boolean, key: number) => {
+                if (key == currentUserID) {
+                  updatedMap.set(key, true);
+                } else {
+                  updatedMap.set(key, false);
+                }
+              }); // Update the active status
+
+              return updatedMap;
+            });
+          }}
+        >
+          {` Nur Eigene `}
+        </label>
         {/* Eigener User */}
         <label className="pwbuttons usersel" key={currentUserID}>
           <input
