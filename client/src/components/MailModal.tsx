@@ -21,12 +21,7 @@ export default function MailModal({
 }: MailModalProps) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [privacyConsent, setPrivacyConsent] = useState(false); // Zustand für Checkbox
-  const handlePrivacyConsent = (event: {
-    target: { checked: boolean | ((prevState: boolean) => boolean) };
-  }) => {
-    setPrivacyConsent(event.target.checked);
-  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(e.target.value);
@@ -92,16 +87,10 @@ export default function MailModal({
               <span className="x"></span>
             </button>
             <div className="privacy-info">
-              <input
-                type="checkbox"
-                id="privacyConsent"
-                checked={privacyConsent}
-                onChange={handlePrivacyConsent}
-              />
               <label htmlFor="privacyConsent">
-                Hiermit stimme ich zu, dass meine E-Mailadresse bis zum Studienende, oder bis
-                ich sie explizit lösche, gespeichert wird und ich E-Mails
-                erhalten kann.
+                Hiermit stimme ich zu, dass meine E-Mailadresse bis zum
+                Studienende, oder bis ich sie explizit lösche, gespeichert wird
+                und ich E-Mails erhalten kann.
               </label>
               <p className="privacy-text">
                 Hinweis: Deine E-Mailadresse wird ausschließlich für die
@@ -110,11 +99,7 @@ export default function MailModal({
               </p>
             </div>
             <div className="button-container">
-              <button
-                className="save-button"
-                onClick={handleSubmit}
-                disabled={!privacyConsent}
-              >
+              <button className="save-button" onClick={handleSubmit}>
                 Speichern
               </button>
               <button className="delete-button" onClick={handleDelete}>

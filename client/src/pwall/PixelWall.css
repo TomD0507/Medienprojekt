@@ -170,7 +170,7 @@
   transition: all 0.3s ease; /* Ensure items start from the same position */
   padding: 5px; /* Offsets the content to the right */
 }
-.usersel input {
+.usersel input { 
   margin-right: 5px;
 }
 .icon-invisible {

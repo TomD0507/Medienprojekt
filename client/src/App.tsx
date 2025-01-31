@@ -96,9 +96,7 @@ function App({
       .post(`${API_URL}/update-task`, { updatedTask, name, password })
       .then((response) => {
         const { newPixels } = response.data; // Assuming backend returns a number
-        console.log(newPixels);
         returnHook(newPixels); // Feed the returned number into your returnHook function
-        console.log(response);
       })
       .catch((err) => {
         console.error(err);

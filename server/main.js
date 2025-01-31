@@ -118,13 +118,13 @@ CREATE TABLE IF NOT EXISTS users_pixels (
   const sql_createStatsTable = `
 CREATE TABLE IF NOT EXISTS stats (
   id INT NOT NULL AUTO_INCREMENT,
-  userId INT NOT NULL,
-  interactions INT DEFAULT 0,
-  lastLogin TIMESTAMP ,
-  PRIMARY KEY (id),
-  FOREIGN KEY (userId) REFERENCES users_init(id) ON DELETE CASCADE
+  userId INT,
+  interaction VARCHAR(255),
+  date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
 )
 `;
+
   connection.query(sql_createStatsTable, (err, result) => {
     if (err) throw err;
     console.log("Stats Table successfully created");
@@ -188,6 +188,7 @@ app.post("/create-dummy-users", (req, res) => {
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
+  log_interaction(0,"Hello");
 });
 
 // Function to create a NEW Todoarray from a request body for SQL INSERT
@@ -528,7 +529,6 @@ app.get("/login-user", async (req, res) => {
       }
 
       if (users.length === 0) {
-        console.log("User not found.");
         return res
           .status(404)
           .json({ id: -1, mode: 0, pixels: 0, message: "User not found" });
@@ -541,7 +541,6 @@ app.get("/login-user", async (req, res) => {
       const match = await authenticate(pw, hashedPassword); // Ensure `authenticate` is implemented correctly
       console.log(match);
       if (!match) {
-        console.log("Invalid password. in login");
         return res
           .status(401)
           .json({ id: -1, mode: 0, pixels: 0, message: "Invalid password" });
@@ -576,6 +575,8 @@ app.get("/login-user", async (req, res) => {
             }
 
             console.log(`Inserted new record for user ${user.id}.`);
+            
+  log_interaction(user.id,"login");
             res.status(200).json({
               id: user.id,
               mode: currentMode,
@@ -587,6 +588,8 @@ app.get("/login-user", async (req, res) => {
         } else {
           const pixelsData = pixelsResult[0];
           console.log("Login successful.");
+          
+  log_interaction(user.id,"login");
           res.status(200).json({
             id: user.id,
             mode: currentMode,
@@ -648,6 +651,8 @@ app.post("/update-email", async (req, res) => {
         console.log("Error setting the E-Mail:", err);
         throw err;
       } else {
+        
+  log_interaction(userId,"mailset");
         console.log("E-Mail has been set successfully!");
       }
     });
@@ -673,6 +678,8 @@ app.post("/delete-email", async (req, res) => {
         console.log("Error deleting the E-Mail:", err);
         throw err;
       } else {
+        
+  log_interaction(userId,"maildel");
         console.log("E-Mail has been deleted successfully!");
       }
     });
@@ -918,15 +925,6 @@ async function registerUser(userName, password) {
         console.log("User pixels entry successfully created.");
       });
 
-      // Insert into stats table
-      const sql_insertStats = "INSERT INTO stats (userId) VALUES (?)";
-      connection.query(sql_insertStats, [userId], (err, result) => {
-        if (err) {
-          console.error("Error inserting into stats:", err);
-          throw err;
-        }
-        console.log("User stats entry successfully created.");
-      });
     }
   );
 }
@@ -990,6 +988,7 @@ const sendMail = async (to, subject, text, html) => {
       text,
       html,
     });
+    
     console.log("Email successfully sent: %s", info.messageId);
     return info;
   } catch (err) {
@@ -1152,6 +1151,8 @@ function handleReminder() {
                 if (err) {
                   console.log(err);
                 } else {
+                  
+  log_interaction(task.userId,"mailsend");
                   console.log(info);
                 }
               }
@@ -1267,6 +1268,7 @@ app.post("/pixels/submit", async (req, res) => {
 app.get("/pixels", (req, res) => {
   const userID = req.query.id;
   res.status(200).json(pixelstates);
+  log_interaction(userID,"pixelread");
 });
 const doneToday = {};
 let rewards = {};
@@ -1500,3 +1502,14 @@ function loadPixelData() {
 }
 // Call the function on server startup
 readModeFromDatabase();
+
+function log_interaction(userId,interaction){// Insert into stats table
+  const sql_insertStats = "INSERT INTO stats (userId,interaction) VALUES (?,?)";
+  connection.query(sql_insertStats, [userId,interaction], (err, result) => {
+    if (err) {
+      console.error("Error inserting into stats:", err);
+      throw err;
+    }
+  });
+}
+      

@@ -19,11 +19,11 @@ type PixelData = {
   timestamp: Date;
 };
 
-async function fetchPixelData(): Promise<{
+async function fetchPixelData(id: number): Promise<{
   [userID: number]: PixelData[];
 } | null> {
   try {
-    const response = await axios.get(`${API_URL}/pixels`);
+    const response = await axios.get(`${API_URL}/pixels`, { params: { id } });
 
     // Axios parses JSON responses automatically
     const data: { [userID: number]: PixelData[] } = response.data;
@@ -205,47 +205,48 @@ export function PixelWall({
 
   useEffect(() => {
     const fetchAndSetData = async () => {
-      const data = await fetchPixelData();
-      if (data) {
-        setUserPixelData(data);
-      }
-
-      // only users that have drawn (and the current user) are supposed to be an option
-      setSelectedUsers((prev) => {
-        const updatedUsers = new Map(); //
-        let updated = false; // Track if there's any change
-        // Add users from the backend, preserving their `active` status if they already exist
+      console.log("id", currentUserID);
+      if (currentUserID != null) {
+        const data = await fetchPixelData(currentUserID);
         if (data) {
-          Object.keys(data).forEach((userIdStr) => {
-            const userId = Number(userIdStr);
-            if (!prev.has(userId)) {
-              updatedUsers.set(userId, true); // Set to true if user is new
-              updated = true;
+          setUserPixelData(data);
+        }
+
+        // only users that have drawn (and the current user) are supposed to be an option
+        setSelectedUsers((prev) => {
+          const updatedUsers = new Map(); //
+          let updated = false; // Track if there's any change
+          // Add users from the backend, preserving their `active` status if they already exist
+          if (data) {
+            Object.keys(data).forEach((userIdStr) => {
+              const userId = Number(userIdStr);
+              if (!prev.has(userId)) {
+                updatedUsers.set(userId, true); // Set to true if user is new
+                updated = true;
+              } else {
+                updatedUsers.set(userId, prev.get(userId)); //set to old value if already existing
+              }
+            });
+          }
+          // Always ensure the `currentUserID` is present
+          if (!updatedUsers.has(currentUserID)) {
+            if (prev.has(currentUserID)) {
+              updatedUsers.set(currentUserID, prev.get(currentUserID));
             } else {
-              updatedUsers.set(userId, prev.get(userId)); //set to old value if already existing
-            }
-          });
-        }
-        // Always ensure the `currentUserID` is present
-        if (!updatedUsers.has(currentUserID)) {
-          if (prev.has(currentUserID)) {
-            updatedUsers.set(currentUserID, prev.get(currentUserID));
-          } else {
-            updatedUsers.set(currentUserID, true);
-            updated = true;
-          } // Set to true for currentUserID if not already existing
-        }
+              updatedUsers.set(currentUserID, true);
+              updated = true;
+            } // Set to true for currentUserID if not already existing
+          }
 
-        console.log(updated);
-        return updated ? updatedUsers : prev;
-      });
+          return updated ? updatedUsers : prev;
+        });
+      }
     };
-
     // Fetch data initially
     fetchAndSetData();
 
     // Set up periodic fetching
-    const intervalId = setInterval(fetchAndSetData, 5000); // Fetch every 5 seconds
+    const intervalId = setInterval(fetchAndSetData, 15000); // Fetch every 15 seconds
 
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
@@ -267,7 +268,6 @@ export function PixelWall({
           color: string;
           timestamp: Date;
         }[] = userPixelData[id] || [];
-        console.log(userPixels);
         userPixels.forEach(({ xCoordinate, yCoordinate, color, timestamp }) => {
           const currentPixel = combinedGrid[yCoordinate][xCoordinate];
 

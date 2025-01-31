@@ -11,7 +11,9 @@
   color: #555;
   margin-top: 5px;
 }
-
+.privacy-info input {
+  margin-right: 5px;
+}
 .save-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
