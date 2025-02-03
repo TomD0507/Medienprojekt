@@ -624,7 +624,18 @@ app.get("/exists-user", (req, res) => {
 
 //get a list of all Usernames registered
 app.get("/get-user-list", (req, res) => {
-  const sql = "SELECT name,displayName FROM users_init";
+  const sql1 = "SELECT name,displayName FROM users_init";
+  const sql = `SELECT 
+    u.id AS name, 
+    u.name AS displayName, 
+    DATE(s.date) AS login_date, 
+    COUNT(*) AS login_count
+FROM stats s
+JOIN users_init u ON s.userId = u.id
+WHERE s.interaction = 'login'
+GROUP BY u.id, login_date
+ORDER BY login_date DESC
+`;
   connection.query(sql, [], function (err, result) {
     if (err) {
       console.log("Error getting userlist!");

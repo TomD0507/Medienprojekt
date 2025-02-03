@@ -1,0 +1,15 @@
+.elemwrapper{
+    display: flex;
+    gap: 10px;
+    justify-content:flex-start;
+    
+}
+.elem{
+    border: 1px solid;
+    min-width:  100px;
+    max-width:  100px;
+}
+
+.empty {
+    background-color: rgba(165, 42, 42, 0.421);
+}
