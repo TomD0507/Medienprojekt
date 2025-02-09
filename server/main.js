@@ -545,6 +545,17 @@ app.get("/login-user", async (req, res) => {
           .status(401)
           .json({ id: -1, mode: 0, pixels: 0, message: "Invalid password" });
       }
+      console.log(match);
+      if (isBlocked(user.id)) {
+        log_interaction(user.id,"login_blocked");
+        return res.status(200).json({
+                    id: user.id,
+                    mode: 3,
+                    leftPixels: 0,
+                    placedPixels: 0,
+                    message: "Blocked. Please contact us.",
+                  });
+      }
       //fetch pixels in database
       const sqlPixels = "SELECT * FROM users_pixels WHERE userId = ?";
       connection.query(sqlPixels, [user.id], (err, pixelsResult) => {
@@ -624,7 +635,6 @@ app.get("/exists-user", (req, res) => {
 
 //get a list of all Usernames registered
 app.get("/get-user-list", (req, res) => {
-  const sql1 = "SELECT name,displayName FROM users_init";
   const sql = `SELECT 
     u.id AS name, 
     u.name AS displayName, 
@@ -1524,3 +1534,23 @@ function log_interaction(userId,interaction){// Insert into stats table
   });
 }
       
+
+const blocked = {};
+// Function to check if a user is blocked
+function isBlocked(userID) {
+  return blocked[userID] === true;
+}
+
+// Endpoint to block/unblock a user
+app.post("/block-user", (req, res) => {
+  const { userID, blockedState } = req.body;
+  if (typeof userID !== "number" || userID <= 0) {
+    return res.status(400).json({ message: "Invalid userID." });
+  }
+
+  blocked[userID] = blockedState === "true"; // Wandelt "true" in true und alles andere in false um
+
+  return res
+    .status(200)
+    .json({ message: `User ${userID} block state set to: ${blockedState}` });
+});

@@ -3,6 +3,7 @@ import Register from "./components/Register";
 import ShowUsers from "./components/ShowUsers";
 import ManageRewards from "./components/ManageRewards"; // Import the new component
 import "./styles/PageManager.css"; // Import the CSS file
+import BlockUsers from "./components/BlockUsers";
 
 function PageManager() {
   // State to manage the current view
@@ -33,10 +34,18 @@ function PageManager() {
         >
           Manage Rewards
         </button>
+        <button
+          className={currentView === "blockUsers" ? "active" : ""}
+          onClick={() => setCurrentView("blockUsers")}
+          disabled={currentView === "blockUsers"}
+        >
+          Block user
+        </button>
       </header>
       {currentView === "register" && <Register />}
       {currentView === "showUsers" && <ShowUsers />}
       {currentView === "manageRewards" && <ManageRewards />}
+      {currentView === "blockUsers" && <BlockUsers />}
     </>
   );
 }

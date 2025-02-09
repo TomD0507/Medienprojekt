@@ -12,6 +12,7 @@ import { PixelWall } from "./pwall/PixelWall";
 import { SwapHeader } from "./components/SwapHeader";
 import { PwallHeader } from "./components/PwallHeader";
 import { Snackbar } from "./components/Snackbar";
+import BlockedMessage from "./components/BlockedMessage";
 function PageManager() {
   //userID wird bei login gesetzt
   const [userID, setUserID] = useState<number | null>(null);
@@ -250,7 +251,7 @@ function PageManager() {
         returnHook={addPixels}
       />
     </div>
-  ) : (
+  ) : mode === 1 ? (
     <div className="app">
       <SwapHeader
         firstChild={
@@ -359,6 +360,10 @@ function PageManager() {
           onClose={() => setSnackbar({ visible: false, message: "" })}
         />
       )}
+    </div>
+  ) : (
+    <div className="app">
+      <BlockedMessage />
     </div>
   );
 }
