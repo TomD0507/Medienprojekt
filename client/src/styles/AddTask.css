@@ -11,10 +11,6 @@
   flex-direction: column; /* Stack fields vertically */
   gap: 0em; /* Optional: spacing between Title and Description */
 }
-.add-task-form div {
-  display: flex;
-  gap: 5px; /* Optional: spacing between Title and Description */
-}
 /* Item-Container  wenn kompletter bereich eingenommen werden soll*/
 .add_item {
   display: flex;
@@ -23,13 +19,16 @@
 }
 .contain_menu_buttons {
   display: flex;
+  max-width: 100%;
+  min-width:100%;
   height: 4em;
-  gap: 10px; /* Abstand zwischen den Buttons */
+  gap: 2%; /* Abstand zwischen den Buttons */
 }
 
 .taskMenuButton,
 .taskMenuAbortButton {
-  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
   height: 100%;
   align-self: center;
   border-radius: 8px;
@@ -47,6 +46,12 @@
   transition: border-color 0.25s;
 }
 
+.contain_menu_buttons .taskMenuButton,
+.contain_menu_buttons .taskMenuAbortButton{
+
+  max-width: 49%;
+  min-width: 49%;
+}
 .taskMenuAbortButton {
   background-color: #595959;
 }

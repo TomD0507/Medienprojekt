@@ -1,0 +1,191 @@
+.pwbuttons,
+.penbutton,
+.erasebutton,.colorSelection {
+  align-self: center;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  justify-content: center;
+  align-items: center; /* Zentriert den Text vertikal */
+  cursor: pointer;
+  padding: 10px 10px 10px;
+  transition: border-color 0.25s;
+  color: white;
+  background-color: #304674;
+}
+.overlay-backdropselection{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.05); /* schwarz, 0,5 alpha */
+  cursor: pointer;
+  z-index: 1001; /* über dem rest*/}
+.colorSelection{ 
+  position: absolute;
+  transform: translate(-50%); /* Adjust position to align the center */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* Enable wrapping of content */
+  width: 80dvw;
+   gap: 10px ;
+   z-index: 1002; /* über dem rest*/
+  }.dropdown {
+    position: relative; /* Create a positioning context for the menu */
+    align-self: center;
+  }
+  .coloroption{
+    min-width: 30px;
+    min-height: 30px;
+    border: none;
+    cursor: pointer;}
+.erasebutton,
+.penbutton {
+  background-color: #364871ac;
+}
+.pwbuttons:hover {
+  opacity: 0.8;
+}
+.penbutton:disabled,
+.erasebutton:disabled {
+  background-color: #304674;
+  color: white;
+}
+.pw-buttons-container {
+  display: flex;
+  gap: 5px;
+}
+.options_container,
+.user_selection_container,
+.zoom-container{
+  background-color: #f9f9f9; /* Light background for separation */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+/* Options Container */
+.options_container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  gap: 0.5rem;
+  justify-content: space-evenly; /* Distribute items evenly */
+  align-items: center;
+  padding: 2px;
+}
+.zoom-container {
+  display: flex;
+  overflow: auto; /* Enable scrolling if content overflows */
+  max-width: 100dvw; /* Begrenze die Breite auf die Bildschirmbreite */
+  max-height: 100dvh; /* Begrenze die Höhe auf die Bildschirmhöhe */
+  width: 100%; /* Full width of the parent */
+  white-space: nowrap; /* Prevent row wrapping */
+  align-items: center;
+}
+.drawing-board {
+  display: grid;
+  grid-template-columns: repeat(35, 20px); /* 35 columns of equal width */
+  grid-template-rows: repeat(35, 20px); /* 35 rows of equal height */
+  width: 100%; /* Example width of the entire grid container */
+  height: 100%; /* Example height of the entire grid container */
+
+  row-gap: 0px; /* Gap between rows */
+  column-gap: 0px; /* Gap between columns */
+}
+
+.row {
+  display: flex; /* Align pixels horizontally */
+  flex-wrap: nowrap; /* Prevent rows from wrapping */
+  box-sizing: border-box;
+}
+
+.pixelcontainer {
+  position: relative;
+  width: 20px;
+  height: 20px;
+
+  box-sizing: border-box;
+  flex-shrink: 0; /* Prevents shrinking when screen size is small */
+}
+
+.bgcell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 0;
+}
+
+.fgcell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background-color: rgba(255, 255, 255, 0.8); /* Use rgba for opacity */
+  z-index: 1;
+}
+
+.fgcell.active {
+  border: 1px solid #ffb41e;
+}
+.pwbuttons span{
+  font-size: medium;
+}
+.transparent {
+  background-color: transparent;
+}
+
+
+/* User Selection Container */
+.user_selection_container {
+  display: flex;
+  overflow: hidden;
+  overflow-x: scroll;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1em;
+  padding: 10px;
+}
+.usersel {
+  height: 3em;
+  min-width: 100px;
+  max-width: 100px;
+  display: flex;
+  flex-grow: unset;
+  justify-content: flex-start;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #304674;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Ensure items start from the same position */
+  padding: 5px; /* Offsets the content to the right */
+}
+.usersel input { 
+  margin-right: 5px;
+}
+.icon-invisible {
+  visibility: hidden;
+}
+/*scrollbar design*/
+/* Scrollbar-Styling für Webkit-Browser (Chrome, Edge, Safari) */
+
+.user_selection_container::-webkit-scrollbar {
+  width: 10px; /* Breite der Scroll-Leiste */
+  height: 10px;;
+}
+
+.user_selection_container::-webkit-scrollbar-thumb,
+.user_selection_container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* Dunkler Daumen */
+  border-radius: 8px; /* Runde Ecken */
+}

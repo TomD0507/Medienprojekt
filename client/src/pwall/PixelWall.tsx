@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pixel } from "./CustomPixel";
 import "./PixelWall.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -140,7 +140,7 @@ export function PixelWall({
 
   // get own drawing into the backend and wall
   const [drawing, setDrawing] = useState(true);
-  async function pushDrawing() {
+  async function pushDrawing(pixels: string[][]) {
     const changes: {
       xCoordinate: number;
       yCoordinate: number;
@@ -148,7 +148,7 @@ export function PixelWall({
       timestamp: Date;
     }[] = [];
     // Filter all pixels, that the user drawed to
-    frontendPixels.forEach((row, y) => {
+    pixels.forEach((row, y) => {
       row.forEach((cell, x) => {
         if (cell !== "transparent") {
           changes.push({
@@ -288,6 +288,24 @@ export function PixelWall({
     return combinedGrid;
   }
 
+  const frontendPixelsRef = useRef(frontendPixels);
+
+  useEffect(() => {
+    frontendPixelsRef.current = frontendPixels; // Immer den aktuellen Stand speichern
+  }, [frontendPixels]);
+
+  useEffect(() => {
+    return () => {
+      if (
+        frontendPixelsRef.current.some((row) =>
+          row.some((cell) => cell !== "transparent")
+        )
+      ) {
+        pushDrawing(frontendPixelsRef.current); // Hier übergeben wir die aktuelle Version
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const updatedGrid = getNewestPixels();
     setGrid(updatedGrid);
@@ -300,7 +318,6 @@ export function PixelWall({
         ...prev.slice(0, row),
         [
           ...prev[row].slice(0, col),
-          //wenn gleche farbe dann wieder löschen?
           drawing
             ? prev.flat().filter((v) => v !== "transparent").length >=
               remainingPixel
@@ -324,7 +341,10 @@ export function PixelWall({
       <div className="options_container">
         <label>
           {" "}
-          <button className="pwbuttons" onClick={pushDrawing}>
+          <button
+            className="pwbuttons"
+            onClick={() => pushDrawing(frontendPixels)}
+          >
             Save:{" "}
             <span style={{ color: "#ffb41e" }}>
               {frontendPixels.flat().filter((v) => v !== "transparent").length}

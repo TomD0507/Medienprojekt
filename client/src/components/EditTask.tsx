@@ -214,7 +214,7 @@ function EditTask({
               </div>
             </label>
           )}
-          <div>
+          <div className="contain_menu_buttons">
             <button
               className="taskMenuButton deleteButton"
               type="button"

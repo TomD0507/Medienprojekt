@@ -1,13 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { Pixel } from "./CustomPixel";
+import { useEffect, useState } from "react";
 import "./PixelWall.css";
-import "../index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faEraser,
   faMagnifyingGlassMinus,
   faMagnifyingGlassPlus,
-  faPen,
 } from "@fortawesome/free-solid-svg-icons";
 import { API_URL } from "../App";
 
@@ -64,58 +60,10 @@ const createGrid = () => {
     }))
   );
 };
-const createFrontendGrid = () => {
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => "transparent")
-  );
-};
+
 const currentUserID = 0;
-type PixelWallProps = {
-  username: string;
-  password: string;
-};
-export function PixelWallnoLimit({ username, password }: PixelWallProps) {
-  const predefinedColors = [
-    // Primary Colors
-    "#ff0000", // Red
-    "#00ff00", // Green
-    "#0000ff", // Blue
 
-    // Secondary Colors
-    "#ffff00", // Yellow
-    "#ff00ff", // Magenta
-    "#00ffff", // Cyan
-
-    // Neutral Colors
-    "#000000", // Black
-    "#ffffff", // White
-    "#808080", // Gray
-
-    // Warm Colors
-    "#ffa500", // Orange
-    "#ffdab9", // PeachPuff
-
-    // Pastel Colors
-    "#ffd700", // Gold
-
-    // Vivid Colors
-    "#dc143c", // Crimson
-    "#8a2be2", // BlueViolet
-    "#ff1493", // DeepPink
-    "#1e90ff", // DodgerBlue
-
-    // Earthy Tones
-    "#a0522d", // Sienna
-    "#deb887", // Burlywood
-
-    // Additional Colors
-    "#c71585", // MediumVioletRed
-    "#6a5acd", // SlateBlue
-    "#2e8b57", // SeaGreen
-  ];
-
-  const [selectedColor, setSelectedColor] = useState("#000000"); // Standardfarbe
-  const [selectionOpen, setSelectionOpen] = useState(false);
+export function PixelWallSpeedView() {
   const [userPixelData, setUserPixelData] = useState<{
     [userID: number]: {
       xCoordinate: number;
@@ -130,70 +78,6 @@ export function PixelWallnoLimit({ username, password }: PixelWallProps) {
   );
 
   const [grid, setGrid] = useState(createGrid()); // Rendered grid based on filtered users
-
-  // get own drawing into the backend and wall
-  const [drawing, setDrawing] = useState(true);
-  async function pushDrawing(pixels: string[][]) {
-    const changes: {
-      xCoordinate: number;
-      yCoordinate: number;
-      color: string;
-      timestamp: Date;
-    }[] = [];
-    // Filter all pixels, that the user drawed to
-    pixels.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        if (cell !== "transparent") {
-          changes.push({
-            xCoordinate: x,
-            yCoordinate: y,
-            color: cell,
-            timestamp: new Date(),
-          });
-        }
-      });
-    });
-
-    // Update local userPixelData immediately
-    if (changes.length == 0) return;
-
-    // Send pixels to the backend
-    try {
-      // Use axios to make the POST request
-      await axios
-        .post(
-          `${API_URL}/pixels/submit`,
-          { username, password, changes },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((_response) => {
-          setFrontendPixels(createFrontendGrid());
-
-          setUserPixelData((prev) => {
-            const updatedData = { ...prev };
-            if (!updatedData[currentUserID]) {
-              updatedData[currentUserID] = [];
-            }
-            updatedData[currentUserID] = [
-              ...updatedData[currentUserID],
-              ...changes.map((pixel) => ({
-                xCoordinate: pixel.xCoordinate,
-                yCoordinate: pixel.yCoordinate,
-                color: pixel.color,
-                timestamp: pixel.timestamp,
-              })),
-            ];
-            return updatedData;
-          });
-        });
-
-      // Reset local pixels after successful submission
-    } catch (error) {
-      console.error("Error submitting pixel changes:", error);
-    }
-  }
 
   useEffect(() => {
     const fetchAndSetData = async () => {
@@ -232,21 +116,31 @@ export function PixelWallnoLimit({ username, password }: PixelWallProps) {
 
           return updated ? updatedUsers : prev;
         });
+        if (data) {
+          const newDates = new Set<Date>();
+          newDates.add(new Date());
+          Object.keys(data).forEach((userIdStr) => {
+            const userId = Number(userIdStr);
+            const userPixels: {
+              xCoordinate: number;
+              yCoordinate: number;
+              color: string;
+              timestamp: Date;
+            }[] = data[userId] || [];
+            userPixels.forEach(({ timestamp }) => {
+              newDates.add(timestamp);
+            });
+          });
+          setavailableDates(Array.from(newDates).sort());
+        }
       }
     };
     // Fetch data initially
     fetchAndSetData();
-
-    // Set up periodic fetching
-    const intervalId = setInterval(fetchAndSetData, 15000); // Fetch every 15 seconds
-
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
   }, [currentUserID]);
+  const [availableDates, setavailableDates] = useState([new Date()]);
 
-  const [frontendPixels, setFrontendPixels] = useState<string[][]>(
-    createFrontendGrid()
-  ); // Lokale Frontend-Pixel
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   function getNewestPixels() {
     const combinedGrid = createGrid();
@@ -264,10 +158,8 @@ export function PixelWallnoLimit({ username, password }: PixelWallProps) {
           const currentPixel = combinedGrid[yCoordinate][xCoordinate];
 
           // Update if this pixel is newer
-          if (
-            !currentPixel.timestamp ||
-            new Date(timestamp) > new Date(currentPixel.timestamp)
-          ) {
+          if (new Date(timestamp) > new Date(availableDates[currentIndex])) {
+          } else if (new Date(timestamp) > new Date(currentPixel.timestamp)) {
             combinedGrid[yCoordinate][xCoordinate] = {
               backcolor: color,
               timestamp,
@@ -280,107 +172,35 @@ export function PixelWallnoLimit({ username, password }: PixelWallProps) {
     return combinedGrid;
   }
 
-  const frontendPixelsRef = useRef(frontendPixels);
-
-  useEffect(() => {
-    frontendPixelsRef.current = frontendPixels; // Immer den aktuellen Stand speichern
-  }, [frontendPixels]);
-
-  useEffect(() => {
-    return () => {
-      if (
-        frontendPixelsRef.current.some((row) =>
-          row.some((cell) => cell !== "transparent")
-        )
-      ) {
-        pushDrawing(frontendPixelsRef.current); // Hier übergeben wir die aktuelle Version
-      }
-    };
-  }, []);
-
   useEffect(() => {
     const updatedGrid = getNewestPixels();
     setGrid(updatedGrid);
-  }, [selectedUsers, userPixelData]);
+  }, [selectedUsers, userPixelData, currentIndex]);
 
-  // Handle cell click
-  const handleCellClick = (row: number, col: number) => {
-    setFrontendPixels((prev) => {
-      return [
-        ...prev.slice(0, row),
-        [
-          ...prev[row].slice(0, col),
-          drawing ? selectedColor : "transparent",
-          ...prev[row].slice(col + 1),
-        ],
-        ...prev.slice(row + 1),
-      ];
-    });
-  };
   const [zoomLevel, setZoomLevel] = useState(0.5);
 
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.15, 2.8)); // Max zoom level 3x
   const handleZoomOut = () =>
     setZoomLevel((prev) => Math.max(prev - 0.15, 0.3)); // Min zoom level 0.5x
-
   return (
     <>
       <div className="options_container">
-        <label>
-          {" "}
-          <button
-            className="pwbuttons"
-            onClick={() => pushDrawing(frontendPixels)}
-          >
-            Save:{" "}
-            <span style={{ color: "#ffb41e" }}>
-              {frontendPixels.flat().filter((v) => v !== "transparent").length}
-            </span>
-          </button>
-        </label>
         <div className="pw-buttons-container">
-          <label>
-            {" "}
-            <button
-              className="penbutton "
-              onClick={() => setDrawing(true)}
-              disabled={drawing}
-            >
-              <FontAwesomeIcon icon={faPen} className="icon" />
-            </button>
-            <label>
-              <div>
-                <button
-                  className="pwbuttons "
-                  key={"selected"}
-                  style={{
-                    backgroundColor: selectedColor,
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    setSelectionOpen(true);
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faPen}
-                    className="icon icon-invisible"
-                  />
-                </button>
-              </div>
-            </label>
-          </label>
-          <label>
-            {" "}
-            <button
-              className="erasebutton"
-              onClick={() => setDrawing(false)}
-              disabled={!drawing}
-            >
-              <FontAwesomeIcon icon={faEraser} className="icon" />
-            </button>
-          </label>
+          <span className="text-lg font-semibold">
+            {availableDates.length > 0
+              ? new Date(availableDates[currentIndex]).toLocaleDateString()
+              : "No Dates Available"}
+          </span>
+          <input
+            type="range"
+            min="0"
+            max={availableDates.length - 1}
+            value={currentIndex}
+            onChange={(e) => setCurrentIndex(Number(e.target.value))}
+            className="w-64"
+          />
         </div>
+
         <div className="pw-buttons-container">
           <button className="pwbuttons" onClick={handleZoomIn}>
             <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
@@ -390,35 +210,7 @@ export function PixelWallnoLimit({ username, password }: PixelWallProps) {
           </button>
         </div>
       </div>
-      {selectionOpen && (
-        <>
-          <div
-            className="overlay-backdropselection"
-            onClick={() => {
-              setSelectionOpen(false);
-            }}
-          ></div>
-          <div className="dropdown">
-            <div className="colorSelection">
-              {predefinedColors.map((color) => (
-                <button
-                  className="coloroption"
-                  key={color}
-                  style={{
-                    backgroundColor: color,
-                    outline:
-                      selectedColor === color ? "2px solid black" : "none",
-                  }}
-                  onClick={() => {
-                    setSelectionOpen(false);
-                    setSelectedColor(color);
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+
       {/* Pixel Grid */}
 
       <div className="zoom-container">
@@ -426,21 +218,16 @@ export function PixelWallnoLimit({ username, password }: PixelWallProps) {
           className="drawing-board"
           style={{ transform: `scale(${zoomLevel})`, transformOrigin: "0 0" }}
         >
-          {grid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => (
-              <Pixel
-                key={colIndex}
-                colIndex={colIndex}
-                rowIndex={rowIndex}
-                className={
-                  frontendPixels[rowIndex][colIndex] === "transparent"
-                    ? "transparent"
-                    : "active"
-                }
-                frontcolor={frontendPixels[rowIndex][colIndex]}
-                backcolor={cell.backcolor}
-                handleCellClick={() => handleCellClick(rowIndex, colIndex)}
-              />
+          {grid.map((row) =>
+            row.map((cell) => (
+              <div className="pixelcontainer">
+                <div
+                  className="bgcell"
+                  style={{
+                    backgroundColor: cell.backcolor,
+                  }}
+                />
+              </div>
             ))
           )}
         </div>
